@@ -63,5 +63,36 @@
       "chargesRateRange": "Le taux de charges doit être entre 0% et 50%.",
       "withholdingRateRange": "Le taux de PAS doit être entre 0% et 45%."
     }
+  },
+  "epargnePage": {
+    "title": "Simulateur d'Épargne",
+    "initialDepositLabel": "Versement initial (€)",
+    "periodicDepositLabel": "Versement périodique (€)",
+    "periodicityLabel": "Périodicité des versements",
+    "monthly": "Mensuel",
+    "quarterly": "Trimestriel",
+    "yearly": "Annuel",
+    "durationLabel": "Durée (années)",
+    "returnRateLabel": "Rendement annuel brut (%)",
+    "entryFeeToggleLabel": "Appliquer des frais d'entrée",
+    "entryFeeLabel": "Frais d'entrée (%)",
+    "calculateButton": "Calculer",
+    "exportCsvButton": "Exporter CSV",
+    "copySummaryButton": "Copier le résumé",
+    "finalCapital": "Capital final",
+    "totalContributions": "Apports totaux",
+    "grossGains": "Gains bruts",
+    "summaryTitle": "Résumé de la projection d'épargne",
+    "summaryContent": "Pour un versement initial de {initialDeposit}, des versements périodiques de {periodicDeposit} {periodicity} sur {duration} ans, avec un rendement annuel de {returnRate} et {entryFee} de frais d'entrée :\n\n- Capital final : {finalCapital}\n- Apports totaux : {totalContributions}\n- Gains bruts : {grossGains}",
+    "chartTitle": "Évolution du capital et des apports",
+    "chartCapital": "Capital",
+    "chartContributions": "Apports",
+    "validation": {
+      "initialDepositNonNegative": "Le versement initial ne peut pas être négatif.",
+      "periodicDepositNonNegative": "Le versement périodique ne peut pas être négatif.",
+      "durationMin": "La durée doit être d'au moins 1 an.",
+      "returnRateRange": "Le rendement annuel doit être entre -10% et 20%.",
+      "entryFeeRange": "Les frais d'entrée doivent être entre 0% et 10%."
+    }
   }
 }
