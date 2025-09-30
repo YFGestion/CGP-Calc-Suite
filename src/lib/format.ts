@@ -4,14 +4,16 @@ export const formatCurrency = (value: number, locale: string = 'fr-FR', currency
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
+    minimumFractionDigits: 2, // Toujours 2 décimales pour la devise
+    maximumFractionDigits: 2,
   }).format(value);
 };
 
 export const formatPercent = (value: number, locale: string = 'fr-FR', options?: Intl.NumberFormatOptions): string => {
   return new Intl.NumberFormat(locale, {
     style: 'percent',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
+    minimumFractionDigits: 0, // Par défaut 0 décimale
+    maximumFractionDigits: 1, // Par défaut 1 décimale
     ...options,
   }).format(value);
 };

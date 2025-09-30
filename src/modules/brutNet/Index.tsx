@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,7 +122,13 @@ const BrutNetPage = () => {
                 <FormItem>
                   <FormLabel>{t('grossInputLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('grossInputLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -141,20 +146,21 @@ const BrutNetPage = () => {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                       className="flex flex-col space-y-1"
+                      aria-label={t('inputPeriodLabel')}
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="monthly" />
+                          <RadioGroupItem value="monthly" id="inputPeriod-monthly" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="inputPeriod-monthly" className="font-normal">
                           {t('monthly')}
                         </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="annual" />
+                          <RadioGroupItem value="annual" id="inputPeriod-annual" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="inputPeriod-annual" className="font-normal">
                           {t('annual')}
                         </FormLabel>
                       </FormItem>
@@ -176,13 +182,14 @@ const BrutNetPage = () => {
                       onValueChange={value => field.onChange(parseInt(value))}
                       defaultValue={field.value.toString()}
                       className="flex space-x-4"
+                      aria-label={t('paidMonthsLabel')}
                     >
                       {[12, 13, 14, 15].map(months => (
                         <FormItem key={months} className="flex items-center space-x-3 space-y-0">
                           <FormControl>
-                            <RadioGroupItem value={months.toString()} />
+                            <RadioGroupItem value={months.toString()} id={`paidMonths-${months}`} />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel htmlFor={`paidMonths-${months}`} className="font-normal">
                             {months}
                           </FormLabel>
                         </FormItem>
@@ -205,20 +212,21 @@ const BrutNetPage = () => {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                       className="flex flex-col space-y-1"
+                      aria-label={t('employeeStatusLabel')}
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="cadre" />
+                          <RadioGroupItem value="cadre" id="employeeStatus-cadre" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="employeeStatus-cadre" className="font-normal">
                           {t('cadre')}
                         </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="nonCadre" />
+                          <RadioGroupItem value="nonCadre" id="employeeStatus-nonCadre" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="employeeStatus-nonCadre" className="font-normal">
                           {t('nonCadre')}
                         </FormLabel>
                       </FormItem>
@@ -243,6 +251,7 @@ const BrutNetPage = () => {
                       value={[field.value]}
                       onValueChange={(val) => field.onChange(val[0])}
                       className="w-[100%]"
+                      aria-label={t('withholdingRateLabel')}
                     />
                   </FormControl>
                   <div className="text-right text-sm text-muted-foreground">{field.value}%</div>

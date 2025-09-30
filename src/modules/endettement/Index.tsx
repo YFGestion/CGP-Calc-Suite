@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -101,7 +100,7 @@ const EndettementPage = () => {
   const { t } = useTranslation('endettementPage');
   const { t: commonT } = useTranslation('common');
   const navigate = useNavigate();
-  const settings = useSettingsStore(); // Use settings store
+  const settings = useSettingsStore(); // Import settings store
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
@@ -209,7 +208,7 @@ const EndettementPage = () => {
       [t('stressTestTitle')],
       [t('stressRateDelta'), t('stressMaxPayment'), t('stressAffordablePrincipal')],
       ...results.stress.map(s => [
-        formatPercent(s.rateDelta),
+        formatPercent(s.rateDelta, 'fr-FR', { maximumFractionDigits: 1 }),
         formatCurrency(s.maxPayment),
         formatCurrency(s.affordablePrincipal),
       ]),
@@ -251,7 +250,13 @@ const EndettementPage = () => {
                 <FormItem>
                   <FormLabel>{t('netIncomeLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('netIncomeLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -264,7 +269,13 @@ const EndettementPage = () => {
                 <FormItem>
                   <FormLabel>{t('existingDebtLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('existingDebtLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -277,7 +288,13 @@ const EndettementPage = () => {
                 <FormItem>
                   <FormLabel>{t('chargesLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('chargesLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -297,6 +314,7 @@ const EndettementPage = () => {
                       value={[field.value]}
                       onValueChange={(val) => field.onChange(val[0])}
                       className="w-[100%]"
+                      aria-label={t('targetDTILabel')}
                     />
                   </FormControl>
                   <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
@@ -314,7 +332,13 @@ const EndettementPage = () => {
                 <FormItem>
                   <FormLabel>{t('loanRateLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('loanRateLabel')}
+                    />
                   </FormControl>
                   <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                   <FormMessage />
@@ -328,7 +352,13 @@ const EndettementPage = () => {
                 <FormItem>
                   <FormLabel>{t('loanDurationYearsLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="1"
+                      {...field}
+                      onChange={e => field.onChange(parseInt(e.target.value))}
+                      aria-label={t('loanDurationYearsLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -340,10 +370,15 @@ const EndettementPage = () => {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">{t('loanApplyInsuranceToggleLabel')}</FormLabel>
+                    <FormLabel className="text-base" htmlFor="loanApplyInsurance-switch">{t('loanApplyInsuranceToggleLabel')}</FormLabel>
                   </div>
                   <FormControl>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      id="loanApplyInsurance-switch"
+                      aria-label={t('loanApplyInsuranceToggleLabel')}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -361,14 +396,15 @@ const EndettementPage = () => {
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           className="flex space-x-4"
+                          aria-label={t('loanInsuranceModeLabel')}
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="initialPct" /></FormControl>
-                            <FormLabel className="font-normal">{t('initialPct')}</FormLabel>
+                            <FormControl><RadioGroupItem value="initialPct" id="loanInsuranceMode-initialPct" /></FormControl>
+                            <FormLabel htmlFor="loanInsuranceMode-initialPct" className="font-normal">{t('initialPct')}</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="crdPct" /></FormControl>
-                            <FormLabel className="font-normal">{t('crdPct')}</FormLabel>
+                            <FormControl><RadioGroupItem value="crdPct" id="loanInsuranceMode-crdPct" /></FormControl>
+                            <FormLabel htmlFor="loanInsuranceMode-crdPct" className="font-normal">{t('crdPct')}</FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
@@ -383,7 +419,13 @@ const EndettementPage = () => {
                     <FormItem>
                       <FormLabel>{t('loanInsuranceRateLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('loanInsuranceRateLabel')}
+                        />
                       </FormControl>
                       <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                       <FormMessage />
@@ -401,10 +443,15 @@ const EndettementPage = () => {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">{t('rentalInvestmentSection')}</FormLabel>
+                    <FormLabel className="text-base" htmlFor="applyRentalInvestment-switch">{t('rentalInvestmentSection')}</FormLabel>
                   </div>
                   <FormControl>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      id="applyRentalInvestment-switch"
+                      aria-label={t('rentalInvestmentSection')}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -418,7 +465,13 @@ const EndettementPage = () => {
                     <FormItem>
                       <FormLabel>{t('propertyPriceLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          step="any"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('propertyPriceLabel')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -438,6 +491,7 @@ const EndettementPage = () => {
                           value={[field.value || 0]}
                           onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('rentalYieldLabel')}
                         />
                       </FormControl>
                       <div className="text-right text-sm text-muted-foreground">{field.value || 0}%</div>
@@ -459,6 +513,7 @@ const EndettementPage = () => {
                           value={[field.value || 0]}
                           onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('rentRetentionLabel')}
                         />
                       </FormControl>
                       <div className="text-right text-sm text-muted-foreground">{field.value || 0}%</div>
@@ -514,7 +569,7 @@ const EndettementPage = () => {
             <Separator className="my-4" />
 
             <Collapsible className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg" aria-label={t('stressTestTitle')}>
                 {t('stressTestTitle')}
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>

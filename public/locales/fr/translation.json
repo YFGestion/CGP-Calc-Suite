@@ -59,7 +59,7 @@
     "netAfterTaxMonthlyAvg": "Net après impôt (mensuel moyen)",
     "netPerPay": "Net par paie",
     "summaryTitle": "Résumé du calcul Brut → Net",
-    "summaryContent": "✨ Résumé du Calcul Brut → Net ✨\n\n📊 **Inputs :**\n• Montant brut : {grossValue}\n• Période de saisie : {inputPeriod}\n• Mois payés : {paidMonths}\n• Statut employé : {employeeStatus}\n• Taux PAS : {withholdingRate}\n\n📈 **Résultats :**\n• Net avant impôt (annuel) : {netBeforeTaxAnnual}\n• Net avant impôt (mensuel moyen) : {netBeforeTaxMonthlyAvg}\n• Net après impôt (annuel) : {netAfterTaxAnnual}\n• Net après impôt (mensuel moyen) : {netAfterTaxMonthlyAvg}\n• Net par paie : {netPerPay}",
+    "summaryContent": "Résumé du Calcul Brut -> Net\n\nInputs :\n- Montant brut : {grossValue}\n- Période de saisie : {inputPeriod}\n- Mois payés : {paidMonths}\n- Statut employé : {employeeStatus}\n- Taux PAS : {withholdingRate}\n\nRésultats :\n- Net avant impôt (annuel) : {netBeforeTaxAnnual}\n- Net avant impôt (mensuel moyen) : {netBeforeTaxMonthlyAvg}\n- Net après impôt (annuel) : {netAfterTaxAnnual}\n- Net après impôt (mensuel moyen) : {netAfterTaxMonthlyAvg}\n- Net par paie : {netPerPay}",
     "validation": {
       "grossValuePositive": "Le montant brut doit être positif.",
       "chargesRateRange": "Le taux de charges doit être entre 0% et 50%.",
@@ -85,7 +85,7 @@
     "totalContributions": "Apports totaux",
     "grossGains": "Gains bruts",
     "summaryTitle": "Résumé de la projection d'épargne",
-    "summaryContent": "💰 Résumé de la Projection d'Épargne 📈\n\n📊 **Inputs :**\n• Versement initial : {initialDeposit}\n• Versement périodique : {periodicDeposit}\n• Périodicité : {periodicity}\n• Durée : {duration} ans\n• Rendement annuel brut : {returnRate}\n• Frais d'entrée : {entryFee}\n\n📈 **Résultats :**\n• Capital final : {finalCapital}\n• Apports totaux : {totalContributions}\n• Gains bruts : {grossGains}",
+    "summaryContent": "Résumé de la Projection d'Épargne\n\nInputs :\n- Versement initial : {initialDeposit}\n- Versement périodique : {periodicDeposit}\n- Périodicité : {periodicity}\n- Durée : {duration} ans\n- Rendement annuel brut : {returnRate}\n- Frais d'entrée : {entryFee}\n\nRésultats :\n- Capital final : {finalCapital}\n- Apports totaux : {totalContributions}\n- Gains bruts : {grossGains}",
     "chartTitle": "Évolution du capital et des apports",
     "chartCapital": "Capital",
     "chartContributions": "Apports",
@@ -130,7 +130,7 @@
     "sumInsurance": "Somme Assurance",
     "sumPayment": "Somme Mensualités",
     "summaryTitle": "Résumé du simulateur de crédit",
-    "summaryContent": "🏦 Résumé du Simulateur de Crédit 📊\n\n📊 **Inputs :**\n• Montant du prêt : {loanAmount}\n• Durée : {durationYears} ans\n• Taux nominal annuel : {nominalRate}\n• Assurance : {insuranceDetails}\n\n📈 **Résultats :**\n• Mensualité totale : {totalMonthlyPayment}\n• Coût total des intérêts : {totalInterest}\n• Coût total de l'assurance : {totalInsurance}\n• Coût total du crédit : {totalCost}",
+    "summaryContent": "Résumé du Simulateur de Crédit\n\nInputs :\n- Montant du prêt : {loanAmount}\n- Durée : {durationYears} ans\n- Taux nominal annuel : {nominalRate}\n- Assurance : {insuranceDetails}\n\nRésultats :\n- Mensualité totale : {totalMonthlyPayment}\n- Coût total des intérêts : {totalInterest}\n- Coût total de l'assurance : {totalInsurance}\n- Coût total du crédit : {totalCost}",
     "insuranceDetailsInitialPct": "avec une assurance de {insuranceRate} sur le capital initial",
     "insuranceDetailsCrdPct": "avec une assurance de {insuranceRate} sur le capital restant dû",
     "insuranceDetailsNone": "sans assurance",
@@ -204,7 +204,7 @@
     "duplicateScenarioButton": "Dupliquer Scénario",
 
     "summaryTitle": "Résumé de la simulation immobilière",
-    "summaryContent": "🏠 Résumé de la Simulation Immobilière 📈\n\n📊 **Inputs :**\n• Prix d'acquisition : {price}\n• Horizon de projection : {horizonYears} ans\n• Année de revente : {saleYear}\n• Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n\n📈 **Résultats :**\n• Effort d'épargne moyen pendant le crédit : {avgSavingEffortDuringLoan}\n• Revenus complémentaires moyens après crédit : {avgPostLoanIncome}\n• Taux de Rentabilité Interne (TRI) : {irr}",
+    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit : {avgSavingEffortDuringLoan}\n- Revenus complémentaires moyens après crédit : {avgPostLoanIncome}\n- Taux de Rentabilité Interne (TRI) : {irr}",
 
     "avgSavingEffortDuringLoan": "Effort d'épargne moyen pendant le crédit",
     "avgPostLoanIncome": "Revenus complémentaires moyens après crédit",
@@ -278,7 +278,7 @@
     "stressMaxPayment": "Mensualité max. stressée",
     "stressAffordablePrincipal": "Capital max. stressé",
     "summaryTitle": "Résumé de la capacité d'endettement",
-    "summaryContent": "⚖️ Résumé de la Capacité d'Endettement 💰\n\n📊 **Inputs :**\n• Revenus nets mensuels : {netIncome}\n• Charges récurrentes : {charges}\n• Dettes existantes : {existingDebt}\n• DTI cible : {targetDTI}\n\n📈 **Résultats :**\n• DTI actuel : {currentDTI}\n• DTI projeté : {projectedDTI}\n• Mensualité maximale du nouveau prêt : {maxPayment}\n• Capital empruntable maximal : {affordablePrincipal}",
+    "summaryContent": "Résumé de la Capacité d'Endettement\n\nInputs :\n- Revenus nets mensuels : {netIncome}\n- Charges récurrentes : {charges}\n- Dettes existantes : {existingDebt}\n- DTI cible : {targetDTI}\n\nRésultats :\n- DTI actuel : {currentDTI}\n- DTI projeté : {projectedDTI}\n- Mensualité maximale du nouveau prêt : {maxPayment}\n- Capital empruntable maximal : {affordablePrincipal}",
     "validation": {
       "netIncomePositive": "Les revenus nets mensuels doivent être positifs.",
       "nonNegativeNumber": "Ne peut pas être négatif.",

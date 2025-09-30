@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -41,7 +40,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   nominalRate: z.coerce.number({
     required_error: t('validation.nominalRateRange'),
     invalid_type_error: t('validation.nominalRateRange'),
-  }).min(0, t('validation.nominalRateRange')).max(10, t('validation.nominalRateRange')), // User enters 0-10 for percentage
+  }).min(0, t('validation.loanRateRange')).max(10, t('validation.loanRateRange')), // User enters 0-10 for percentage
   durationYears: z.coerce.number({
     required_error: t('validation.durationMin'),
     invalid_type_error: t('validation.durationMin'),
@@ -49,22 +48,22 @@ const formSchema = (t: (key: string) => string) => z.object({
   applyInsurance: z.boolean(),
   insuranceMode: z.enum(['initialPct', 'crdPct']).optional(),
   insuranceRate: z.coerce.number({
-    required_error: t('validation.insuranceRateRange'),
-    invalid_type_error: t('validation.insuranceRateRange'),
-  }).min(0, t('validation.insuranceRateRange')).max(1, t('validation.insuranceRateRange')).optional(), // User enters 0-1 for percentage
+    required_error: t('validation.loanInsuranceRateRange'),
+    invalid_type_error: t('validation.loanInsuranceRateRange'),
+  }).min(0, t('validation.loanInsuranceRateRange')).max(1, t('validation.loanInsuranceRateRange')).optional(), // User enters 0-1 for percentage
 }).superRefine((data, ctx) => {
   if (data.applyInsurance) {
     if (!data.insuranceMode) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: t('validation.insuranceRateRange'), // Reusing message for simplicity
+        message: t('validation.requiredField'), // Reusing message for simplicity
         path: ['insuranceMode'],
       });
     }
     if (data.insuranceRate === undefined || data.insuranceRate === null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: t('validation.insuranceRateRange'),
+        message: t('validation.requiredField'),
         path: ['insuranceRate'],
       });
     }
@@ -114,7 +113,7 @@ const CreditPage = () => {
     if (shouldSubmit) {
       form.handleSubmit(onSubmit)();
     }
-  }, [searchParams, settings]); // Add settings to dependency array
+  }, [searchParams, settings, form.handleSubmit, form.setValue]); // Add form.handleSubmit and form.setValue to dependency array
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const insuranceDetails = values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined
@@ -230,7 +229,13 @@ const CreditPage = () => {
                 <FormItem>
                   <FormLabel>{t('loanAmountLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('loanAmountLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -249,6 +254,7 @@ const CreditPage = () => {
                       step="0.01"
                       {...field}
                       onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('nominalRateLabel')}
                     />
                   </FormControl>
                   <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
@@ -264,7 +270,13 @@ const CreditPage = () => {
                 <FormItem>
                   <FormLabel>{t('durationYearsLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="1"
+                      {...field}
+                      onChange={e => field.onChange(parseInt(e.target.value))}
+                      aria-label={t('durationYearsLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -277,7 +289,7 @@ const CreditPage = () => {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">
+                    <FormLabel className="text-base" htmlFor="applyInsurance-switch">
                       {t('insuranceToggleLabel')}
                     </FormLabel>
                   </div>
@@ -285,6 +297,8 @@ const CreditPage = () => {
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      id="applyInsurance-switch"
+                      aria-label={t('insuranceToggleLabel')}
                     />
                   </FormControl>
                 </FormItem>
@@ -304,20 +318,21 @@ const CreditPage = () => {
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           className="flex flex-col space-y-1 sm:flex-row sm:space-x-4 sm:space-y-0"
+                          aria-label={t('insuranceModeLabel')}
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0">
                             <FormControl>
-                              <RadioGroupItem value="initialPct" />
+                              <RadioGroupItem value="initialPct" id="insuranceMode-initialPct" />
                             </FormControl>
-                            <FormLabel className="font-normal">
+                            <FormLabel htmlFor="insuranceMode-initialPct" className="font-normal">
                               {t('initialPct')}
                             </FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
                             <FormControl>
-                              <RadioGroupItem value="crdPct" />
+                              <RadioGroupItem value="crdPct" id="insuranceMode-crdPct" />
                             </FormControl>
-                            <FormLabel className="font-normal">
+                            <FormLabel htmlFor="insuranceMode-crdPct" className="font-normal">
                               {t('crdPct')}
                             </FormLabel>
                           </FormItem>
@@ -339,6 +354,7 @@ const CreditPage = () => {
                           step="0.01"
                           {...field}
                           onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('insuranceRateLabel')}
                         />
                       </FormControl>
                       <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
@@ -382,7 +398,7 @@ const CreditPage = () => {
             <Separator className="my-4" />
 
             <Collapsible className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg" aria-label={t('amortizationTableTitle')}>
                 {t('amortizationTableTitle')}
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
@@ -419,7 +435,7 @@ const CreditPage = () => {
             <Separator className="my-4" />
 
             <Collapsible className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg" aria-label={t('annualAggregatesTitle')}>
                 {t('annualAggregatesTitle')}
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>

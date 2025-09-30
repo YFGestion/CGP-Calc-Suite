@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -151,7 +150,13 @@ const EpargnePage = () => {
                 <FormItem>
                   <FormLabel>{t('initialDepositLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('initialDepositLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,7 +170,13 @@ const EpargnePage = () => {
                 <FormItem>
                   <FormLabel>{t('periodicDepositLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="any"
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      aria-label={t('periodicDepositLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -183,28 +194,29 @@ const EpargnePage = () => {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                       className="flex flex-col space-y-1 sm:flex-row sm:space-x-4 sm:space-y-0"
+                      aria-label={t('periodicityLabel')}
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="monthly" />
+                          <RadioGroupItem value="monthly" id="periodicity-monthly" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="periodicity-monthly" className="font-normal">
                           {t('monthly')}
                         </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="quarterly" />
+                          <RadioGroupItem value="quarterly" id="periodicity-quarterly" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="periodicity-quarterly" className="font-normal">
                           {t('quarterly')}
                         </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="yearly" />
+                          <RadioGroupItem value="yearly" id="periodicity-yearly" />
                         </FormControl>
-                        <FormLabel className="font-normal">
+                        <FormLabel htmlFor="periodicity-yearly" className="font-normal">
                           {t('yearly')}
                         </FormLabel>
                       </FormItem>
@@ -222,7 +234,13 @@ const EpargnePage = () => {
                 <FormItem>
                   <FormLabel>{t('durationLabel')}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                    <Input
+                      type="number"
+                      step="1"
+                      {...field}
+                      onChange={e => field.onChange(parseInt(e.target.value))}
+                      aria-label={t('durationLabel')}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -243,6 +261,7 @@ const EpargnePage = () => {
                       value={[field.value]}
                       onValueChange={(val) => field.onChange(val[0])}
                       className="w-[100%]"
+                      aria-label={t('returnRateLabel')}
                     />
                   </FormControl>
                   <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
@@ -257,7 +276,7 @@ const EpargnePage = () => {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
-                    <FormLabel className="text-base">
+                    <FormLabel className="text-base" htmlFor="applyEntryFee-switch">
                       {t('entryFeeToggleLabel')}
                     </FormLabel>
                   </div>
@@ -265,6 +284,8 @@ const EpargnePage = () => {
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
+                      id="applyEntryFee-switch"
+                      aria-label={t('entryFeeToggleLabel')}
                     />
                   </FormControl>
                 </FormItem>
@@ -286,6 +307,7 @@ const EpargnePage = () => {
                         value={[field.value || 0]}
                         onValueChange={(val) => field.onChange(val[0])}
                         className="w-[100%]"
+                        aria-label={t('entryFeeLabel')}
                       />
                     </FormControl>
                     <div className="text-right text-sm text-muted-foreground">{field.value || 0}%</div>
@@ -320,7 +342,7 @@ const EpargnePage = () => {
             <Separator className="my-4" />
 
             <h3 className="text-lg font-semibold mb-4">{t('chartTitle')}</h3>
-            <div className="h-[300px] w-full">
+            <div className="h-[300px] w-full" aria-label={t('chartTitle')}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={results.series}

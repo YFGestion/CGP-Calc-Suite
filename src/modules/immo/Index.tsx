@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import {
@@ -232,7 +231,7 @@ const ImmoPage = () => {
   const [results, setResults] = useState<ReturnType<typeof rentalCashflowIrr> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
 
-  const calculate = (values: z.infer<ReturnType<typeof formSchema>>) => {
+  const calculate = useCallback((values: z.infer<ReturnType<typeof formSchema>>) => {
     const adjustedRentGross = values.rentGross * (values.rentPeriodicity === 'monthly' ? 12 : 1);
     const adjustedVacancyRate = (values.vacancyRate + vacancySensitivity) / 100;
     const adjustedRentAnnualGross = adjustedRentGross * (1 + rentSensitivity / 100);
@@ -305,7 +304,7 @@ const ImmoPage = () => {
     setSummaryContent(
       t('summaryContent', formattedResults)
     );
-  };
+  }, [rentSensitivity, vacancySensitivity, salePriceSensitivity, loanRateSensitivity, commonT, t]); // Add all dependencies
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     calculate(values);
@@ -445,7 +444,7 @@ const ImmoPage = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Section A: Investissement */}
             <Collapsible defaultOpen className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b" aria-label={t('sectionInvestment')}>
                 {t('sectionInvestment')}
                 <ChevronDown className="h-5 w-5" />
               </CollapsibleTrigger>
@@ -457,7 +456,13 @@ const ImmoPage = () => {
                     <FormItem>
                       <FormLabel>{t('priceLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          step="any"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('priceLabel')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -469,10 +474,15 @@ const ImmoPage = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-base">{t('acqCostsToggleLabel')}</FormLabel>
+                        <FormLabel className="text-base" htmlFor="applyAcqCosts-switch">{t('acqCostsToggleLabel')}</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="applyAcqCosts-switch"
+                          aria-label={t('acqCostsToggleLabel')}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -485,7 +495,13 @@ const ImmoPage = () => {
                       <FormItem>
                         <FormLabel>{t('acqCostsLabel')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          <Input
+                            type="number"
+                            step="any"
+                            {...field}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            aria-label={t('acqCostsLabel')}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -501,7 +517,13 @@ const ImmoPage = () => {
                       <FormItem>
                         <FormLabel>{t('rentGrossLabel')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          <Input
+                            type="number"
+                            step="any"
+                            {...field}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            aria-label={t('rentGrossLabel')}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -518,14 +540,15 @@ const ImmoPage = () => {
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                             className="flex space-x-4"
+                            aria-label={t('rentPeriodicityLabel')}
                           >
                             <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl><RadioGroupItem value="monthly" /></FormControl>
-                              <FormLabel className="font-normal">{t('monthly')}</FormLabel>
+                              <FormControl><RadioGroupItem value="monthly" id="rentPeriodicity-monthly" /></FormControl>
+                              <FormLabel htmlFor="rentPeriodicity-monthly" className="font-normal">{t('monthly')}</FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl><RadioGroupItem value="annual" /></FormControl>
-                              <FormLabel className="font-normal">{t('annual')}</FormLabel>
+                              <FormControl><RadioGroupItem value="annual" id="rentPeriodicity-annual" /></FormControl>
+                              <FormLabel htmlFor="rentPeriodicity-annual" className="font-normal">{t('annual')}</FormLabel>
                             </FormItem>
                           </RadioGroup>
                         </FormControl>
@@ -546,6 +569,7 @@ const ImmoPage = () => {
                           min={0} max={100} step={0.1}
                           value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('vacancyRateLabel')}
                         />
                       </FormControl>
                       <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
@@ -561,7 +585,13 @@ const ImmoPage = () => {
                     <FormItem>
                       <FormLabel>{t('opexLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          step="any"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('opexLabel')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -574,7 +604,13 @@ const ImmoPage = () => {
                     <FormItem>
                       <FormLabel>{t('propertyTaxLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          step="any"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('propertyTaxLabel')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -587,10 +623,15 @@ const ImmoPage = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-base">{t('mgmtFeesToggleLabel')}</FormLabel>
+                        <FormLabel className="text-base" htmlFor="applyMgmtFees-switch">{t('mgmtFeesToggleLabel')}</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="applyMgmtFees-switch"
+                          aria-label={t('mgmtFeesToggleLabel')}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -608,14 +649,15 @@ const ImmoPage = () => {
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                               className="flex space-x-4"
+                              aria-label={t('mgmtFeesTypeLabel')}
                             >
                               <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value="mgmtFeesPct" /></FormControl>
-                                <FormLabel className="font-normal">{t('mgmtFeesPct')}</FormLabel>
+                                <FormControl><RadioGroupItem value="mgmtFeesPct" id="mgmtFeesType-pct" /></FormControl>
+                                <FormLabel htmlFor="mgmtFeesType-pct" className="font-normal">{t('mgmtFeesPct')}</FormLabel>
                               </FormItem>
                               <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl><RadioGroupItem value="mgmtFeesFixed" /></FormControl>
-                                <FormLabel className="font-normal">{t('mgmtFeesFixed')}</FormLabel>
+                                <FormControl><RadioGroupItem value="mgmtFeesFixed" id="mgmtFeesType-fixed" /></FormControl>
+                                <FormLabel htmlFor="mgmtFeesType-fixed" className="font-normal">{t('mgmtFeesFixed')}</FormLabel>
                               </FormItem>
                             </RadioGroup>
                           </FormControl>
@@ -630,7 +672,13 @@ const ImmoPage = () => {
                         <FormItem>
                           <FormLabel>{t('mgmtFeesValueLabel')}</FormLabel>
                           <FormControl>
-                            <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                            <Input
+                              type="number"
+                              step="any"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('mgmtFeesValueLabel')}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -646,7 +694,13 @@ const ImmoPage = () => {
                     <FormItem>
                       <FormLabel>{t('capexLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        <Input
+                          type="number"
+                          step="any"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('capexLabel')}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -661,7 +715,13 @@ const ImmoPage = () => {
                       <FormItem>
                         <FormLabel>{t('horizonYearsLabel')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                          <Input
+                            type="number"
+                            step="1"
+                            {...field}
+                            onChange={e => field.onChange(parseInt(e.target.value))}
+                            aria-label={t('horizonYearsLabel')}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -674,7 +734,13 @@ const ImmoPage = () => {
                       <FormItem>
                         <FormLabel>{t('saleYearLabel')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                          <Input
+                            type="number"
+                            step="1"
+                            {...field}
+                            onChange={e => field.onChange(parseInt(e.target.value))}
+                            aria-label={t('saleYearLabel')}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -693,14 +759,15 @@ const ImmoPage = () => {
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           className="flex space-x-4"
+                          aria-label={t('salePriceModeLabel')}
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="fixed" /></FormControl>
-                            <FormLabel className="font-normal">{t('salePriceFixed')}</FormLabel>
+                            <FormControl><RadioGroupItem value="fixed" id="salePriceMode-fixed" /></FormControl>
+                            <FormLabel htmlFor="salePriceMode-fixed" className="font-normal">{t('salePriceFixed')}</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="growth" /></FormControl>
-                            <FormLabel className="font-normal">{t('salePriceGrowth')}</FormLabel>
+                            <FormControl><RadioGroupItem value="growth" id="salePriceMode-growth" /></FormControl>
+                            <FormLabel htmlFor="salePriceMode-growth" className="font-normal">{t('salePriceGrowth')}</FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
@@ -716,7 +783,13 @@ const ImmoPage = () => {
                       <FormItem>
                         <FormLabel>{t('salePriceLabel')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          <Input
+                            type="number"
+                            step="any"
+                            {...field}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            aria-label={t('salePriceLabel')}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -731,7 +804,13 @@ const ImmoPage = () => {
                       <FormItem>
                         <FormLabel>{t('saleGrowthRateLabel')}</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.1" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          <Input
+                            type="number"
+                            step="0.1"
+                            {...field}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            aria-label={t('saleGrowthRateLabel')}
+                          />
                         </FormControl>
                         <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                         <FormMessage />
@@ -750,6 +829,7 @@ const ImmoPage = () => {
                           min={0} max={100} step={0.1}
                           value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('saleCostsPctLabel')}
                         />
                       </FormControl>
                       <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
@@ -762,7 +842,7 @@ const ImmoPage = () => {
 
             {/* Section B: Crédit */}
             <Collapsible defaultOpen className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b" aria-label={t('sectionLoan')}>
                 {t('sectionLoan')}
                 <ChevronDown className="h-5 w-5" />
               </CollapsibleTrigger>
@@ -773,10 +853,15 @@ const ImmoPage = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-base">{t('applyLoanToggleLabel')}</FormLabel>
+                        <FormLabel className="text-base" htmlFor="applyLoan-switch">{t('applyLoanToggleLabel')}</FormLabel>
                       </div>
                       <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="applyLoan-switch"
+                          aria-label={t('applyLoanToggleLabel')}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -790,7 +875,13 @@ const ImmoPage = () => {
                         <FormItem>
                           <FormLabel>{t('loanAmountLabel')}</FormLabel>
                           <FormControl>
-                            <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                            <Input
+                              type="number"
+                              step="any"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('loanAmountLabel')}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -803,7 +894,13 @@ const ImmoPage = () => {
                         <FormItem>
                           <FormLabel>{t('loanRateLabel')}</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                            <Input
+                              type="number"
+                              step="0.01"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('loanRateLabel')}
+                            />
                           </FormControl>
                           <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                           <FormMessage />
@@ -817,7 +914,13 @@ const ImmoPage = () => {
                         <FormItem>
                           <FormLabel>{t('loanDurationYearsLabel')}</FormLabel>
                           <FormControl>
-                            <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                            <Input
+                              type="number"
+                              step="1"
+                              {...field}
+                              onChange={e => field.onChange(parseInt(e.target.value))}
+                              aria-label={t('loanDurationYearsLabel')}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -829,10 +932,15 @@ const ImmoPage = () => {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">{t('loanInsuranceToggleLabel')}</FormLabel>
+                            <FormLabel className="text-base" htmlFor="loanApplyInsurance-switch">{t('loanInsuranceToggleLabel')}</FormLabel>
                           </div>
                           <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              id="loanApplyInsurance-switch"
+                              aria-label={t('loanInsuranceToggleLabel')}
+                            />
                           </FormControl>
                         </FormItem>
                       )}
@@ -850,14 +958,15 @@ const ImmoPage = () => {
                                   onValueChange={field.onChange}
                                   defaultValue={field.value}
                                   className="flex space-x-4"
+                                  aria-label={t('loanInsuranceModeLabel')}
                                 >
                                   <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl><RadioGroupItem value="initialPct" /></FormControl>
-                                    <FormLabel className="font-normal">{t('initialPct')}</FormLabel>
+                                    <FormControl><RadioGroupItem value="initialPct" id="loanInsuranceMode-initialPct" /></FormControl>
+                                    <FormLabel htmlFor="loanInsuranceMode-initialPct" className="font-normal">{t('initialPct')}</FormLabel>
                                   </FormItem>
                                   <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl><RadioGroupItem value="crdPct" /></FormControl>
-                                    <FormLabel className="font-normal">{t('crdPct')}</FormLabel>
+                                    <FormControl><RadioGroupItem value="crdPct" id="loanInsuranceMode-crdPct" /></FormControl>
+                                    <FormLabel htmlFor="loanInsuranceMode-crdPct" className="font-normal">{t('crdPct')}</FormLabel>
                                   </FormItem>
                                 </RadioGroup>
                               </FormControl>
@@ -872,7 +981,13 @@ const ImmoPage = () => {
                             <FormItem>
                               <FormLabel>{t('loanInsuranceRateLabel')}</FormLabel>
                               <FormControl>
-                                <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  {...field}
+                                  onChange={e => field.onChange(parseFloat(e.target.value))}
+                                  aria-label={t('loanInsuranceRateLabel')}
+                                />
                               </FormControl>
                               <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                               <FormMessage />
@@ -888,7 +1003,7 @@ const ImmoPage = () => {
 
             {/* Section C: Fiscalité simple */}
             <Collapsible defaultOpen className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b" aria-label={t('sectionTaxation')}>
                 {t('sectionTaxation')}
                 <ChevronDown className="h-5 w-5" />
               </CollapsibleTrigger>
@@ -904,22 +1019,23 @@ const ImmoPage = () => {
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           className="flex flex-col space-y-2"
+                          aria-label={t('taxModeLabel')}
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="none" /></FormControl>
-                            <FormLabel className="font-normal">{t('taxModeNone')}</FormLabel>
+                            <FormControl><RadioGroupItem value="none" id="taxMode-none" /></FormControl>
+                            <FormLabel htmlFor="taxMode-none" className="font-normal">{t('taxModeNone')}</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="micro_foncier_30" /></FormControl>
-                            <FormLabel className="font-normal">{t('taxModeMicroFoncier30')}</FormLabel>
+                            <FormControl><RadioGroupItem value="micro_foncier_30" id="taxMode-micro_foncier_30" /></FormControl>
+                            <FormLabel htmlFor="taxMode-micro_foncier_30" className="font-normal">{t('taxModeMicroFoncier30')}</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="micro_bic_50" /></FormControl>
-                            <FormLabel className="font-normal">{t('taxModeMicroBic50')}</FormLabel>
+                            <FormControl><RadioGroupItem value="micro_bic_50" id="taxMode-micro_bic_50" /></FormControl>
+                            <FormLabel htmlFor="taxMode-micro_bic_50" className="font-normal">{t('taxModeMicroBic50')}</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="effective_rate" /></FormControl>
-                            <FormLabel className="font-normal">{t('taxModeEffectiveRate')}</FormLabel>
+                            <FormControl><RadioGroupItem value="effective_rate" id="taxMode-effective_rate" /></FormControl>
+                            <FormLabel htmlFor="taxMode-effective_rate" className="font-normal">{t('taxModeEffectiveRate')}</FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
@@ -936,7 +1052,13 @@ const ImmoPage = () => {
                         <FormItem>
                           <FormLabel>{t('tmiLabel')}</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.1" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('tmiLabel')}
+                            />
                           </FormControl>
                           <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                           <FormMessage />
@@ -950,7 +1072,13 @@ const ImmoPage = () => {
                         <FormItem>
                           <FormLabel>{t('psLabel')}</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.1" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                            <Input
+                              type="number"
+                              step="0.1"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('psLabel')}
+                            />
                           </FormControl>
                           <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                           <FormMessage />
@@ -964,7 +1092,7 @@ const ImmoPage = () => {
 
             {/* Section D: Sensibilités */}
             <Collapsible defaultOpen className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b" aria-label={t('sectionSensitivities')}>
                 {t('sectionSensitivities')}
                 <ChevronDown className="h-5 w-5" />
               </CollapsibleTrigger>
@@ -980,6 +1108,7 @@ const ImmoPage = () => {
                           min={-10} max={10} step={1}
                           value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('rentSensitivityLabel')}
                         />
                       </FormControl>
                       <FormMessage />
@@ -997,6 +1126,7 @@ const ImmoPage = () => {
                           min={-5} max={5} step={1}
                           value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('vacancySensitivityLabel')}
                         />
                       </FormControl>
                       <FormMessage />
@@ -1014,6 +1144,7 @@ const ImmoPage = () => {
                           min={-10} max={10} step={1}
                           value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('salePriceSensitivityLabel')}
                         />
                       </FormControl>
                       <FormMessage />
@@ -1031,13 +1162,14 @@ const ImmoPage = () => {
                           min={-1} max={1} step={0.1}
                           value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
                           className="w-[100%]"
+                          aria-label={t('loanRateSensitivityLabel')}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button variant="outline" onClick={handleResetSensitivities} className="w-full">
+                <Button variant="outline" onClick={handleResetSensitivities} className="w-full" aria-label={t('resetSensitivities')}>
                   <RefreshCcw className="mr-2 h-4 w-4" />
                   {t('resetSensitivities')}
                 </Button>
@@ -1081,7 +1213,7 @@ const ImmoPage = () => {
             <Separator className="my-4" />
 
             <Collapsible defaultOpen className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg py-2 border-b">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg py-2 border-b" aria-label={t('annualTableTitle')}>
                 {t('annualTableTitle')}
                 <ChevronDown className="h-4 w-4" />
               </CollapsibleTrigger>
@@ -1134,7 +1266,7 @@ const ImmoPage = () => {
             <Separator className="my-4" />
 
             <h3 className="text-lg font-semibold mb-4">{t('chartCashflowTitle')}</h3>
-            <div className="h-[300px] w-full">
+            <div className="h-[300px] w-full" aria-label={t('chartCashflowTitle')}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={results.annualTable}
@@ -1154,7 +1286,7 @@ const ImmoPage = () => {
               <>
                 <Separator className="my-4" />
                 <h3 className="text-lg font-semibold mb-4">{t('chartCrdTitle')}</h3>
-                <div className="h-[300px] w-full">
+                <div className="h-[300px] w-full" aria-label={t('chartCrdTitle')}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={results.annualTable}
