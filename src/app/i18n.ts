@@ -17,7 +17,7 @@ const resources = {
     creditPage: frTranslations.creditPage,
     immoPage: frTranslations.immoPage,
     endettementPage: frTranslations.endettementPage,
-    settingsPage: frTranslations.settingsPage // Ajout du namespace settingsPage
+    settingsPage: frTranslations.settingsPage
   },
 };
 
@@ -29,6 +29,9 @@ i18n
     fallbackLng: 'fr',
     interpolation: {
       escapeValue: false, // React échappe déjà les valeurs
+      // Correction: Définir explicitement les préfixes et suffixes pour les placeholders
+      prefix: '{',
+      suffix: '}'
     },
     // Déclare explicitement tous les namespaces disponibles en utilisant les clés du fichier JSON
     ns: Object.keys(frTranslations),
