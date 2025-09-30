@@ -14,7 +14,7 @@ import BrutNetPage from "./modules/brutNet/Index";
 import EndettementPage from "./modules/endettement/Index";
 import EpargnePage from "./modules/epargne/Index";
 import CreditPage from "./modules/credit/Index";
-import ImmoPage from "./modules/immo/Index";
+import ImmoPage from "./modules/immo/Index"; // Import the new ImmoPage
 
 const queryClient = new QueryClient();
 
@@ -33,7 +33,7 @@ const App = () => (
                 <Route path="endettement" element={<EndettementPage />} />
                 <Route path="epargne" element={<EpargnePage />} />
                 <Route path="credit" element={<CreditPage />} />
-                <Route path="immo" element={<ImmoPage />} />
+                <Route path="immo" element={<ImmoPage />} /> {/* Add the new route */}
                 <Route path="about" element={<AboutPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

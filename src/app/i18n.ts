@@ -14,7 +14,8 @@ const resources = {
     aboutPage: frTranslations.aboutPage,
     brutNetPage: frTranslations.brutNetPage,
     epargnePage: frTranslations.epargnePage,
-    creditPage: frTranslations.creditPage // Ajout du namespace creditPage
+    creditPage: frTranslations.creditPage,
+    immoPage: frTranslations.immoPage // Ajout du namespace immoPage
   },
 };
 

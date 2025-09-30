@@ -1,18 +1,1195 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { CopyBlock } from '@/lib/copy';
+import { exportCsv } from '@/lib/csv';
+import { formatCurrency, formatPercent } from '@/lib/format';
+import { rentalCashflowIrr } from '@/lib/math-core/rental';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, RefreshCcw } from 'lucide-react';
+
+// Zod schema for form validation
+const formSchema = (t: (key: string) => string) => z.object({
+  // A) Investissement
+  price: z.coerce.number({
+    required_error: t('validation.positiveNumber'),
+    invalid_type_error: t('validation.positiveNumber'),
+  }).positive(t('validation.positiveNumber')),
+  applyAcqCosts: z.boolean(),
+  acqCosts: z.coerce.number({
+    required_error: t('validation.nonNegativeNumber'),
+    invalid_type_error: t('validation.nonNegativeNumber'),
+  }).min(0, t('validation.nonNegativeNumber')).optional(),
+  rentGross: z.coerce.number({
+    required_error: t('validation.nonNegativeNumber'),
+    invalid_type_error: t('validation.nonNegativeNumber'),
+  }).min(0, t('validation.nonNegativeNumber')),
+  rentPeriodicity: z.enum(['monthly', 'annual']),
+  vacancyRate: z.coerce.number({
+    required_error: t('validation.percentageRange', { min: 0, max: 100 }),
+    invalid_type_error: t('validation.percentageRange', { min: 0, max: 100 }),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 100 })).max(100, t('validation.percentageRange', { min: 0, max: 100 })),
+  opex: z.coerce.number({
+    required_error: t('validation.nonNegativeNumber'),
+    invalid_type_error: t('validation.nonNegativeNumber'),
+  }).min(0, t('validation.nonNegativeNumber')),
+  propertyTax: z.coerce.number({
+    required_error: t('validation.nonNegativeNumber'),
+    invalid_type_error: t('validation.nonNegativeNumber'),
+  }).min(0, t('validation.nonNegativeNumber')),
+  applyMgmtFees: z.boolean(),
+  mgmtFeesType: z.enum(['mgmtFeesPct', 'mgmtFeesFixed']).optional(),
+  mgmtFeesValue: z.coerce.number({
+    required_error: t('validation.nonNegativeNumber'),
+    invalid_type_error: t('validation.nonNegativeNumber'),
+  }).min(0, t('validation.nonNegativeNumber')).optional(),
+  capex: z.coerce.number({
+    required_error: t('validation.nonNegativeNumber'),
+    invalid_type_error: t('validation.nonNegativeNumber'),
+  }).min(0, t('validation.nonNegativeNumber')),
+  horizonYears: z.coerce.number({
+    required_error: t('validation.durationMin'),
+    invalid_type_error: t('validation.durationMin'),
+  }).int(t('validation.durationMin')).min(1, t('validation.durationMin')).max(60, "Maximum 60 ans"),
+  saleYear: z.coerce.number({
+    required_error: t('validation.saleYearRange'),
+    invalid_type_error: t('validation.saleYearRange'),
+  }).int(t('validation.saleYearRange')).min(1, t('validation.saleYearRange')),
+  salePriceMode: z.enum(['fixed', 'growth']),
+  salePrice: z.coerce.number({
+    required_error: t('validation.positiveNumber'),
+    invalid_type_error: t('validation.positiveNumber'),
+  }).positive(t('validation.positiveNumber')).optional(),
+  saleGrowthRate: z.coerce.number({
+    required_error: t('validation.percentageRange', { min: -10, max: 20 }),
+    invalid_type_error: t('validation.percentageRange', { min: -10, max: 20 }),
+  }).min(-10, t('validation.percentageRange', { min: -10, max: 20 })).max(20, t('validation.percentageRange', { min: -10, max: 20 })).optional(),
+  saleCostsPct: z.coerce.number({
+    required_error: t('validation.percentageRange', { min: 0, max: 100 }),
+    invalid_type_error: t('validation.percentageRange', { min: 0, max: 100 }),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 100 })).max(100, t('validation.percentageRange', { min: 0, max: 100 })),
+
+  // B) Crédit
+  applyLoan: z.boolean(),
+  loanAmount: z.coerce.number({
+    required_error: t('validation.loanAmountPositive'),
+    invalid_type_error: t('validation.loanAmountPositive'),
+  }).positive(t('validation.loanAmountPositive')).optional(),
+  loanRate: z.coerce.number({
+    required_error: t('validation.loanRateRange'),
+    invalid_type_error: t('validation.loanRateRange'),
+  }).min(0, t('validation.loanRateRange')).max(10, t('validation.loanRateRange')).optional(),
+  loanDurationYears: z.coerce.number({
+    required_error: t('validation.loanDurationMin'),
+    invalid_type_error: t('validation.loanDurationMin'),
+  }).int(t('validation.loanDurationMin')).min(1, t('validation.loanDurationMin')).max(60, "Maximum 60 ans").optional(),
+  loanApplyInsurance: z.boolean().optional(),
+  loanInsuranceMode: z.enum(['initialPct', 'crdPct']).optional(),
+  loanInsuranceRate: z.coerce.number({
+    required_error: t('validation.loanInsuranceRateRange'),
+    invalid_type_error: t('validation.loanInsuranceRateRange'),
+  }).min(0, t('validation.loanInsuranceRateRange')).max(1, t('validation.loanInsuranceRateRange')).optional(),
+
+  // C) Fiscalité simple
+  taxMode: z.enum(['none', 'micro_foncier_30', 'micro_bic_50', 'effective_rate']),
+  tmi: z.coerce.number({
+    required_error: t('validation.percentageRange', { min: 0, max: 45 }),
+    invalid_type_error: t('validation.percentageRange', { min: 0, max: 45 }),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 45 })).max(45, t('validation.percentageRange', { min: 0, max: 45 })).optional(),
+  ps: z.coerce.number({
+    required_error: t('validation.percentageRange', { min: 0, max: 17.2 }),
+    invalid_type_error: t('validation.percentageRange', { min: 0, max: 17.2 }),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 17.2 })).max(17.2, t('validation.percentageRange', { min: 0, max: 17.2 })).optional(),
+
+  // D) Sensibilités
+  rentSensitivity: z.coerce.number().min(-10).max(10).default(0),
+  vacancySensitivity: z.coerce.number().min(-5).max(5).default(0),
+  salePriceSensitivity: z.coerce.number().min(-10).max(10).default(0),
+  loanRateSensitivity: z.coerce.number().min(-1).max(1).default(0),
+
+}).superRefine((data, ctx) => {
+  if (data.applyAcqCosts && (data.acqCosts === undefined || data.acqCosts === null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['acqCosts'] });
+  }
+  if (data.applyMgmtFees && (!data.mgmtFeesType || data.mgmtFeesValue === undefined || data.mgmtFeesValue === null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['mgmtFeesType'] });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['mgmtFeesValue'] });
+  }
+  if (data.salePriceMode === 'fixed' && (data.salePrice === undefined || data.salePrice === null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['salePrice'] });
+  }
+  if (data.salePriceMode === 'growth' && (data.saleGrowthRate === undefined || data.saleGrowthRate === null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['saleGrowthRate'] });
+  }
+  if (data.saleYear > data.horizonYears) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.saleYearRange'), path: ['saleYear'] });
+  }
+
+  if (data.applyLoan) {
+    if (data.loanAmount === undefined || data.loanAmount === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanAmount'] });
+    if (data.loanRate === undefined || data.loanRate === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanRate'] });
+    if (data.loanDurationYears === undefined || data.loanDurationYears === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanDurationYears'] });
+
+    if (data.loanApplyInsurance) {
+      if (!data.loanInsuranceMode) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceMode'] });
+      if (data.loanInsuranceRate === undefined || data.loanInsuranceRate === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceRate'] });
+    }
+  }
+
+  if (data.taxMode === 'effective_rate') {
+    if (data.tmi === undefined || data.tmi === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.tmiPsRequired'), path: ['tmi'] });
+    if (data.ps === undefined || data.ps === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.tmiPsRequired'), path: ['ps'] });
+  }
+});
 
 const ImmoPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('immoPage');
+  const { t: commonT } = useTranslation('common');
+
+  const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
+    resolver: zodResolver(formSchema(t)),
+    defaultValues: {
+      price: 250000,
+      applyAcqCosts: true,
+      acqCosts: 20000,
+      rentGross: 1000,
+      rentPeriodicity: 'monthly',
+      vacancyRate: 5,
+      opex: 500,
+      propertyTax: 1000,
+      applyMgmtFees: true,
+      mgmtFeesType: 'mgmtFeesPct',
+      mgmtFeesValue: 8,
+      capex: 300,
+      horizonYears: 20,
+      saleYear: 20,
+      salePriceMode: 'growth',
+      saleGrowthRate: 2,
+      saleCostsPct: 7,
+
+      applyLoan: true,
+      loanAmount: 200000,
+      loanRate: 2.5,
+      loanDurationYears: 20,
+      loanApplyInsurance: true,
+      loanInsuranceMode: 'initialPct',
+      loanInsuranceRate: 0.3,
+
+      taxMode: 'micro_foncier_30',
+      tmi: 30,
+      ps: 17.2,
+
+      rentSensitivity: 0,
+      vacancySensitivity: 0,
+      salePriceSensitivity: 0,
+      loanRateSensitivity: 0,
+    },
+  });
+
+  const { watch, handleSubmit, setValue, getValues, reset } = form;
+
+  const applyAcqCosts = watch('applyAcqCosts');
+  const rentPeriodicity = watch('rentPeriodicity');
+  const applyMgmtFees = watch('applyMgmtFees');
+  const mgmtFeesType = watch('mgmtFeesType');
+  const salePriceMode = watch('salePriceMode');
+  const applyLoan = watch('applyLoan');
+  const loanApplyInsurance = watch('loanApplyInsurance');
+  const taxMode = watch('taxMode');
+
+  const rentSensitivity = watch('rentSensitivity');
+  const vacancySensitivity = watch('vacancySensitivity');
+  const salePriceSensitivity = watch('salePriceSensitivity');
+  const loanRateSensitivity = watch('loanRateSensitivity');
+
+  const [results, setResults] = useState<ReturnType<typeof rentalCashflowIrr> | null>(null);
+  const [summaryContent, setSummaryContent] = useState('');
+
+  const calculate = (values: z.infer<ReturnType<typeof formSchema>>) => {
+    const adjustedRentGross = values.rentGross * (values.rentPeriodicity === 'monthly' ? 12 : 1);
+    const adjustedVacancyRate = (values.vacancyRate + vacancySensitivity) / 100;
+    const adjustedRentAnnualGross = adjustedRentGross * (1 + rentSensitivity / 100);
+
+    let mgmtFeesPctValue = 0;
+    if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
+      mgmtFeesPctValue = values.mgmtFeesValue / 100;
+    }
+    // For fixed fees, rentalCashflowIrr expects a percentage of gross rent.
+    // This is a simplification. A more robust solution would pass fixed fees directly
+    // and adjust the rentalCashflowIrr function to handle it.
+    // For now, if fixed, we'll convert it to a percentage of the *initial* gross rent.
+    // This might not be perfectly accurate if rent changes, but for a fixed rent model, it works.
+    if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesFixed' && values.mgmtFeesValue !== undefined && adjustedRentAnnualGross > 0) {
+      mgmtFeesPctValue = values.mgmtFeesValue / adjustedRentAnnualGross;
+    }
+
+    const loanDetails = values.applyLoan && values.loanAmount && values.loanRate && values.loanDurationYears
+      ? {
+        amount: values.loanAmount,
+        rate: (values.loanRate + loanRateSensitivity) / 100, // Apply sensitivity
+        years: values.loanDurationYears,
+        insurance: values.loanApplyInsurance && values.loanInsuranceMode && values.loanInsuranceRate !== undefined
+          ? {
+            mode: values.loanInsuranceMode,
+            value: values.loanInsuranceRate / 100,
+          }
+          : { mode: 'initialPct' as const, value: 0 }, // Default to 0 if no insurance
+      }
+      : undefined;
+
+    let salePriceValue = values.salePrice;
+    let saleGrowthRateValue = values.saleGrowthRate;
+
+    if (values.salePriceMode === 'fixed' && values.salePrice !== undefined) {
+      salePriceValue = values.salePrice * (1 + salePriceSensitivity / 100);
+    } else if (values.salePriceMode === 'growth' && values.saleGrowthRate !== undefined) {
+      saleGrowthRateValue = (values.saleGrowthRate + salePriceSensitivity) / 100;
+    }
+
+    const computedResults = rentalCashflowIrr({
+      price: values.price,
+      acqCosts: values.applyAcqCosts ? values.acqCosts : 0,
+      rentAnnualGross: adjustedRentAnnualGross,
+      vacancyRate: adjustedVacancyRate,
+      opex: values.opex,
+      propertyTax: values.propertyTax,
+      mgmtFeesPct: mgmtFeesPctValue,
+      capex: values.capex,
+      horizonYears: values.horizonYears,
+      saleYear: values.saleYear,
+      salePriceMode: values.salePriceMode,
+      salePrice: salePriceValue,
+      saleGrowthRate: saleGrowthRateValue,
+      saleCostsPct: values.saleCostsPct / 100,
+      loan: loanDetails,
+      taxMode: values.taxMode,
+      tmi: values.taxMode === 'effective_rate' && values.tmi !== undefined ? values.tmi / 100 : 0,
+      ps: values.taxMode === 'effective_rate' && values.ps !== undefined ? values.ps / 100 : 0,
+    });
+    setResults(computedResults);
+
+    const formattedResults = {
+      price: formatCurrency(values.price),
+      horizonYears: values.horizonYears,
+      loanAmount: loanDetails ? formatCurrency(loanDetails.amount) : t('common.none'),
+      loanRate: loanDetails ? formatPercent(loanDetails.rate) : t('common.none'),
+      loanDurationYears: loanDetails ? loanDetails.years : t('common.none'),
+      saleYear: values.saleYear,
+      avgSavingEffortDuringLoan: formatCurrency(computedResults.avgSavingEffortDuringLoan),
+      avgPostLoanIncome: formatCurrency(computedResults.avgPostLoanIncome),
+      irr: formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    };
+
+    setSummaryContent(
+      t('summaryContent', formattedResults)
+    );
+  };
+
+  const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
+    calculate(values);
+  };
+
+  // Recalculate on sensitivity change
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name && ['rentSensitivity', 'vacancySensitivity', 'salePriceSensitivity', 'loanRateSensitivity'].includes(name)) {
+        // Only recalculate if the form is valid and results exist
+        if (form.formState.isValid && results) {
+          calculate(getValues());
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, form.formState.isValid, results, getValues, calculate]);
+
+
+  const handleExportCsv = () => {
+    if (!results) return;
+
+    const values = getValues();
+    const acqCostsValue = values.applyAcqCosts && values.acqCosts !== undefined ? values.acqCosts : 0;
+    const mgmtFeesValue = values.applyMgmtFees && values.mgmtFeesValue !== undefined ? values.mgmtFeesValue : 0;
+    const mgmtFeesTypeTranslated = values.applyMgmtFees && values.mgmtFeesType ? t(values.mgmtFeesType) : 'N/A';
+
+    const loanAmountValue = values.applyLoan && values.loanAmount !== undefined ? values.loanAmount : 0;
+    const loanRateValue = values.applyLoan && values.loanRate !== undefined ? values.loanRate : 0;
+    const loanDurationYearsValue = values.applyLoan && values.loanDurationYears !== undefined ? values.loanDurationYears : 0;
+    const loanInsuranceRateValue = values.applyLoan && values.loanApplyInsurance && values.loanInsuranceRate !== undefined ? values.loanInsuranceRate : 0;
+    const loanInsuranceModeTranslated = values.applyLoan && values.loanApplyInsurance && values.loanInsuranceMode ? t(values.loanInsuranceMode) : 'N/A';
+
+    const salePriceOrGrowth = values.salePriceMode === 'fixed' ? values.salePrice : values.saleGrowthRate;
+    const salePriceOrGrowthLabel = values.salePriceMode === 'fixed' ? t('salePriceLabel') : t('saleGrowthRateLabel');
+
+    const tmiValue = values.taxMode === 'effective_rate' && values.tmi !== undefined ? values.tmi : 0;
+    const psValue = values.taxMode === 'effective_rate' && values.ps !== undefined ? values.ps : 0;
+
+    const rows = [
+      [commonT('appName')],
+      [t('title')],
+      [],
+      [t('sectionInvestment')],
+      [t('priceLabel'), values.price.toString()],
+      [t('acqCostsToggleLabel'), values.applyAcqCosts ? 'Oui' : 'Non'],
+      [t('acqCostsLabel'), acqCostsValue.toString()],
+      [t('rentGrossLabel'), values.rentGross.toString()],
+      [t('rentPeriodicityLabel'), t(values.rentPeriodicity)],
+      [t('vacancyRateLabel'), values.vacancyRate.toString() + '%'],
+      [t('opexLabel'), values.opex.toString()],
+      [t('propertyTaxLabel'), values.propertyTax.toString()],
+      [t('mgmtFeesToggleLabel'), values.applyMgmtFees ? 'Oui' : 'Non'],
+      [t('mgmtFeesTypeLabel'), mgmtFeesTypeTranslated],
+      [t('mgmtFeesValueLabel'), mgmtFeesValue.toString()],
+      [t('capexLabel'), values.capex.toString()],
+      [t('horizonYearsLabel'), values.horizonYears.toString()],
+      [t('saleYearLabel'), values.saleYear.toString()],
+      [t('salePriceModeLabel'), t(values.salePriceMode === 'fixed' ? 'salePriceFixed' : 'salePriceGrowth')],
+      [salePriceOrGrowthLabel, salePriceOrGrowth?.toString() + (values.salePriceMode === 'growth' ? '%' : '')],
+      [t('saleCostsPctLabel'), values.saleCostsPct.toString() + '%'],
+      [],
+      [t('sectionLoan')],
+      [t('applyLoanToggleLabel'), values.applyLoan ? 'Oui' : 'Non'],
+      [t('loanAmountLabel'), loanAmountValue.toString()],
+      [t('loanRateLabel'), loanRateValue.toString() + '%'],
+      [t('loanDurationYearsLabel'), loanDurationYearsValue.toString()],
+      [t('loanInsuranceToggleLabel'), values.loanApplyInsurance ? 'Oui' : 'Non'],
+      [t('loanInsuranceModeLabel'), loanInsuranceModeTranslated],
+      [t('loanInsuranceRateLabel'), loanInsuranceRateValue.toString() + '%'],
+      [],
+      [t('sectionTaxation')],
+      [t('taxModeLabel'), t(values.taxMode)],
+      [t('tmiLabel'), tmiValue.toString() + '%'],
+      [t('psLabel'), psValue.toString() + '%'],
+      [],
+      [t('sectionSensitivities')],
+      [t('rentSensitivityLabel'), rentSensitivity.toString() + '%'],
+      [t('vacancySensitivityLabel'), vacancySensitivity.toString() + ' pts'],
+      [t('salePriceSensitivityLabel'), salePriceSensitivity.toString() + '%'],
+      [t('loanRateSensitivityLabel'), loanRateSensitivity.toString() + ' pts'],
+      [],
+      [commonT('results')],
+      [t('avgSavingEffortDuringLoan'), formatCurrency(results.avgSavingEffortDuringLoan)],
+      [t('avgPostLoanIncome'), formatCurrency(results.avgPostLoanIncome)],
+      [t('irr'), formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+      [],
+      [t('annualTableTitle')],
+      [
+        t('tableHeaderYear'), t('tableHeaderRentGross'), t('tableHeaderVacancy'), t('tableHeaderRentNet'),
+        t('tableHeaderOpexTotal'), t('tableHeaderNOI'), t('tableHeaderInterest'), t('tableHeaderPrincipal'),
+        t('tableHeaderInsurance'), t('tableHeaderAnnuity'), t('tableHeaderTaxableIncome'), t('tableHeaderTax'),
+        t('tableHeaderCashflow'), t('tableHeaderCrdEnd')
+      ],
+      ...results.annualTable.map(row => [
+        row.year.toString(),
+        formatCurrency(row.rentGross),
+        formatCurrency(row.vacancy),
+        formatCurrency(row.rentNet),
+        formatCurrency(row.opexTotal),
+        formatCurrency(row.NOI),
+        formatCurrency(row.interest),
+        formatCurrency(row.principal),
+        formatCurrency(row.insurance),
+        formatCurrency(row.annuity),
+        formatCurrency(row.taxableIncome),
+        formatCurrency(row.tax),
+        formatCurrency(row.cashflow),
+        formatCurrency(row.crdEnd),
+      ]),
+    ];
+
+    exportCsv('immo-simulation.csv', rows);
+  };
+
+  const handleDuplicateScenario = () => {
+    toast.info(t('scenarioDuplicated'));
+    // Future implementation: copy current form state to a new scenario
+  };
+
+  const handleResetSensitivities = () => {
+    setValue('rentSensitivity', 0);
+    setValue('vacancySensitivity', 0);
+    setValue('salePriceSensitivity', 0);
+    setValue('loanRateSensitivity', 0);
+    // Trigger recalculation if results exist
+    if (results) {
+      calculate(getValues());
+    }
+  };
+
   return (
-    <Card>
+    <Card className="w-full max-w-5xl mx-auto">
       <CardHeader>
-        <CardTitle>{t('common.immo')}</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Contenu du module Immo (Effort & TRI). (En développement)</p>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Section A: Investissement */}
+            <Collapsible defaultOpen className="space-y-2">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+                {t('sectionInvestment')}
+                <ChevronDown className="h-5 w-5" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 p-4">
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('priceLabel')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="applyAcqCosts"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">{t('acqCostsToggleLabel')}</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {applyAcqCosts && (
+                  <FormField
+                    control={form.control}
+                    name="acqCosts"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('acqCostsLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="rentGross"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('rentGrossLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="rentPeriodicity"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>{t('rentPeriodicityLabel')}</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex space-x-4"
+                          >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl><RadioGroupItem value="monthly" /></FormControl>
+                              <FormLabel className="font-normal">{t('monthly')}</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl><RadioGroupItem value="annual" /></FormControl>
+                              <FormLabel className="font-normal">{t('annual')}</FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="vacancyRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('vacancyRateLabel')}</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={0} max={100} step={0.1}
+                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
+                          className="w-[100%]"
+                        />
+                      </FormControl>
+                      <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="opex"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('opexLabel')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="propertyTax"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('propertyTaxLabel')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="applyMgmtFees"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">{t('mgmtFeesToggleLabel')}</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {applyMgmtFees && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="mgmtFeesType"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>{t('mgmtFeesTypeLabel')}</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex space-x-4"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl><RadioGroupItem value="mgmtFeesPct" /></FormControl>
+                                <FormLabel className="font-normal">{t('mgmtFeesPct')}</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl><RadioGroupItem value="mgmtFeesFixed" /></FormControl>
+                                <FormLabel className="font-normal">{t('mgmtFeesFixed')}</FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="mgmtFeesValue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('mgmtFeesValueLabel')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="capex"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('capexLabel')}</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="horizonYears"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('horizonYearsLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="saleYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('saleYearLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="salePriceMode"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>{t('salePriceModeLabel')}</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex space-x-4"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="fixed" /></FormControl>
+                            <FormLabel className="font-normal">{t('salePriceFixed')}</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="growth" /></FormControl>
+                            <FormLabel className="font-normal">{t('salePriceGrowth')}</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {salePriceMode === 'fixed' && (
+                  <FormField
+                    control={form.control}
+                    name="salePrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('salePriceLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                {salePriceMode === 'growth' && (
+                  <FormField
+                    control={form.control}
+                    name="saleGrowthRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('saleGrowthRateLabel')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.1" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                        </FormControl>
+                        <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                <FormField
+                  control={form.control}
+                  name="saleCostsPct"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('saleCostsPctLabel')}</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={0} max={100} step={0.1}
+                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
+                          className="w-[100%]"
+                        />
+                      </FormControl>
+                      <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CollapsibleContent>
+            </Collapsible>
+
+            {/* Section B: Crédit */}
+            <Collapsible defaultOpen className="space-y-2">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+                {t('sectionLoan')}
+                <ChevronDown className="h-5 w-5" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 p-4">
+                <FormField
+                  control={form.control}
+                  name="applyLoan"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">{t('applyLoanToggleLabel')}</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {applyLoan && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="loanAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('loanAmountLabel')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="any" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="loanRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('loanRateLabel')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          </FormControl>
+                          <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="loanDurationYears"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('loanDurationYearsLabel')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="loanApplyInsurance"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base">{t('loanInsuranceToggleLabel')}</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    {loanApplyInsurance && (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="loanInsuranceMode"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>{t('loanInsuranceModeLabel')}</FormLabel>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                  className="flex space-x-4"
+                                >
+                                  <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value="initialPct" /></FormControl>
+                                    <FormLabel className="font-normal">{t('initialPct')}</FormLabel>
+                                  </FormItem>
+                                  <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl><RadioGroupItem value="crdPct" /></FormControl>
+                                    <FormLabel className="font-normal">{t('crdPct')}</FormLabel>
+                                  </FormItem>
+                                </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="loanInsuranceRate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('loanInsuranceRateLabel')}</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                              </FormControl>
+                              <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+
+            {/* Section C: Fiscalité simple */}
+            <Collapsible defaultOpen className="space-y-2">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+                {t('sectionTaxation')}
+                <ChevronDown className="h-5 w-5" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 p-4">
+                <FormField
+                  control={form.control}
+                  name="taxMode"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>{t('taxModeLabel')}</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-2"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="none" /></FormControl>
+                            <FormLabel className="font-normal">{t('taxModeNone')}</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="micro_foncier_30" /></FormControl>
+                            <FormLabel className="font-normal">{t('taxModeMicroFoncier30')}</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="micro_bic_50" /></FormControl>
+                            <FormLabel className="font-normal">{t('taxModeMicroBic50')}</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="effective_rate" /></FormControl>
+                            <FormLabel className="font-normal">{t('taxModeEffectiveRate')}</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {taxMode === 'effective_rate' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="tmi"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('tmiLabel')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.1" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          </FormControl>
+                          <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="ps"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('psLabel')}</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.1" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                          </FormControl>
+                          <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+
+            {/* Section D: Sensibilités */}
+            <Collapsible defaultOpen className="space-y-2">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b">
+                {t('sectionSensitivities')}
+                <ChevronDown className="h-5 w-5" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 p-4">
+                <FormField
+                  control={form.control}
+                  name="rentSensitivity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('rentSensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value}%)</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={-10} max={10} step={1}
+                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
+                          className="w-[100%]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="vacancySensitivity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('vacancySensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value} pts)</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={-5} max={5} step={1}
+                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
+                          className="w-[100%]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="salePriceSensitivity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('salePriceSensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value}%)</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={-10} max={10} step={1}
+                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
+                          className="w-[100%]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="loanRateSensitivity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('loanRateSensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value} pts)</FormLabel>
+                      <FormControl>
+                        <Slider
+                          min={-1} max={1} step={0.1}
+                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
+                          className="w-[100%]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button variant="outline" onClick={handleResetSensitivities} className="w-full">
+                  <RefreshCcw className="mr-2 h-4 w-4" />
+                  {t('resetSensitivities')}
+                </Button>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Button type="submit" className="w-full">{t('calculateButton')}</Button>
+          </form>
+        </Form>
+
+        {results && (
+          <div className="mt-8 space-y-6">
+            <h3 className="text-2xl font-bold text-center">{commonT('results')}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('avgSavingEffortDuringLoan')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(results.avgSavingEffortDuringLoan)}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('avgPostLoanIncome')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(results.avgPostLoanIncome)}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('irr')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Separator className="my-4" />
+
+            <Collapsible defaultOpen className="space-y-2">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-lg py-2 border-b">
+                {t('annualTableTitle')}
+                <ChevronDown className="h-4 w-4" />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t('tableHeaderYear')}</TableHead>
+                        <TableHead>{t('tableHeaderRentGross')}</TableHead>
+                        <TableHead>{t('tableHeaderVacancy')}</TableHead>
+                        <TableHead>{t('tableHeaderRentNet')}</TableHead>
+                        <TableHead>{t('tableHeaderOpexTotal')}</TableHead>
+                        <TableHead>{t('tableHeaderNOI')}</TableHead>
+                        <TableHead>{t('tableHeaderInterest')}</TableHead>
+                        <TableHead>{t('tableHeaderPrincipal')}</TableHead>
+                        <TableHead>{t('tableHeaderInsurance')}</TableHead>
+                        <TableHead>{t('tableHeaderAnnuity')}</TableHead>
+                        <TableHead>{t('tableHeaderTaxableIncome')}</TableHead>
+                        <TableHead>{t('tableHeaderTax')}</TableHead>
+                        <TableHead>{t('tableHeaderCashflow')}</TableHead>
+                        <TableHead>{t('tableHeaderCrdEnd')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {results.annualTable.map((row) => (
+                        <TableRow key={row.year}>
+                          <TableCell>{row.year}</TableCell>
+                          <TableCell>{formatCurrency(row.rentGross)}</TableCell>
+                          <TableCell>{formatCurrency(row.vacancy)}</TableCell>
+                          <TableCell>{formatCurrency(row.rentNet)}</TableCell>
+                          <TableCell>{formatCurrency(row.opexTotal)}</TableCell>
+                          <TableCell>{formatCurrency(row.NOI)}</TableCell>
+                          <TableCell>{formatCurrency(row.interest)}</TableCell>
+                          <TableCell>{formatCurrency(row.principal)}</TableCell>
+                          <TableCell>{formatCurrency(row.insurance)}</TableCell>
+                          <TableCell>{formatCurrency(row.annuity)}</TableCell>
+                          <TableCell>{formatCurrency(row.taxableIncome)}</TableCell>
+                          <TableCell>{formatCurrency(row.tax)}</TableCell>
+                          <TableCell>{formatCurrency(row.cashflow)}</TableCell>
+                          <TableCell>{formatCurrency(row.crdEnd)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Separator className="my-4" />
+
+            <h3 className="text-lg font-semibold mb-4">{t('chartCashflowTitle')}</h3>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={results.annualTable}
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" label={{ value: t('tableHeaderYear'), position: 'insideBottom', offset: 0 }} />
+                  <YAxis tickFormatter={(value) => formatCurrency(value, 'fr-FR', 'EUR')} />
+                  <Tooltip formatter={(value: number) => formatCurrency(value, 'fr-FR', 'EUR')} />
+                  <Legend />
+                  <Line type="monotone" dataKey="cashflow" stroke="#8884d8" name={t('chartCashflow')} activeDot={{ r: 8 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {applyLoan && (
+              <>
+                <Separator className="my-4" />
+                <h3 className="text-lg font-semibold mb-4">{t('chartCrdTitle')}</h3>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={results.annualTable}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="year" label={{ value: t('tableHeaderYear'), position: 'insideBottom', offset: 0 }} />
+                      <YAxis tickFormatter={(value) => formatCurrency(value, 'fr-FR', 'EUR')} />
+                      <Tooltip formatter={(value: number) => formatCurrency(value, 'fr-FR', 'EUR')} />
+                      <Legend />
+                      <Line type="monotone" dataKey="crdEnd" stroke="#82ca9d" name={t('chartCrd')} activeDot={{ r: 8 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            )}
+
+            <Separator className="my-4" />
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={handleExportCsv} className="flex-1">
+                {t('exportCsvButton')}
+              </Button>
+              <Button variant="outline" onClick={handleDuplicateScenario} className="flex-1">
+                {t('duplicateScenarioButton')}
+              </Button>
+            </div>
+            <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
