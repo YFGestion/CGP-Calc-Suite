@@ -1,0 +1,1 @@
+// Utilitaires pour la copie de texte ou d'éléments

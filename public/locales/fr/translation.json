@@ -1,0 +1,35 @@
+{
+  "common": {
+    "appName": "CGP Calc Suite",
+    "home": "Accueil",
+    "about": "À propos / Hypothèses",
+    "brutNet": "Brut → Net",
+    "endettement": "Endettement",
+    "epargne": "Épargne",
+    "credit": "Crédit",
+    "immo": "Immo (Effort & TRI)",
+    "themeToggle": "Basculer le thème",
+    "languageToggle": "Basculer la langue"
+  },
+  "compliance": {
+    "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et mettre à jour."
+  },
+  "homePage": {
+    "welcome": "Bienvenue dans CGP Calc Suite",
+    "description": "Votre suite d'outils pour les calculs financiers et patrimoniaux.",
+    "brutNetCardTitle": "Calcul Brut → Net",
+    "brutNetCardDescription": "Estimez le salaire net à partir du brut, et vice-versa.",
+    "endettementCardTitle": "Capacité d'Endettement",
+    "endettementCardDescription": "Calculez la capacité d'endettement de vos clients.",
+    "epargneCardTitle": "Simulateur d'Épargne",
+    "epargneCardDescription": "Projetez l'évolution d'un capital épargné.",
+    "creditCardTitle": "Simulateur de Crédit",
+    "creditCardDescription": "Calculez les mensualités et le coût total d'un crédit.",
+    "immoCardTitle": "Immobilier (Effort & TRI)",
+    "immoCardDescription": "Analysez l'effort d'épargne et le Taux de Rentabilité Interne d'un investissement immobilier."
+  },
+  "aboutPage": {
+    "title": "À propos et Hypothèses",
+    "content": "Cette page contient des informations sur l'application et les hypothèses utilisées pour les calculs. Elle est en cours de développement."
+  }
+}

@@ -1,17 +1,75 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+"use client";
 
 import { MadeWithDyad } from "@/components/made-with-dyad";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import {
+  Calculator,
+  LandPlot,
+  PiggyBank,
+  Wallet,
+  Scale,
+} from 'lucide-react';
 
 const Index = () => {
+  const { t } = useTranslation();
+
+  const moduleCards = [
+    {
+      title: t('homePage.brutNetCardTitle'),
+      description: t('homePage.brutNetCardDescription'),
+      link: '/brut-net',
+      icon: Scale,
+    },
+    {
+      title: t('homePage.endettementCardTitle'),
+      description: t('homePage.endettementCardDescription'),
+      link: '/endettement',
+      icon: Wallet,
+    },
+    {
+      title: t('homePage.epargneCardTitle'),
+      description: t('homePage.epargneCardDescription'),
+      link: '/epargne',
+      icon: PiggyBank,
+    },
+    {
+      title: t('homePage.creditCardTitle'),
+      description: t('homePage.creditCardDescription'),
+      link: '/credit',
+      icon: Calculator,
+    },
+    {
+      title: t('homePage.immoCardTitle'),
+      description: t('homePage.immoCardDescription'),
+      link: '/immo',
+      icon: LandPlot,
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">
-          Start building your amazing project here!
-        </p>
+    <div className="flex flex-col items-center justify-center p-4">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-2">{t('homePage.welcome')}</h1>
+        <p className="text-xl text-muted-foreground">{t('homePage.description')}</p>
       </div>
-      <MadeWithDyad />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
+        {moduleCards.map((card, index) => (
+          <Link to={card.link} key={index}>
+            <Card className="h-full hover:shadow-lg transition-shadow duration-200">
+              <CardHeader className="flex flex-row items-center space-x-4 pb-2">
+                <card.icon className="h-8 w-8 text-primary" />
+                <CardTitle className="text-2xl font-semibold">{card.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>{card.description}</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };
