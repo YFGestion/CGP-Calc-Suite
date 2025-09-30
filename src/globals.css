@@ -32,12 +32,10 @@
     --input: 216 38% 88%; /* #ceddef */
     --ring: 216 38% 77%; /* #a8c2e2 */
 
-    --radius: 0.5rem;
-
     --sidebar-background: 228 80% 19%; /* #070d59 */
     --sidebar-foreground: 210 20% 97%; /* #f4f8fc */
-    --sidebar-primary: 228 88% 29%; /* #0b1488 */
-    --sidebar-primary-foreground: 210 20% 97%; /* #f4f8fc */
+    --sidebar-primary: 210 20% 97%; /* #f4f8fc - Rendu plus clair pour le thème clair */
+    --sidebar-primary-foreground: 228 80% 19%; /* #070d59 */
     --sidebar-accent: 216 38% 77%; /* #a8c2e2 */
     --sidebar-accent-foreground: 228 80% 19%; /* #070d59 */
     --sidebar-border: 216 38% 88%; /* #ceddef */
