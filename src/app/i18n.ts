@@ -13,7 +13,7 @@ const resources = {
     homePage: frTranslations.homePage,
     aboutPage: frTranslations.aboutPage,
     brutNetPage: frTranslations.brutNetPage,
-    // Ajoutez ici d'autres namespaces si vous en créez de nouveaux dans translation.json
+    epargnePage: frTranslations.epargnePage, // Ajout du namespace epargnePage
   },
 };
 
