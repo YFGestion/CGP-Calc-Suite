@@ -9,7 +9,9 @@
     "credit": "Crédit",
     "immo": "Immo (Effort & TRI)",
     "themeToggle": "Basculer le thème",
-    "languageToggle": "Basculer la langue"
+    "languageToggle": "Basculer la langue",
+    "copy": "Copier",
+    "copied": "Copié !"
   },
   "compliance": {
     "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et mettre à jour."
