@@ -10,11 +10,12 @@ import { AppLayout } from './app/AppLayout';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/About";
+import SettingsPage from "./pages/Settings"; // Import the new SettingsPage
 import BrutNetPage from "./modules/brutNet/Index";
 import EndettementPage from "./modules/endettement/Index";
 import EpargnePage from "./modules/epargne/Index";
 import CreditPage from "./modules/credit/Index";
-import ImmoPage from "./modules/immo/Index"; // Import the new ImmoPage
+import ImmoPage from "./modules/immo/Index";
 
 const queryClient = new QueryClient();
 
@@ -33,8 +34,9 @@ const App = () => (
                 <Route path="endettement" element={<EndettementPage />} />
                 <Route path="epargne" element={<EpargnePage />} />
                 <Route path="credit" element={<CreditPage />} />
-                <Route path="immo" element={<ImmoPage />} /> {/* Add the new route */}
+                <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />
+                <Route path="settings" element={<SettingsPage />} /> {/* Add the new route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>

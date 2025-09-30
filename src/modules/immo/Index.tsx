@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, RefreshCcw } from 'lucide-react';
+import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -170,13 +171,14 @@ const formSchema = (t: (key: string) => string) => z.object({
 const ImmoPage = () => {
   const { t } = useTranslation('immoPage');
   const { t: commonT } = useTranslation('common');
+  const settings = useSettingsStore(); // Use settings store
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
       price: 250000,
       applyAcqCosts: true,
-      acqCosts: 20000,
+      acqCosts: 250000 * (settings.defaultAcqCostsPct / 100), // Use defaultAcqCostsPct
       rentGross: 1000,
       rentPeriodicity: 'monthly',
       vacancyRate: 5,
@@ -194,15 +196,15 @@ const ImmoPage = () => {
 
       applyLoan: true,
       loanAmount: 200000,
-      loanRate: 2.5,
-      loanDurationYears: 20,
+      loanRate: settings.defaultLoanRate,
+      loanDurationYears: settings.defaultLoanDurationYears,
       loanApplyInsurance: true,
       loanInsuranceMode: 'initialPct',
-      loanInsuranceRate: 0.3,
+      loanInsuranceRate: settings.defaultLoanInsuranceRate,
 
       taxMode: 'micro_foncier_30',
-      tmi: 30,
-      ps: 17.2,
+      tmi: settings.defaultTMI,
+      ps: settings.defaultPS,
 
       rentSensitivity: 0,
       vacancySensitivity: 0,
@@ -239,11 +241,6 @@ const ImmoPage = () => {
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
       mgmtFeesPctValue = values.mgmtFeesValue / 100;
     }
-    // For fixed fees, rentalCashflowIrr expects a percentage of gross rent.
-    // This is a simplification. A more robust solution would pass fixed fees directly
-    // and adjust the rentalCashflowIrr function to handle it.
-    // For now, if fixed, we'll convert it to a percentage of the *initial* gross rent.
-    // This might not be perfectly accurate if rent changes, but for a fixed rent model, it works.
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesFixed' && values.mgmtFeesValue !== undefined && adjustedRentAnnualGross > 0) {
       mgmtFeesPctValue = values.mgmtFeesValue / adjustedRentAnnualGross;
     }
@@ -296,9 +293,9 @@ const ImmoPage = () => {
     const formattedResults = {
       price: formatCurrency(values.price),
       horizonYears: values.horizonYears,
-      loanAmount: loanDetails ? formatCurrency(loanDetails.amount) : t('common.none'),
-      loanRate: loanDetails ? formatPercent(loanDetails.rate) : t('common.none'),
-      loanDurationYears: loanDetails ? loanDetails.years : t('common.none'),
+      loanAmount: loanDetails ? formatCurrency(loanDetails.amount) : commonT('none'),
+      loanRate: loanDetails ? formatPercent(loanDetails.rate, 'fr-FR', { maximumFractionDigits: 1 }) : commonT('none'),
+      loanDurationYears: loanDetails ? loanDetails.years : commonT('none'),
       saleYear: values.saleYear,
       avgSavingEffortDuringLoan: formatCurrency(computedResults.avgSavingEffortDuringLoan),
       avgPostLoanIncome: formatCurrency(computedResults.avgPostLoanIncome),
@@ -314,11 +311,9 @@ const ImmoPage = () => {
     calculate(values);
   };
 
-  // Recalculate on sensitivity change
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       if (name && ['rentSensitivity', 'vacancySensitivity', 'salePriceSensitivity', 'loanRateSensitivity'].includes(name)) {
-        // Only recalculate if the form is valid and results exist
         if (form.formState.isValid && results) {
           calculate(getValues());
         }

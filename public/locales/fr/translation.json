@@ -8,12 +8,14 @@
     "epargne": "Épargne",
     "credit": "Crédit",
     "immo": "Immo (Effort & TRI)",
+    "settings": "Paramètres",
     "themeToggle": "Basculer le thème",
     "languageToggle": "Basculer la langue",
     "copy": "Copier",
     "copied": "Copié !",
     "results": "Résultats",
-    "tools": "Outils"
+    "tools": "Outils",
+    "none": "Aucun"
   },
   "compliance": {
     "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et à mettre à jour."
@@ -57,7 +59,7 @@
     "netAfterTaxMonthlyAvg": "Net après impôt (mensuel moyen)",
     "netPerPay": "Net par paie",
     "summaryTitle": "Résumé du calcul Brut → Net",
-    "summaryContent": "Pour un brut de {grossValue} {inputPeriod} sur {paidMonths} mois, avec un statut {employeeStatus} et {withholdingRate} de PAS :\n\n- Net avant impôt (annuel) : {netBeforeTaxAnnual}\n- Net avant impôt (mensuel moyen) : {netBeforeTaxMonthlyAvg}\n- Net après impôt (annuel) : {netAfterTaxAnnual}\n- Net après impôt (mensuel moyen) : {netAfterTaxMonthlyAvg}\n- Net par paie : {netPerPay}",
+    "summaryContent": "✨ Résumé du Calcul Brut → Net ✨\n\n📊 **Inputs :**\n• Montant brut : {grossValue}\n• Période de saisie : {inputPeriod}\n• Mois payés : {paidMonths}\n• Statut employé : {employeeStatus}\n• Taux PAS : {withholdingRate}\n\n📈 **Résultats :**\n• Net avant impôt (annuel) : {netBeforeTaxAnnual}\n• Net avant impôt (mensuel moyen) : {netBeforeTaxMonthlyAvg}\n• Net après impôt (annuel) : {netAfterTaxAnnual}\n• Net après impôt (mensuel moyen) : {netAfterTaxMonthlyAvg}\n• Net par paie : {netPerPay}",
     "validation": {
       "grossValuePositive": "Le montant brut doit être positif.",
       "chargesRateRange": "Le taux de charges doit être entre 0% et 50%.",
@@ -83,7 +85,7 @@
     "totalContributions": "Apports totaux",
     "grossGains": "Gains bruts",
     "summaryTitle": "Résumé de la projection d'épargne",
-    "summaryContent": "Pour un versement initial de {initialDeposit}, des versements périodiques de {periodicDeposit} {periodicity} sur {duration} ans, avec un rendement annuel de {returnRate} et {entryFee} de frais d'entrée :\n\n- Capital final : {finalCapital}\n- Apports totaux : {totalContributions}\n- Gains bruts : {grossGains}",
+    "summaryContent": "💰 Résumé de la Projection d'Épargne 📈\n\n📊 **Inputs :**\n• Versement initial : {initialDeposit}\n• Versement périodique : {periodicDeposit}\n• Périodicité : {periodicity}\n• Durée : {duration} ans\n• Rendement annuel brut : {returnRate}\n• Frais d'entrée : {entryFee}\n\n📈 **Résultats :**\n• Capital final : {finalCapital}\n• Apports totaux : {totalContributions}\n• Gains bruts : {grossGains}",
     "chartTitle": "Évolution du capital et des apports",
     "chartCapital": "Capital",
     "chartContributions": "Apports",
@@ -128,7 +130,7 @@
     "sumInsurance": "Somme Assurance",
     "sumPayment": "Somme Mensualités",
     "summaryTitle": "Résumé du simulateur de crédit",
-    "summaryContent": "Pour un prêt de {loanAmount} sur {durationYears} ans à un taux nominal de {nominalRate} {insuranceDetails} :\n\n- Mensualité totale : {totalMonthlyPayment}\n- Coût total des intérêts : {totalInterest}\n- Coût total de l'assurance : {totalInsurance}\n- Coût total du crédit : {totalCost}",
+    "summaryContent": "🏦 Résumé du Simulateur de Crédit 📊\n\n📊 **Inputs :**\n• Montant du prêt : {loanAmount}\n• Durée : {durationYears} ans\n• Taux nominal annuel : {nominalRate}\n• Assurance : {insuranceDetails}\n\n📈 **Résultats :**\n• Mensualité totale : {totalMonthlyPayment}\n• Coût total des intérêts : {totalInterest}\n• Coût total de l'assurance : {totalInsurance}\n• Coût total du crédit : {totalCost}",
     "insuranceDetailsInitialPct": "avec une assurance de {insuranceRate} sur le capital initial",
     "insuranceDetailsCrdPct": "avec une assurance de {insuranceRate} sur le capital restant dû",
     "insuranceDetailsNone": "sans assurance",
@@ -202,7 +204,7 @@
     "duplicateScenarioButton": "Dupliquer Scénario",
 
     "summaryTitle": "Résumé de la simulation immobilière",
-    "summaryContent": "Pour un investissement de {price}€ sur {horizonYears} ans, avec un prêt de {loanAmount}€ à {loanRate}% sur {loanDurationYears} ans, et une revente à {saleYear} ans :\n\n- Effort d'épargne moyen pendant le crédit : {avgSavingEffortDuringLoan}\n- Revenus complémentaires moyens après crédit : {avgPostLoanIncome}\n- Taux de Rentabilité Interne (TRI) : {irr}",
+    "summaryContent": "🏠 Résumé de la Simulation Immobilière 📈\n\n📊 **Inputs :**\n• Prix d'acquisition : {price}\n• Horizon de projection : {horizonYears} ans\n• Année de revente : {saleYear}\n• Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n\n📈 **Résultats :**\n• Effort d'épargne moyen pendant le crédit : {avgSavingEffortDuringLoan}\n• Revenus complémentaires moyens après crédit : {avgPostLoanIncome}\n• Taux de Rentabilité Interne (TRI) : {irr}",
 
     "avgSavingEffortDuringLoan": "Effort d'épargne moyen pendant le crédit",
     "avgPostLoanIncome": "Revenus complémentaires moyens après crédit",
@@ -276,7 +278,7 @@
     "stressMaxPayment": "Mensualité max. stressée",
     "stressAffordablePrincipal": "Capital max. stressé",
     "summaryTitle": "Résumé de la capacité d'endettement",
-    "summaryContent": "Pour des revenus nets de {netIncome}€, des charges de {charges}€ et des dettes existantes de {existingDebt}€, avec un DTI cible de {targetDTI}%, votre capacité d'endettement est :\n\n- DTI actuel : {currentDTI}\n- DTI projeté : {projectedDTI}\n- Mensualité maximale du nouveau prêt : {maxPayment}\n- Capital empruntable maximal : {affordablePrincipal}",
+    "summaryContent": "⚖️ Résumé de la Capacité d'Endettement 💰\n\n📊 **Inputs :**\n• Revenus nets mensuels : {netIncome}\n• Charges récurrentes : {charges}\n• Dettes existantes : {existingDebt}\n• DTI cible : {targetDTI}\n\n📈 **Résultats :**\n• DTI actuel : {currentDTI}\n• DTI projeté : {projectedDTI}\n• Mensualité maximale du nouveau prêt : {maxPayment}\n• Capital empruntable maximal : {affordablePrincipal}",
     "validation": {
       "netIncomePositive": "Les revenus nets mensuels doivent être positifs.",
       "nonNegativeNumber": "Ne peut pas être négatif.",
@@ -287,7 +289,36 @@
       "propertyPricePositive": "Le prix du bien doit être positif.",
       "rentalYieldRange": "Le rendement locatif doit être entre 0% et 20%.",
       "rentRetentionRange": "La retenue des loyers doit être entre 0% et 100%.",
-      "requiredField": "Ce champ est requis."
+      "requiredField": "Ce champ est requis.",
+      "noResultsYet": "Veuillez calculer pour voir les résultats."
+    },
+    "creditSentSuccess": "Données de prêt envoyées au module Crédit."
+  },
+  "settingsPage": {
+    "title": "Paramètres par défaut",
+    "description": "Définissez les valeurs par défaut pour les différents calculateurs.",
+    "sectionGeneral": "Général",
+    "defaultTargetDTILabel": "DTI cible par défaut (%)",
+    "defaultRentRetentionLabel": "Retenue des loyers par défaut (%)",
+    "sectionTaxation": "Fiscalité",
+    "defaultTMILabel": "Taux Marginal d'Imposition (TMI) par défaut (%)",
+    "defaultPSLabel": "Prélèvements Sociaux (PS) par défaut (%)",
+    "sectionInvestment": "Investissement Immobilier",
+    "defaultAcqCostsPctLabel": "Frais d'acquisition par défaut (% du prix)",
+    "defaultLoanRateLabel": "Taux de prêt par défaut (%)",
+    "defaultLoanDurationYearsLabel": "Durée de prêt par défaut (années)",
+    "defaultLoanInsuranceRateLabel": "Taux d'assurance par défaut (%)",
+    "saveButton": "Sauvegarder les paramètres",
+    "settingsSaved": "Paramètres sauvegardés !",
+    "validation": {
+      "targetDTIRange": "Le DTI cible doit être entre 20% et 50%.",
+      "rentRetentionRange": "La retenue des loyers doit être entre 0% et 100%.",
+      "tmiRange": "Le TMI doit être entre 0% et 45%.",
+      "psRange": "Les PS doivent être entre 0% et 17.2%.",
+      "acqCostsPctRange": "Les frais d'acquisition doivent être entre 0% et 20%.",
+      "loanRateRange": "Le taux de prêt doit être entre 0% et 10%.",
+      "loanDurationYearsRange": "La durée de prêt doit être entre 1 et 60 ans.",
+      "loanInsuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%."
     }
   }
 }

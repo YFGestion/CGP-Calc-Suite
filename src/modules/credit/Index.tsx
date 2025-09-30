@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { useSearchParams } from 'react-router-dom'; // Import useSearchParams
+import { useSearchParams } from 'react-router-dom';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
+import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -73,17 +74,18 @@ const formSchema = (t: (key: string) => string) => z.object({
 const CreditPage = () => {
   const { t } = useTranslation('creditPage');
   const { t: commonT } = useTranslation('common');
-  const [searchParams] = useSearchParams(); // Hook to read URL query parameters
+  const [searchParams] = useSearchParams();
+  const settings = useSettingsStore(); // Use settings store
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
-      loanAmount: 200000,
-      nominalRate: 2.5,
-      durationYears: 20,
-      applyInsurance: false,
+      loanAmount: 200000, // Default loan amount, not from settings
+      nominalRate: settings.defaultLoanRate,
+      durationYears: settings.defaultLoanDurationYears,
+      applyInsurance: true, // Default to applying insurance
       insuranceMode: 'initialPct',
-      insuranceRate: 0.3,
+      insuranceRate: settings.defaultLoanInsuranceRate,
     },
   });
 
@@ -93,7 +95,6 @@ const CreditPage = () => {
   const [results, setResults] = useState<ReturnType<typeof amortizationSchedule> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
 
-  // Effect to read query parameters and set form values
   useEffect(() => {
     const loanAmount = searchParams.get('loanAmount');
     const nominalRate = searchParams.get('nominalRate');
@@ -102,18 +103,18 @@ const CreditPage = () => {
     const insuranceModeParam = searchParams.get('insuranceMode');
     const insuranceRateParam = searchParams.get('insuranceRate');
 
-    if (loanAmount) form.setValue('loanAmount', parseFloat(loanAmount));
-    if (nominalRate) form.setValue('nominalRate', parseFloat(nominalRate));
-    if (durationYears) form.setValue('durationYears', parseInt(durationYears));
-    if (applyInsuranceParam) form.setValue('applyInsurance', applyInsuranceParam === 'true');
-    if (insuranceModeParam) form.setValue('insuranceMode', insuranceModeParam as 'initialPct' | 'crdPct');
-    if (insuranceRateParam) form.setValue('insuranceRate', parseFloat(insuranceRateParam));
+    let shouldSubmit = false;
+    if (loanAmount) { form.setValue('loanAmount', parseFloat(loanAmount)); shouldSubmit = true; }
+    if (nominalRate) { form.setValue('nominalRate', parseFloat(nominalRate)); shouldSubmit = true; }
+    if (durationYears) { form.setValue('durationYears', parseInt(durationYears)); shouldSubmit = true; }
+    if (applyInsuranceParam) { form.setValue('applyInsurance', applyInsuranceParam === 'true'); shouldSubmit = true; }
+    if (insuranceModeParam) { form.setValue('insuranceMode', insuranceModeParam as 'initialPct' | 'crdPct'); shouldSubmit = true; }
+    if (insuranceRateParam) { form.setValue('insuranceRate', parseFloat(insuranceRateParam)); shouldSubmit = true; }
 
-    // If any parameter was set, trigger form submission to calculate results
-    if (loanAmount || nominalRate || durationYears || applyInsuranceParam || insuranceModeParam || insuranceRateParam) {
+    if (shouldSubmit) {
       form.handleSubmit(onSubmit)();
     }
-  }, [searchParams]); // Rerun when searchParams change
+  }, [searchParams, settings]); // Add settings to dependency array
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const insuranceDetails = values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined
@@ -136,7 +137,7 @@ const CreditPage = () => {
 
     let insuranceSummaryText = t('insuranceDetailsNone');
     if (values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined) {
-      const formattedInsuranceRate = formatPercent(values.insuranceRate / 100, 'fr-FR', { maximumFractionDigits: 2 });
+      const formattedInsuranceRate = formatPercent(values.insuranceRate / 100, 'fr-FR', { maximumFractionDigits: 1 });
       if (values.insuranceMode === 'initialPct') {
         insuranceSummaryText = t('insuranceDetailsInitialPct', { insuranceRate: formattedInsuranceRate });
       } else if (values.insuranceMode === 'crdPct') {
@@ -147,7 +148,7 @@ const CreditPage = () => {
     const formattedResults = {
       loanAmount: formatCurrency(values.loanAmount),
       durationYears: values.durationYears,
-      nominalRate: formatPercent(values.nominalRate / 100, 'fr-FR', { maximumFractionDigits: 2 }),
+      nominalRate: formatPercent(values.nominalRate / 100, 'fr-FR', { maximumFractionDigits: 1 }),
       insuranceDetails: insuranceSummaryText,
       totalMonthlyPayment: formatCurrency(totalMonthlyPayment),
       totalInterest: formatCurrency(computedResults.totals.interest),
@@ -245,12 +246,12 @@ const CreditPage = () => {
                   <FormControl>
                     <Input
                       type="number"
-                      step="0.01" // Allow decimal input for percentage
+                      step="0.01"
                       {...field}
                       onChange={e => field.onChange(parseFloat(e.target.value))}
-                      suffix="%" // Visual suffix, not part of value
                     />
                   </FormControl>
+                  <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -335,12 +336,12 @@ const CreditPage = () => {
                       <FormControl>
                         <Input
                           type="number"
-                          step="0.01" // Allow decimal input for percentage
+                          step="0.01"
                           {...field}
                           onChange={e => field.onChange(parseFloat(e.target.value))}
-                          suffix="%" // Visual suffix, not part of value
                         />
                       </FormControl>
+                      <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                       <FormMessage />
                     </FormItem>
                   )}

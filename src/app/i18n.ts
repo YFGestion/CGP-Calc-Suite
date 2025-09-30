@@ -16,7 +16,8 @@ const resources = {
     epargnePage: frTranslations.epargnePage,
     creditPage: frTranslations.creditPage,
     immoPage: frTranslations.immoPage,
-    endettementPage: frTranslations.endettementPage // Ajout du namespace endettementPage
+    endettementPage: frTranslations.endettementPage,
+    settingsPage: frTranslations.settingsPage // Ajout du namespace settingsPage
   },
 };
 

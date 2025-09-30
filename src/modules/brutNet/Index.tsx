@@ -69,7 +69,7 @@ const BrutNetPage = () => {
       inputPeriod: values.inputPeriod === 'monthly' ? t('monthly') : t('annual'),
       paidMonths: values.paidMonths,
       employeeStatus: t(values.employeeStatus), // Translate employee status
-      withholdingRate: formatPercent(values.withholdingRate / 100),
+      withholdingRate: formatPercent(values.withholdingRate / 100, 'fr-FR', { maximumFractionDigits: 1 }),
       netBeforeTaxAnnual: formatCurrency(computedResults.netBeforeTaxAnnual),
       netBeforeTaxMonthlyAvg: formatCurrency(computedResults.netBeforeTaxMonthlyAvg),
       netAfterTaxAnnual: formatCurrency(computedResults.netAfterTaxAnnual),

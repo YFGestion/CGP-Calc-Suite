@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
+import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -100,6 +101,7 @@ const EndettementPage = () => {
   const { t } = useTranslation('endettementPage');
   const { t: commonT } = useTranslation('common');
   const navigate = useNavigate();
+  const settings = useSettingsStore(); // Use settings store
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
@@ -107,16 +109,16 @@ const EndettementPage = () => {
       netIncome: 3000,
       existingDebt: 500,
       charges: 0,
-      targetDTI: 35,
-      loanRate: 3,
-      loanDurationYears: 20,
-      loanApplyInsurance: false,
+      targetDTI: settings.defaultTargetDTI,
+      loanRate: settings.defaultLoanRate,
+      loanDurationYears: settings.defaultLoanDurationYears,
+      loanApplyInsurance: true, // Default to applying insurance
       loanInsuranceMode: 'initialPct',
-      loanInsuranceRate: 0.3,
+      loanInsuranceRate: settings.defaultLoanInsuranceRate,
       applyRentalInvestment: false,
       propertyPrice: 200000,
       rentalYield: 5,
-      rentRetention: 70,
+      rentRetention: settings.defaultRentRetention,
     },
   });
 
@@ -154,9 +156,9 @@ const EndettementPage = () => {
       netIncome: formatCurrency(values.netIncome),
       charges: formatCurrency(values.charges),
       existingDebt: formatCurrency(values.existingDebt),
-      targetDTI: formatPercent(values.targetDTI / 100),
-      currentDTI: formatPercent(computedResults.currentDTI),
-      projectedDTI: formatPercent(computedResults.projectedDTI),
+      targetDTI: formatPercent(values.targetDTI / 100, 'fr-FR', { maximumFractionDigits: 1 }),
+      currentDTI: formatPercent(computedResults.currentDTI, 'fr-FR', { maximumFractionDigits: 1 }),
+      projectedDTI: formatPercent(computedResults.projectedDTI, 'fr-FR', { maximumFractionDigits: 1 }),
       maxPayment: formatCurrency(computedResults.maxPayment),
       affordablePrincipal: formatCurrency(computedResults.affordablePrincipal),
     };
@@ -529,7 +531,7 @@ const EndettementPage = () => {
                     <TableBody>
                       {results.stress.map((row, index) => (
                         <TableRow key={index}>
-                          <TableCell>{formatPercent(row.rateDelta)}</TableCell>
+                          <TableCell>{formatPercent(row.rateDelta, 'fr-FR', { maximumFractionDigits: 1 })}</TableCell>
                           <TableCell>{formatCurrency(row.maxPayment)}</TableCell>
                           <TableCell>{formatCurrency(row.affordablePrincipal)}</TableCell>
                         </TableRow>

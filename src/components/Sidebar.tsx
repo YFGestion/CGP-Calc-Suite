@@ -16,16 +16,17 @@ import {
   Info,
   Sun,
   Moon,
-  Globe, // Added Globe icon for language toggle
+  Globe,
+  Settings, // Import Settings icon
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import { useTheme } from 'next-themes';
-import i18n from '@/app/i18n'; // Import i18n instance
+import i18n from '@/app/i18n';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
-  const { t } = useTranslation('common'); // Explicitly use 'common' namespace
+  const { t } = useTranslation('common');
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useAppState();
 
@@ -43,9 +44,9 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   const toggleLanguage = () => {
-    const newLang = language === 'fr-FR' ? 'en-US' : 'fr-FR'; // Example toggle
+    const newLang = language === 'fr-FR' ? 'en-US' : 'fr-FR';
     setLanguage(newLang);
-    i18n.changeLanguage(newLang.split('-')[0]); // Update i18next
+    i18n.changeLanguage(newLang.split('-')[0]);
   };
 
   return (
@@ -87,6 +88,16 @@ export function Sidebar({ className }: SidebarProps) {
                 <Sun className="mr-2 h-4 w-4" />
               )}
               {t('themeToggle')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              asChild
+            >
+              <Link to="/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                {t('settings')}
+              </Link>
             </Button>
             {/* Uncommented language toggle for future use if needed, but keeping it commented for now as per original */}
             {/* <Button
