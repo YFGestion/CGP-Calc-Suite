@@ -16,7 +16,7 @@
     "tools": "Outils"
   },
   "compliance": {
-    "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et mettre à jour."
+    "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et à mettre à jour."
   },
   "homePage": {
     "welcome": "Bienvenue dans CGP Calc Suite",
@@ -94,5 +94,51 @@
       "returnRateRange": "Le rendement annuel doit être entre -10% et 20%.",
       "entryFeeRange": "Les frais d'entrée doivent être entre 0% et 10%."
     }
+  },
+  "creditPage": {
+    "title": "Simulateur de Crédit",
+    "loanAmountLabel": "Montant du prêt (€)",
+    "nominalRateLabel": "Taux nominal annuel (%)",
+    "durationYearsLabel": "Durée du prêt (années)",
+    "insuranceToggleLabel": "Appliquer une assurance emprunteur",
+    "insuranceModeLabel": "Mode de calcul de l'assurance",
+    "initialPct": "Sur capital initial",
+    "crdPct": "Sur capital restant dû",
+    "insuranceRateLabel": "Taux annuel de l'assurance (%)",
+    "calculateButton": "Calculer",
+    "exportCsvButton": "Exporter CSV",
+    "copySummaryButton": "Copier le résumé",
+    "sendToImmoButton": "Envoyer vers Immo",
+    "monthlyPayment": "Mensualité (hors assurance)",
+    "totalInterest": "Coût total des intérêts",
+    "totalInsurance": "Coût total de l'assurance",
+    "totalCost": "Coût total du crédit (intérêts + assurance)",
+    "totalPayments": "Total des paiements",
+    "amortizationTableTitle": "Tableau d'amortissement mensuel",
+    "annualAggregatesTitle": "Agrégats annuels",
+    "period": "Période",
+    "year": "Année",
+    "interest": "Intérêts",
+    "principal": "Capital remboursé",
+    "insurance": "Assurance",
+    "payment": "Mensualité totale",
+    "crdEnd": "CRD fin de période",
+    "sumInterest": "Somme Intérêts",
+    "sumPrincipal": "Somme Capital",
+    "sumInsurance": "Somme Assurance",
+    "sumPayment": "Somme Mensualités",
+    "summaryTitle": "Résumé du simulateur de crédit",
+    "summaryContent": "Pour un prêt de {loanAmount} sur {durationYears} ans à un taux nominal de {nominalRate} {insuranceDetails} :\n\n- Mensualité totale : {totalMonthlyPayment}\n- Coût total des intérêts : {totalInterest}\n- Coût total de l'assurance : {totalInsurance}\n- Coût total du crédit : {totalCost}",
+    "insuranceDetailsInitialPct": "avec une assurance de {insuranceRate} sur le capital initial",
+    "insuranceDetailsCrdPct": "avec une assurance de {insuranceRate} sur le capital restant dû",
+    "insuranceDetailsNone": "sans assurance",
+    "validation": {
+      "loanAmountPositive": "Le montant du prêt doit être positif.",
+      "nominalRateRange": "Le taux nominal doit être entre 0% et 10%.",
+      "durationMin": "La durée doit être d'au moins 1 an.",
+      "insuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%."
+    },
+    "immoSentSuccess": "Données de prêt envoyées au module Immo (simulation).",
+    "immoNotReady": "Le module Immo n'est pas encore prêt à recevoir les données."
   }
 }

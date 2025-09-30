@@ -13,7 +13,8 @@ const resources = {
     homePage: frTranslations.homePage,
     aboutPage: frTranslations.aboutPage,
     brutNetPage: frTranslations.brutNetPage,
-    epargnePage: frTranslations.epargnePage, // Ajout du namespace epargnePage
+    epargnePage: frTranslations.epargnePage,
+    creditPage: frTranslations.creditPage // Ajout du namespace creditPage
   },
 };
 
