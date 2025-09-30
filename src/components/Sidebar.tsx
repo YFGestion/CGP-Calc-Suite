@@ -16,24 +16,26 @@ import {
   Info,
   Sun,
   Moon,
+  Globe, // Added Globe icon for language toggle
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import { useTheme } from 'next-themes';
+import i18n from '@/app/i18n'; // Import i18n instance
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common'); // Explicitly use 'common' namespace
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useAppState();
 
   const navItems = [
-    { to: '/', icon: Home, label: t('common.home') },
-    { to: '/brut-net', icon: Scale, label: t('common.brutNet') },
-    { to: '/endettement', icon: Wallet, label: t('common.endettement') },
-    { to: '/epargne', icon: PiggyBank, label: t('common.epargne') },
-    { to: '/credit', icon: Calculator, label: t('common.credit') },
-    { to: '/immo', icon: LandPlot, label: t('common.immo') },
+    { to: '/', icon: Home, label: t('home') },
+    { to: '/brut-net', icon: Scale, label: t('brutNet') },
+    { to: '/endettement', icon: Wallet, label: t('endettement') },
+    { to: '/epargne', icon: PiggyBank, label: t('epargne') },
+    { to: '/credit', icon: Calculator, label: t('credit') },
+    { to: '/immo', icon: LandPlot, label: t('immo') },
   ];
 
   const toggleTheme = () => {
@@ -51,7 +53,7 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-sidebar-primary">
-            {t('common.appName')}
+            {t('appName')}
           </h2>
           <div className="space-y-1">
             {navItems.map((item) => (
@@ -71,7 +73,7 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-sidebar-primary">
-            {t('common.tools')}
+            {t('tools')}
           </h2>
           <div className="space-y-1">
             <Button
@@ -84,15 +86,16 @@ export function Sidebar({ className }: SidebarProps) {
               ) : (
                 <Sun className="mr-2 h-4 w-4" />
               )}
-              {t('common.themeToggle')}
+              {t('themeToggle')}
             </Button>
+            {/* Uncommented language toggle for future use if needed, but keeping it commented for now as per original */}
             {/* <Button
               variant="ghost"
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               onClick={toggleLanguage}
             >
               <Globe className="mr-2 h-4 w-4" />
-              {t('common.languageToggle')}
+              {t('languageToggle')}
             </Button> */}
           </div>
         </div>
