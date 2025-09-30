@@ -11,7 +11,8 @@
     "themeToggle": "Basculer le thème",
     "languageToggle": "Basculer la langue",
     "copy": "Copier",
-    "copied": "Copié !"
+    "copied": "Copié !",
+    "results": "Résultats"
   },
   "compliance": {
     "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et mettre à jour."
@@ -33,5 +34,30 @@
   "aboutPage": {
     "title": "À propos et Hypothèses",
     "content": "Cette page contient des informations sur l'application et les hypothèses utilisées pour les calculs. Elle est en cours de développement."
+  },
+  "brutNetPage": {
+    "title": "Calculateur Brut → Net",
+    "grossInputLabel": "Montant brut",
+    "inputPeriodLabel": "Période de saisie",
+    "monthly": "Mensuel",
+    "annual": "Annuel",
+    "paidMonthsLabel": "Nombre de mois payés",
+    "chargesRateLabel": "Taux de charges sociales (%)",
+    "withholdingRateLabel": "Taux de prélèvement à la source (PAS) (%)",
+    "calculateButton": "Calculer",
+    "exportCsvButton": "Exporter CSV",
+    "copySummaryButton": "Copier le résumé",
+    "netBeforeTaxAnnual": "Net avant impôt (annuel)",
+    "netBeforeTaxMonthlyAvg": "Net avant impôt (mensuel moyen)",
+    "netAfterTaxAnnual": "Net après impôt (annuel)",
+    "netAfterTaxMonthlyAvg": "Net après impôt (mensuel moyen)",
+    "netPerPay": "Net par paie",
+    "summaryTitle": "Résumé du calcul Brut → Net",
+    "summaryContent": "Pour un brut de {grossValue} {inputPeriod} sur {paidMonths} mois, avec {chargesRate} de charges et {withholdingRate} de PAS :\n\n- Net avant impôt (annuel) : {netBeforeTaxAnnual}\n- Net avant impôt (mensuel moyen) : {netBeforeTaxMonthlyAvg}\n- Net après impôt (annuel) : {netAfterTaxAnnual}\n- Net après impôt (mensuel moyen) : {netAfterTaxMonthlyAvg}\n- Net par paie : {netPerPay}",
+    "validation": {
+      "grossValuePositive": "Le montant brut doit être positif.",
+      "chargesRateRange": "Le taux de charges doit être entre 0% et 50%.",
+      "withholdingRateRange": "Le taux de PAS doit être entre 0% et 45%."
+    }
   }
 }
