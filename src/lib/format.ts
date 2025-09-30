@@ -1,4 +1,4 @@
-import { round } from './math-core';
+import { round } from './math-core/utils';
 
 export const formatCurrency = (value: number, locale: string = 'fr-FR', currency: string = 'EUR'): string => {
   return new Intl.NumberFormat(locale, {
