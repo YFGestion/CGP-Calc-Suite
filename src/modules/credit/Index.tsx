@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import { Slider } from '@/components/ui/slider'; // Slider is still imported but not used for rates
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { CopyBlock } from '@/lib/copy';
@@ -219,16 +219,14 @@ const CreditPage = () => {
                 <FormItem>
                   <FormLabel>{t('nominalRateLabel')}</FormLabel>
                   <FormControl>
-                    <Slider
-                      min={0}
-                      max={10}
-                      step={0.01}
-                      value={[field.value]}
-                      onValueChange={(val) => field.onChange(val[0])}
-                      className="w-[100%]"
+                    <Input
+                      type="number"
+                      step="0.01" // Allow decimal input for percentage
+                      {...field}
+                      onChange={e => field.onChange(parseFloat(e.target.value))}
+                      suffix="%" // Visual suffix, not part of value
                     />
                   </FormControl>
-                  <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -311,16 +309,14 @@ const CreditPage = () => {
                     <FormItem>
                       <FormLabel>{t('insuranceRateLabel')}</FormLabel>
                       <FormControl>
-                        <Slider
-                          min={0}
-                          max={1}
-                          step={0.01}
-                          value={[field.value || 0]}
-                          onValueChange={(val) => field.onChange(val[0])}
-                          className="w-[100%]"
+                        <Input
+                          type="number"
+                          step="0.01" // Allow decimal input for percentage
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          suffix="%" // Visual suffix, not part of value
                         />
                       </FormControl>
-                      <div className="text-right text-sm text-muted-foreground">{field.value || 0}%</div>
                       <FormMessage />
                     </FormItem>
                   )}
