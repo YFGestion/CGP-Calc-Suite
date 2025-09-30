@@ -26,10 +26,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   }).positive(t('validation.grossValuePositive')),
   inputPeriod: z.enum(['monthly', 'annual']),
   paidMonths: z.coerce.number().int().min(12).max(15),
-  chargesRate: z.coerce.number({
-    required_error: t('validation.chargesRateRange'),
-    invalid_type_error: t('validation.chargesRateRange'),
-  }).min(0, t('validation.chargesRateRange')).max(50, t('validation.chargesRateRange')), // User enters 0-50 for percentage
+  employeeStatus: z.enum(['cadre', 'nonCadre']), // New field for employee status
   withholdingRate: z.coerce.number({
     required_error: t('validation.withholdingRateRange'),
     invalid_type_error: t('validation.withholdingRateRange'),
@@ -46,7 +43,7 @@ const BrutNetPage = () => {
       grossValue: 3000,
       inputPeriod: 'monthly',
       paidMonths: 12,
-      chargesRate: 25, // Default 25%
+      employeeStatus: 'cadre', // Default to 'cadre'
       withholdingRate: 8, // Default 8%
     },
   });
@@ -55,11 +52,14 @@ const BrutNetPage = () => {
   const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
+    // Determine chargesRate based on employeeStatus
+    const chargesRateValue = values.employeeStatus === 'cadre' ? 25 : 22;
+
     const computedResults = computeBrutNet({
       grossValue: values.grossValue,
       inputPeriod: values.inputPeriod,
       paidMonths: values.paidMonths as 12 | 13 | 14 | 15, // Type assertion as Zod ensures it
-      chargesRate: values.chargesRate / 100, // Convert percentage to decimal
+      chargesRate: chargesRateValue / 100, // Convert percentage to decimal
       withholdingRate: values.withholdingRate / 100, // Convert percentage to decimal
     });
     setResults(computedResults);
@@ -68,7 +68,7 @@ const BrutNetPage = () => {
       grossValue: formatCurrency(values.grossValue),
       inputPeriod: values.inputPeriod === 'monthly' ? t('monthly') : t('annual'),
       paidMonths: values.paidMonths,
-      chargesRate: formatPercent(values.chargesRate / 100),
+      employeeStatus: t(values.employeeStatus), // Translate employee status
       withholdingRate: formatPercent(values.withholdingRate / 100),
       netBeforeTaxAnnual: formatCurrency(computedResults.netBeforeTaxAnnual),
       netBeforeTaxMonthlyAvg: formatCurrency(computedResults.netBeforeTaxMonthlyAvg),
@@ -85,6 +85,8 @@ const BrutNetPage = () => {
   const handleExportCsv = () => {
     if (!results) return;
 
+    const chargesRateValue = form.getValues('employeeStatus') === 'cadre' ? 25 : 22;
+
     const rows = [
       [commonT('appName')],
       [t('title')],
@@ -92,7 +94,8 @@ const BrutNetPage = () => {
       [t('grossInputLabel'), form.getValues('grossValue').toString()],
       [t('inputPeriodLabel'), form.getValues('inputPeriod') === 'monthly' ? t('monthly') : t('annual')],
       [t('paidMonthsLabel'), form.getValues('paidMonths').toString()],
-      [t('chargesRateLabel'), form.getValues('chargesRate').toString() + '%'],
+      [t('employeeStatusLabel'), t(form.getValues('employeeStatus'))], // Export translated status
+      [t('chargesRateLabel'), chargesRateValue.toString() + '%'], // Export actual rate used
       [t('withholdingRateLabel'), form.getValues('withholdingRate').toString() + '%'],
       [],
       [t('netBeforeTaxAnnual'), formatCurrency(results.netBeforeTaxAnnual)],
@@ -193,21 +196,34 @@ const BrutNetPage = () => {
 
             <FormField
               control={form.control}
-              name="chargesRate"
+              name="employeeStatus"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('chargesRateLabel')}</FormLabel>
+                <FormItem className="space-y-3">
+                  <FormLabel>{t('employeeStatusLabel')}</FormLabel>
                   <FormControl>
-                    <Slider
-                      min={0}
-                      max={50}
-                      step={0.1}
-                      value={[field.value]}
-                      onValueChange={(val) => field.onChange(val[0])}
-                      className="w-[100%]"
-                    />
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="cadre" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {t('cadre')}
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="nonCadre" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {t('nonCadre')}
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                   </FormControl>
-                  <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
                   <FormMessage />
                 </FormItem>
               )}
