@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AboutPage = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('aboutPage'); // Spécifie le namespace 'aboutPage'
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('aboutPage.title')}</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>{t('aboutPage.content')}</p>
+        <p>{t('content')}</p>
       </CardContent>
     </Card>
   );

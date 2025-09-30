@@ -13,36 +13,36 @@ import {
 } from 'lucide-react';
 
 const Index = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('homePage'); // Spécifie le namespace 'homePage'
 
   const moduleCards = [
     {
-      title: t('homePage.brutNetCardTitle'),
-      description: t('homePage.brutNetCardDescription'),
+      title: t('brutNetCardTitle'),
+      description: t('brutNetCardDescription'),
       link: '/brut-net',
       icon: Scale,
     },
     {
-      title: t('homePage.endettementCardTitle'),
-      description: t('homePage.endettementCardDescription'),
+      title: t('endettementCardTitle'),
+      description: t('endettementCardDescription'),
       link: '/endettement',
       icon: Wallet,
     },
     {
-      title: t('homePage.epargneCardTitle'),
-      description: t('homePage.epargneCardDescription'),
+      title: t('epargneCardTitle'),
+      description: t('epargneCardDescription'),
       link: '/epargne',
       icon: PiggyBank,
     },
     {
-      title: t('homePage.creditCardTitle'),
-      description: t('homePage.creditCardDescription'),
+      title: t('creditCardTitle'),
+      description: t('creditCardDescription'),
       link: '/credit',
       icon: Calculator,
     },
     {
-      title: t('homePage.immoCardTitle'),
-      description: t('homePage.immoCardDescription'),
+      title: t('immoCardTitle'),
+      description: t('immoCardDescription'),
       link: '/immo',
       icon: LandPlot,
     },
@@ -51,8 +51,8 @@ const Index = () => {
   return (
     <div className="flex flex-col items-center justify-center p-4">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">{t('homePage.welcome')}</h1>
-        <p className="text-xl text-muted-foreground">{t('homePage.description')}</p>
+        <h1 className="text-4xl font-bold mb-2">{t('welcome')}</h1>
+        <p className="text-xl text-muted-foreground">{t('description')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
