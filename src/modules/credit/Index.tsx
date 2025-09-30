@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom'; // Import useSearchParams
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider'; // Slider is still imported but not used for rates
+import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { CopyBlock } from '@/lib/copy';
@@ -72,6 +73,7 @@ const formSchema = (t: (key: string) => string) => z.object({
 const CreditPage = () => {
   const { t } = useTranslation('creditPage');
   const { t: commonT } = useTranslation('common');
+  const [searchParams] = useSearchParams(); // Hook to read URL query parameters
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
@@ -90,6 +92,28 @@ const CreditPage = () => {
 
   const [results, setResults] = useState<ReturnType<typeof amortizationSchedule> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
+
+  // Effect to read query parameters and set form values
+  useEffect(() => {
+    const loanAmount = searchParams.get('loanAmount');
+    const nominalRate = searchParams.get('nominalRate');
+    const durationYears = searchParams.get('durationYears');
+    const applyInsuranceParam = searchParams.get('applyInsurance');
+    const insuranceModeParam = searchParams.get('insuranceMode');
+    const insuranceRateParam = searchParams.get('insuranceRate');
+
+    if (loanAmount) form.setValue('loanAmount', parseFloat(loanAmount));
+    if (nominalRate) form.setValue('nominalRate', parseFloat(nominalRate));
+    if (durationYears) form.setValue('durationYears', parseInt(durationYears));
+    if (applyInsuranceParam) form.setValue('applyInsurance', applyInsuranceParam === 'true');
+    if (insuranceModeParam) form.setValue('insuranceMode', insuranceModeParam as 'initialPct' | 'crdPct');
+    if (insuranceRateParam) form.setValue('insuranceRate', parseFloat(insuranceRateParam));
+
+    // If any parameter was set, trigger form submission to calculate results
+    if (loanAmount || nominalRate || durationYears || applyInsuranceParam || insuranceModeParam || insuranceRateParam) {
+      form.handleSubmit(onSubmit)();
+    }
+  }, [searchParams]); // Rerun when searchParams change
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const insuranceDetails = values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined
