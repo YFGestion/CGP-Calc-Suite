@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form'; // Corrected import
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
@@ -193,7 +193,7 @@ const SettingsPage = () => {
                     <Input type="number" step="0.01" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
                   </FormControl>
                   <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
-                  <FormMessage />
+                    <FormMessage />
                 </FormItem>
               )}
             />

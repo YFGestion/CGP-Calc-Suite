@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form'; // Corrected import
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -40,7 +41,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   nominalRate: z.coerce.number({
     required_error: t('validation.nominalRateRange'),
     invalid_type_error: t('validation.nominalRateRange'),
-  }).min(0, t('validation.loanRateRange')).max(10, t('validation.loanRateRange')), // User enters 0-10 for percentage
+  }).min(0, t('validation.nominalRateRange')).max(10, t('validation.nominalRateRange')), // User enters 0-10 for percentage
   durationYears: z.coerce.number({
     required_error: t('validation.durationMin'),
     invalid_type_error: t('validation.durationMin'),
