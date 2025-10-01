@@ -307,5 +307,19 @@
       "loanDurationYearsRange": "La durée de prêt doit être entre 1 et 60 ans.",
       "loanInsuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%."
     }
+  },
+  "homePage": {
+    "welcome": "Bienvenue sur CGP Calc Suite",
+    "description": "Votre boîte à outils pour les calculs financiers et patrimoniaux.",
+    "brutNetCardTitle": "Brut → Net",
+    "brutNetCardDescription": "Convertissez facilement un salaire brut en net.",
+    "endettementCardTitle": "Capacité d'Endettement",
+    "endettementCardDescription": "Calculez votre capacité d'emprunt maximale.",
+    "epargneCardTitle": "Simulateur d'Épargne",
+    "epargneCardDescription": "Projetez l'évolution de votre épargne.",
+    "creditCardTitle": "Simulateur de Crédit",
+    "creditCardDescription": "Obtenez le tableau d'amortissement de votre prêt.",
+    "immoCardTitle": "Immo (Effort & TRI)",
+    "immoCardDescription": "Analysez la rentabilité de votre investissement immobilier."
   }
 }
