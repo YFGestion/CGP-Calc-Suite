@@ -7,7 +7,9 @@ import frTranslations from '../../public/locales/fr/translation.json';
 // Crée l'objet de ressources en mappant directement l'objet JSON importé
 // Chaque clé de haut niveau du fichier JSON (e.g., 'common', 'homePage') sera un namespace.
 const resources = {
-  fr: frTranslations,
+  fr: {
+    ...frTranslations, // Utilise l'opérateur spread pour que les clés de frTranslations deviennent des namespaces
+  },
 };
 
 i18n
