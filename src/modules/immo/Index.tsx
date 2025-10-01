@@ -59,10 +59,6 @@ const formSchema = (t: (key: string) => string) => z.object({
   }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(),
   
   rentPeriodicity: z.enum(['monthly', 'annual']),
-  // vacancyRate: z.coerce.number({ // REMOVED
-  //   required_error: t('validation.percentageRange', { min: 0, max: 100 }),
-  //   invalid_type_error: t('validation.percentageRange', { min: 0, max: 100 }),
-  // }).min(0, t('validation.percentageRange', { min: 0, max: 100 })).max(100, t('validation.percentageRange', { min: 0, max: 100 })),
   opex: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
@@ -196,7 +192,6 @@ const ImmoPage = () => {
       rentGross: 1000,
       expectedYield: 5,
       rentPeriodicity: 'monthly',
-      // vacancyRate: 5, // REMOVED
       opex: 500,
       propertyTax: 1000,
       applyMgmtFees: false,
@@ -247,7 +242,6 @@ const ImmoPage = () => {
     }
 
     const adjustedRentAnnualGross = baseRentAnnualGross;
-    // const adjustedVacancyRate = values.vacancyRate / 100; // REMOVED
     
     let mgmtFeesPctValue = 0;
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
@@ -284,7 +278,6 @@ const ImmoPage = () => {
       price: values.price,
       acqCosts: values.applyAcqCosts ? values.acqCosts : 0,
       rentAnnualGross: adjustedRentAnnualGross,
-      // vacancyRate: adjustedVacancyRate, // REMOVED
       opex: values.opex,
       propertyTax: values.propertyTax,
       mgmtFeesPct: mgmtFeesPctValue,
@@ -405,7 +398,6 @@ const ImmoPage = () => {
       [t('rentInputModeLabel'), rentInputModeTranslated],
       [rentLabel, rentValue],
       [t('rentPeriodicityLabel'), t(values.rentPeriodicity)],
-      // [t('vacancyRateLabel'), values.vacancyRate.toString() + '%'], // REMOVED
       [t('opexLabel'), values.opex.toString()],
       [t('propertyTaxLabel'), values.propertyTax.toString()],
       [t('mgmtFeesToggleLabel'), values.applyMgmtFees ? 'Oui' : 'Non'],
@@ -445,7 +437,7 @@ const ImmoPage = () => {
       [],
       [t('annualTableTitle')],
       [
-        t('tableHeaderYear'), t('tableHeaderRentGross'), /* t('tableHeaderVacancy'), */ t('tableHeaderRentNet'), // REMOVED
+        t('tableHeaderYear'), t('tableHeaderRentGross'), t('tableHeaderRentNet'),
         t('tableHeaderOpexTotal'), t('tableHeaderNOI'), t('tableHeaderInterest'), t('tableHeaderPrincipal'),
         t('tableHeaderInsurance'), t('tableHeaderAnnuity'), t('tableHeaderTaxableIncome'), t('tableHeaderTax'),
         t('tableHeaderCashflow'), t('tableHeaderCrdEnd')
@@ -453,7 +445,6 @@ const ImmoPage = () => {
       ...results.annualTable.map(row => [
         row.year.toString(),
         formatCurrency(row.rentGross),
-        // formatCurrency(row.vacancy), // REMOVED
         formatCurrency(row.rentNet),
         formatCurrency(row.opexTotal),
         formatCurrency(row.NOI),
@@ -651,27 +642,6 @@ const ImmoPage = () => {
                     )}
                   />
                 )}
-
-                {/* REMOVED VACANCY RATE FIELD */}
-                {/* <FormField
-                  control={form.control}
-                  name="vacancyRate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('vacancyRateLabel')}</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={0} max={100} step={0.1}
-                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
-                          className="w-[100%]"
-                          aria-label={t('vacancyRateLabel')}
-                        />
-                      </FormControl>
-                      <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
 
                 <FormField
                   control={form.control}
@@ -1296,7 +1266,6 @@ const ImmoPage = () => {
                       <TableRow>
                         <TableHead>{t('tableHeaderYear')}</TableHead>
                         <TableHead>{t('tableHeaderRentGross')}</TableHead>
-                        {/* <TableHead>{t('tableHeaderVacancy')}</TableHead> */} {/* REMOVED */}
                         <TableHead>{t('tableHeaderRentNet')}</TableHead>
                         <TableHead>{t('tableHeaderOpexTotal')}</TableHead>
                         <TableHead>{t('tableHeaderNOI')}</TableHead>
@@ -1315,7 +1284,6 @@ const ImmoPage = () => {
                         <TableRow key={row.year}>
                           <TableCell>{row.year}</TableCell>
                           <TableCell>{formatCurrency(row.rentGross)}</TableCell>
-                          {/* <TableCell>{formatCurrency(row.vacancy)}</TableCell> */} {/* REMOVED */}
                           <TableCell>{formatCurrency(row.rentNet)}</TableCell>
                           <TableCell>{formatCurrency(row.opexTotal)}</TableCell>
                           <TableCell>{formatCurrency(row.NOI)}</TableCell>

@@ -91,8 +91,7 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   }) : null;
 
   const annualTable: AnnualTableEntry[] = [];
-  // const cashFlows: number[] = [-initialInvestment]; // Original cashflows for overall IRR - REMOVED
-
+  
   let totalSavingEffortDuringLoan = 0;
   let loanPeriodsCount = 0;
   let postLoanIncomeSum = 0;
@@ -105,7 +104,6 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
 
   for (let year = 1; year <= horizonYears; year++) {
     const currentRentGross = rentAnnualGross;
-    // const currentVacancy = currentRentGross * vacancyRate; // REMOVED
     const currentRentNet = currentRentGross; // No vacancy rate applied
 
     const currentMgmtFees = currentRentGross * mgmtFeesPct;
@@ -154,12 +152,10 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     tax = round(tax, 2);
 
     const cashflow = round(NOI - annuity - tax, 2);
-    // cashFlows.push(cashflow); // Original cashflows for overall IRR - REMOVED
-
+    
     annualTable.push({
       year,
       rentGross: round(currentRentGross, 2),
-      // vacancy: round(currentVacancy, 2), // REMOVED
       rentNet: round(currentRentNet, 2),
       opexTotal: round(opexTotal, 2),
       NOI: round(NOI, 2),
@@ -201,39 +197,44 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   const avgSavingEffortDuringLoan = loanPeriodsCount > 0 ? round(totalSavingEffortDuringLoan / loanPeriodsCount, 2) : 0;
   const avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
 
-  // Calculate irr (now the only IRR, representing the return on saving effort + initial equity)
+  // Calculate IRR (TRI de l'effort d'épargne)
   let finalIrr = NaN;
-  const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2); // Capital de départ non financé
+  const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2);
   const numMonths = horizonYears * 12;
+  const cashFlowsForIrr: number[] = [];
 
-  // Only calculate if there's an initial equity or saving effort, and recovered capital
-  if ((initialEquity > 0 || avgSavingEffortDuringLoan > 0) && finalCapitalRecoveredAtSale !== 0) {
-    const monthlySavingEffort = avgSavingEffortDuringLoan / 12;
-    const savingEffortCashFlows: number[] = [];
+  // Initial investment (outflow at t=0)
+  cashFlowsForIrr.push(-initialEquity);
 
-    // Initial outflow (unfunded capital) at t=0
-    savingEffortCashFlows.push(-initialEquity);
+  for (let year = 1; year <= horizonYears; year++) {
+    const annualData = annualTable[year - 1];
+    const monthlyCashflowFromOperations = annualData.cashflow / 12;
 
-    // Monthly saving efforts (outflows) from t=1 to t=numMonths
-    for (let i = 0; i < numMonths; i++) {
-      savingEffortCashFlows.push(-monthlySavingEffort);
+    for (let month = 1; month <= 12; month++) {
+      let currentMonthlyFlow = monthlyCashflowFromOperations;
+      // If this is the exact month of sale, add the recovered capital
+      if (year === saleYear && month === 12) { // Assuming sale happens at the end of the saleYear
+        currentMonthlyFlow = round(currentMonthlyFlow + finalCapitalRecoveredAtSale, 2);
+      }
+      cashFlowsForIrr.push(currentMonthlyFlow);
     }
+  }
 
-    // Add final recovered capital to the last cash flow (at t=numMonths)
-    savingEffortCashFlows[numMonths] = round(savingEffortCashFlows[numMonths] + finalCapitalRecoveredAtSale, 2);
+  // Check for valid cashFlowsForIrr length and content
+  if (cashFlowsForIrr.length > 1) { // Need at least initial outflow and one subsequent flow for IRR
+    const monthlyIrr = irr(cashFlowsForIrr);
 
-    const monthlyIrr = irr(savingEffortCashFlows);
     if (!isNaN(monthlyIrr) && monthlyIrr > -1) {
       finalIrr = Math.pow(1 + monthlyIrr, 12) - 1; // Annualize
-    } else if (monthlyIrr <= -1) { // If IRR is -100% or worse
-      finalIrr = -1;
+    } else if (monthlyIrr <= -1) {
+      finalIrr = -1; // -100% return
     }
-  } else if (initialEquity === 0 && avgSavingEffortDuringLoan === 0 && finalCapitalRecoveredAtSale > 0) {
-    // If no initial equity, no saving effort, but recovered capital, it's an infinite return.
-    finalIrr = NaN; // Or a very high number, NaN is safer for IRR.
-  } else if ((initialEquity > 0 || avgSavingEffortDuringLoan > 0) && finalCapitalRecoveredAtSale <= 0) {
-    // If there was effort/initial equity but no recovered capital or a loss
-    finalIrr = -1; // -100% return
+  } else if (initialEquity > 0 && finalCapitalRecoveredAtSale <= 0) {
+      finalIrr = -1; // Only initial outflow, no recovery
+  } else if (initialEquity <= 0 && finalCapitalRecoveredAtSale > 0) {
+      finalIrr = NaN; // Only final inflow, no initial outflow
+  } else if (initialEquity === 0 && finalCapitalRecoveredAtSale === 0 && cashFlowsForIrr.every(cf => cf === 0)) {
+      finalIrr = 0; // No activity, 0 return
   }
 
 
