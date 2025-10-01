@@ -134,13 +134,6 @@ const formSchema = (t: (key: string) => string) => z.object({
     required_error: t('validation.percentageRange', { min: 0, max: 17.2 }),
     invalid_type_error: t('validation.percentageRange', { min: 0, max: 17.2 }),
   }).min(0, t('validation.percentageRange', { min: 0, max: 17.2 })).max(17.2, t('validation.percentageRange', { min: 0, max: 17.2 })).optional(),
-
-  // D) Sensibilités
-  rentSensitivity: z.coerce.number().min(-10).max(10).default(0),
-  vacancySensitivity: z.coerce.number().min(-5).max(5).default(0),
-  salePriceSensitivity: z.coerce.number().min(-10).max(10).default(0),
-  loanRateSensitivity: z.coerce.number().min(-1).max(1).default(0),
-
 }).superRefine((data, ctx) => {
   if (data.applyAcqCosts && (data.acqCosts === undefined || data.acqCosts === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['acqCosts'] });
@@ -227,11 +220,6 @@ const ImmoPage = () => {
       taxMode: 'micro_foncier_30',
       tmi: settings.defaultTMI,
       ps: settings.defaultPS,
-
-      rentSensitivity: 0,
-      vacancySensitivity: 0,
-      salePriceSensitivity: 0,
-      loanRateSensitivity: 0,
     },
   });
 
@@ -247,11 +235,6 @@ const ImmoPage = () => {
   const loanApplyInsurance = watch('loanApplyInsurance');
   const taxMode = watch('taxMode');
 
-  const rentSensitivity = watch('rentSensitivity');
-  const vacancySensitivity = watch('vacancySensitivity');
-  const salePriceSensitivity = watch('salePriceSensitivity');
-  const loanRateSensitivity = watch('loanRateSensitivity');
-
   const [results, setResults] = useState<ReturnType<typeof rentalCashflowIrr> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
 
@@ -263,8 +246,8 @@ const ImmoPage = () => {
       baseRentAnnualGross = values.price * (values.expectedYield / 100);
     }
 
-    const adjustedRentAnnualGross = baseRentAnnualGross * (1 + rentSensitivity / 100);
-    const adjustedVacancyRate = (values.vacancyRate + vacancySensitivity) / 100;
+    const adjustedRentAnnualGross = baseRentAnnualGross; // No sensitivity
+    const adjustedVacancyRate = values.vacancyRate / 100; // No sensitivity
     
     let mgmtFeesPctValue = 0;
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
@@ -277,7 +260,7 @@ const ImmoPage = () => {
     const loanDetails = values.applyLoan && values.loanAmount && values.loanRate && values.loanDurationYears
       ? {
         amount: values.loanAmount,
-        rate: (values.loanRate + loanRateSensitivity) / 100, // Apply sensitivity
+        rate: values.loanRate / 100, // No sensitivity
         years: values.loanDurationYears,
         insurance: values.loanApplyInsurance && values.loanInsuranceMode && values.loanInsuranceRate !== undefined
           ? {
@@ -292,9 +275,9 @@ const ImmoPage = () => {
     let saleGrowthRateValue = values.saleGrowthRate;
 
     if (values.salePriceMode === 'fixed' && values.salePrice !== undefined) {
-      salePriceValue = values.salePrice * (1 + salePriceSensitivity / 100);
+      salePriceValue = values.salePrice; // No sensitivity
     } else if (values.salePriceMode === 'growth' && values.saleGrowthRate !== undefined) {
-      saleGrowthRateValue = (values.saleGrowthRate + salePriceSensitivity) / 100;
+      saleGrowthRateValue = values.saleGrowthRate / 100; // No sensitivity
     }
 
     const computedResults = rentalCashflowIrr({
@@ -334,7 +317,7 @@ const ImmoPage = () => {
     setSummaryContent(
       t('summaryContent', formattedResults)
     );
-  }, [rentSensitivity, vacancySensitivity, salePriceSensitivity, loanRateSensitivity, commonT, t]);
+  }, [commonT, t]);
 
   const onSubmit = useCallback((values: z.infer<ReturnType<typeof formSchema>>) => {
     calculate(values);
@@ -375,17 +358,7 @@ const ImmoPage = () => {
     }
   }, [searchParams, setValue, handleSubmit, onSubmit]);
 
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      if (name && ['rentSensitivity', 'vacancySensitivity', 'salePriceSensitivity', 'loanRateSensitivity'].includes(name)) {
-        if (form.formState.isValid && results) {
-          calculate(getValues());
-        }
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, form.formState.isValid, results, getValues, calculate]);
-
+  // Removed the useEffect for sensitivity changes as sensitivities are removed.
 
   const handleExportCsv = () => {
     if (!results) return;
@@ -450,12 +423,6 @@ const ImmoPage = () => {
       [t('tmiLabel'), tmiValue.toString() + '%'],
       [t('psLabel'), psValue.toString() + '%'],
       [],
-      [t('sectionSensitivities')],
-      [t('rentSensitivityLabel'), rentSensitivity.toString() + '%'],
-      [t('vacancySensitivityLabel'), vacancySensitivity.toString() + ' pts'],
-      [t('salePriceSensitivityLabel'), salePriceSensitivity.toString() + '%'],
-      [t('loanRateSensitivityLabel'), loanRateSensitivity.toString() + ' pts'],
-      [],
       [commonT('results')],
       [t('avgSavingEffortDuringLoan'), formatCurrency(results.avgSavingEffortDuringLoan)],
       [t('avgPostLoanIncome'), formatCurrency(results.avgPostLoanIncome)],
@@ -494,16 +461,7 @@ const ImmoPage = () => {
     // Future implementation: copy current form state to a new scenario
   };
 
-  const handleResetSensitivities = () => {
-    setValue('rentSensitivity', 0);
-    setValue('vacancySensitivity', 0);
-    setValue('salePriceSensitivity', 0);
-    setValue('loanRateSensitivity', 0);
-    // Trigger recalculation if results exist
-    if (results) {
-      calculate(getValues());
-    }
-  };
+  // Removed handleResetSensitivities as sensitivities are removed.
 
   return (
     <Card className="w-full max-w-5xl mx-auto">
@@ -1210,92 +1168,6 @@ const ImmoPage = () => {
                     />
                   </div>
                 )}
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* Section D: Sensibilités */}
-            <Collapsible defaultOpen className="space-y-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b" aria-label={t('sectionSensitivities')}>
-                {t('sectionSensitivities')}
-                <ChevronDown className="h-5 w-5" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-4 p-4">
-                <FormField
-                  control={form.control}
-                  name="rentSensitivity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('rentSensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value}%)</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={-10} max={10} step={1}
-                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
-                          className="w-[100%]"
-                          aria-label={t('rentSensitivityLabel')}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="vacancySensitivity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('vacancySensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value} pts)</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={-5} max={5} step={1}
-                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
-                          className="w-[100%]"
-                          aria-label={t('vacancySensitivityLabel')}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="salePriceSensitivity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('salePriceSensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value}%)</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={-10} max={10} step={1}
-                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
-                          className="w-[100%]"
-                          aria-label={t('salePriceSensitivityLabel')}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="loanRateSensitivity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('loanRateSensitivityLabel')} ({field.value > 0 ? '+' : ''}{field.value} pts)</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={-1} max={1} step={0.1}
-                          value={[field.value]} onValueChange={(val) => field.onChange(val[0])}
-                          className="w-[100%]"
-                          aria-label={t('loanRateSensitivityLabel')}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button variant="outline" onClick={handleResetSensitivities} className="w-full" aria-label={t('resetSensitivities')}>
-                  <RefreshCcw className="mr-2 h-4 w-4" />
-                  {t('resetSensitivities')}
-                </Button>
               </CollapsibleContent>
             </Collapsible>
 

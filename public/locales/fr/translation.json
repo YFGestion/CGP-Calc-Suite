@@ -183,13 +183,6 @@
     "tmiLabel": "Taux Marginal d'Imposition (TMI) (%)",
     "psLabel": "Prélèvements Sociaux (PS) (%)",
 
-    "sectionSensitivities": "D) Sensibilités",
-    "rentSensitivityLabel": "Loyer",
-    "vacancySensitivityLabel": "Vacance",
-    "salePriceSensitivityLabel": "Prix de revente",
-    "loanRateSensitivityLabel": "Taux de crédit",
-    "resetSensitivities": "Réinitialiser les sensibilités",
-
     "calculateButton": "Calculer",
     "exportCsvButton": "Exporter CSV",
     "copySummaryButton": "Copier le résumé",
