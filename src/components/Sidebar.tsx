@@ -14,20 +14,18 @@ import {
   Scale,
   Home,
   Info,
-  // Sun, // Supprimé
-  // Moon, // Supprimé
   Globe,
   Settings,
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
-// import { useTheme } from 'next-themes'; // Supprimé
 import i18n from '@/app/i18n';
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  onLinkClick?: () => void; // Nouvelle prop
+}
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className, onLinkClick }: SidebarProps) {
   const { t } = useTranslation('common');
-  // const { theme, setTheme } = useTheme(); // Supprimé
   const { language, setLanguage } = useAppState();
 
   const navItems = [
@@ -38,10 +36,6 @@ export function Sidebar({ className }: SidebarProps) {
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
   ];
-
-  // const toggleTheme = () => { // Supprimé
-  //   setTheme(theme === 'light' ? 'dark' : 'light');
-  // };
 
   const toggleLanguage = () => {
     const newLang = language === 'fr-FR' ? 'en-US' : 'fr-FR';
@@ -63,6 +57,7 @@ export function Sidebar({ className }: SidebarProps) {
                 variant="ghost"
                 className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 asChild
+                onClick={onLinkClick} {/* Appel de onLinkClick ici */}
               >
                 <Link to={item.to}>
                   <item.icon className="mr-2 h-4 w-4" />
@@ -77,38 +72,17 @@ export function Sidebar({ className }: SidebarProps) {
             {t('tools')}
           </h2>
           <div className="space-y-1">
-            {/* Bouton de bascule du thème supprimé */}
-            {/* <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              onClick={toggleTheme}
-            >
-              {theme === 'light' ? (
-                <Moon className="mr-2 h-4 w-4" />
-              ) : (
-                <Sun className="mr-2 h-4 w-4" />
-              )}
-              {t('themeToggle')}
-            </Button> */}
             <Button
               variant="ghost"
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               asChild
+              onClick={onLinkClick} {/* Appel de onLinkClick ici */}
             >
               <Link to="/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 {t('settings')}
               </Link>
             </Button>
-            {/* Uncommented language toggle for future use if needed, but keeping it commented for now as per original */}
-            {/* <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              onClick={toggleLanguage}
-            >
-              <Globe className="mr-2 h-4 w-4" />
-              {t('languageToggle')}
-            </Button> */}
           </div>
         </div>
       </div>
