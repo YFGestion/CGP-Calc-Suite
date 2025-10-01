@@ -1,5 +1,5 @@
 import { amortizationSchedule } from './loan';
-import { round } from './utils'; // Removed irr import as it's no longer used here
+import { round } from './utils';
 
 interface LoanDetails {
   amount: number;
@@ -26,9 +26,8 @@ interface RentalCashflowIrrParams {
   saleGrowthRate?: number; // Si 'growth' (e.g., 0.02 pour 2% annuel)
   saleCostsPct?: number; // Frais de vente (pourcentage du prix de vente)
   loan?: LoanDetails;
-  taxMode: 'none' | 'micro_foncier_30' | 'micro_bic_50' | 'effective_rate';
-  tmi?: number; // Taux Marginal d'Imposition (e.g., 0.30)
-  ps?: number; // Prélèvements Sociaux (e.g., 0.172)
+  tmi: number; // Taux Marginal d'Imposition (e.g., 0.30)
+  ps: number; // Prélèvements Sociaux (e.g., 0.172)
 }
 
 interface AnnualTableEntry {
@@ -74,9 +73,8 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     saleGrowthRate = 0,
     saleCostsPct = 0,
     loan,
-    taxMode,
-    tmi = 0,
-    ps = 0,
+    tmi, // Directement utilisé
+    ps,  // Directement utilisé
   } = params;
 
   const initialInvestment = price + acqCosts;
@@ -91,8 +89,6 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   
   let totalSavingEffortDuringLoan = 0;
   let loanPeriodsCount = 0;
-  let postLoanIncomeSum = 0;
-  let postLoanYearsCount = 0;
 
   let finalSalePriceAtSale = 0;
   let finalNetSalePriceBeforeCrd = 0;
@@ -125,29 +121,10 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
       }
     }
 
-    let taxableIncome = 0;
-    let tax = 0;
-
-    switch (taxMode) {
-      case 'none':
-        taxableIncome = 0;
-        tax = 0;
-        break;
-      case 'micro_foncier_30':
-        taxableIncome = currentRentGross * 0.70; // 30% abattement
-        tax = taxableIncome * (tmi + ps);
-        break;
-      case 'micro_bic_50':
-        taxableIncome = currentRentGross * 0.50; // 50% abattement
-        tax = taxableIncome * (tmi + ps);
-        break;
-      case 'effective_rate':
-        taxableIncome = Math.max(0, NOI - interest);
-        tax = taxableIncome * (tmi + ps);
-        break;
-    }
-    tax = round(tax, 2);
-
+    // Calcul fiscal simplifié : toujours TMI + PS sur (NOI - intérêts)
+    const taxableIncome = Math.max(0, NOI - interest);
+    const tax = taxableIncome * (tmi + ps);
+    
     const cashflow = round(NOI - annuity - tax, 2);
     
     annualTable.push({
@@ -169,9 +146,6 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     if (loan && year <= loan.years) {
       totalSavingEffortDuringLoan += Math.max(0, -cashflow); // If cashflow is negative, it's an effort
       loanPeriodsCount++;
-    } else if (year > (loan?.years || 0)) {
-      postLoanIncomeSum += cashflow;
-      postLoanYearsCount++;
     }
 
     // Handle sale in the saleYear
@@ -192,7 +166,21 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   }
 
   const avgSavingEffortDuringLoan = loanPeriodsCount > 0 ? round(totalSavingEffortDuringLoan / loanPeriodsCount, 2) : 0;
-  const avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
+
+  // Calculate avgPostLoanIncome
+  let avgPostLoanIncome = 0;
+  if (loan && horizonYears > loan.years) {
+    let postLoanIncomeSum = 0;
+    let postLoanYearsCount = 0;
+    for (let year = loan.years + 1; year <= horizonYears; year++) {
+      const annualData = annualTable.find(entry => entry.year === year);
+      if (annualData) {
+        postLoanIncomeSum += annualData.cashflow;
+        postLoanYearsCount++;
+      }
+    }
+    avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
+  }
 
   // Calculate CAGR (TCAC) based on user's formula
   let finalCagr = NaN;

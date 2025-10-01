@@ -174,11 +174,6 @@
     "loanInsuranceRateLabel": "Taux annuel de l'assurance (%)",
 
     "sectionTaxation": "C) Fiscalité simple",
-    "taxModeLabel": "Régime fiscal",
-    "taxModeNone": "Aucune",
-    "taxModeMicroFoncier30": "Micro-foncier (abattement 30%)",
-    "taxModeMicroBic50": "Micro-BIC (abattement 50%)",
-    "taxModeEffectiveRate": "Taux effectif (TMI + PS)",
     "tmiLabel": "Taux Marginal d'Imposition (TMI) (%)",
     "psLabel": "Prélèvements Sociaux (PS) (%)",
 
@@ -188,7 +183,7 @@
     "duplicateScenarioButton": "Dupliquer Scénario",
 
     "summaryTitle": "Résumé de la simulation immobilière",
-    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit (annuel) : {avgSavingEffortDuringLoanAnnual}\n- Effort d'épargne moyen pendant le crédit (mensuel) : {avgSavingEffortDuringLoanMonthly}\n- Revenus complémentaires moyens après crédit (annuel) : {avgPostLoanIncomeAnnual}\n- Revenus complémentaires moyens après crédit (mensuel) : {avgPostLoanIncomeMonthly}\n- Prix de cession : {salePriceAtSale}\n- Prix de cession net de frais : {netSalePriceBeforeCrd}\n- Capital restant dû à la revente : {crdAtSale}\n- Capital récupéré à la revente : {capitalRecoveredAtSale}\n- Taux de Croissance Annuel Composé (TCAC) : {cagr}",
+    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n- TMI : {tmi} / PS : {ps}\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit (annuel) : {avgSavingEffortDuringLoanAnnual}\n- Effort d'épargne moyen pendant le crédit (mensuel) : {avgSavingEffortDuringLoanMonthly}\n- Revenus complémentaires moyens après crédit (annuel) : {avgPostLoanIncomeAnnual}\n- Revenus complémentaires moyens après crédit (mensuel) : {avgPostLoanIncomeMonthly}\n- Prix de cession : {salePriceAtSale}\n- Prix de cession net de frais : {netSalePriceBeforeCrd}\n- Capital restant dû à la revente : {crdAtSale}\n- Capital récupéré à la revente : {capitalRecoveredAtSale}\n- Taux de Croissance Annuel Composé (TCAC) : {cagr}",
 
     "avgSavingEffortDuringLoanAnnual": "Effort d'épargne moyen pendant le crédit (annuel)",
     "avgSavingEffortDuringLoanMonthly": "Effort d'épargne moyen pendant le crédit (mensuel)",
@@ -234,9 +229,7 @@
       "loanDurationMin": "La durée du prêt doit être d'au moins 1 an.",
       "loanInsuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%.",
       "tmiPsRequired": "TMI et PS sont requis pour le taux effectif."
-    },
-    "scenarioDuplicated": "Scénario dupliqué (fonctionnalité complète en développement).",
-    "noResultsYet": "Veuillez calculer pour voir les résultats."
+    }
   },
   "endettementPage": {
     "title": "Calculateur de Capacité d'Endettement",

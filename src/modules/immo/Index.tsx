@@ -120,16 +120,15 @@ const formSchema = (t: (key: string) => string) => z.object({
     invalid_type_error: t('validation.loanInsuranceRateRange'),
   }).min(0, t('validation.loanInsuranceRateRange')).max(1, t('validation.loanInsuranceRateRange')).optional(),
 
-  // C) Fiscalité simple
-  taxMode: z.enum(['none', 'micro_foncier_30', 'micro_bic_50', 'effective_rate']),
+  // C) Fiscalité simple (TMI + PS directs)
   tmi: z.coerce.number({
     required_error: t('validation.percentageRange', { min: 0, max: 45 }),
     invalid_type_error: t('validation.percentageRange', { min: 0, max: 45 }),
-  }).min(0, t('validation.percentageRange', { min: 0, max: 45 })).max(45, t('validation.percentageRange', { min: 0, max: 45 })).optional(),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 45 })).max(45, t('validation.percentageRange', { min: 0, max: 45 })),
   ps: z.coerce.number({
     required_error: t('validation.percentageRange', { min: 0, max: 17.2 }),
     invalid_type_error: t('validation.percentageRange', { min: 0, max: 17.2 }),
-  }).min(0, t('validation.percentageRange', { min: 0, max: 17.2 })).max(17.2, t('validation.percentageRange', { min: 0, max: 17.2 })).optional(),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 17.2 })).max(17.2, t('validation.percentageRange', { min: 0, max: 17.2 })),
 }).superRefine((data, ctx) => {
   if (data.applyAcqCosts && (data.acqCosts === undefined || data.acqCosts === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['acqCosts'] });
@@ -157,11 +156,6 @@ const formSchema = (t: (key: string) => string) => z.object({
       if (!data.loanInsuranceMode) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceMode'] });
       if (data.loanInsuranceRate === undefined || data.loanInsuranceRate === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceRate'] });
     }
-  }
-
-  if (data.taxMode === 'effective_rate') {
-    if (data.tmi === undefined || data.tmi === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.tmiPsRequired'), path: ['tmi'] });
-    if (data.ps === undefined || data.ps === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.tmiPsRequired'), path: ['ps'] });
   }
 
   // Conditional validation for rent input mode
@@ -212,9 +206,8 @@ const ImmoPage = () => {
       loanInsuranceMode: 'initialPct',
       loanInsuranceRate: settings.defaultLoanInsuranceRate,
 
-      taxMode: 'micro_foncier_30',
-      tmi: settings.defaultTMI,
-      ps: settings.defaultPS,
+      tmi: settings.defaultTMI, // Directement utilisé
+      ps: settings.defaultPS,   // Directement utilisé
     },
   });
 
@@ -228,7 +221,6 @@ const ImmoPage = () => {
   const salePriceMode = watch('salePriceMode');
   const applyLoan = watch('applyLoan');
   const loanApplyInsurance = watch('loanApplyInsurance');
-  const taxMode = watch('taxMode');
 
   const [results, setResults] = useState<ReturnType<typeof rentalCashflowIrr> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
@@ -289,9 +281,8 @@ const ImmoPage = () => {
       saleGrowthRate: saleGrowthRateValue,
       saleCostsPct: values.saleCostsPct / 100,
       loan: loanDetails,
-      taxMode: values.taxMode,
-      tmi: values.taxMode === 'effective_rate' && values.tmi !== undefined ? values.tmi / 100 : 0,
-      ps: values.taxMode === 'effective_rate' && values.ps !== undefined ? values.ps / 100 : 0,
+      tmi: values.tmi / 100, // Directement utilisé
+      ps: values.ps / 100,   // Directement utilisé
     });
     setResults(computedResults);
 
@@ -377,8 +368,8 @@ const ImmoPage = () => {
     const salePriceOrGrowth = values.salePriceMode === 'fixed' ? values.salePrice : values.saleGrowthRate;
     const salePriceOrGrowthLabel = values.salePriceMode === 'fixed' ? t('salePriceLabel') : t('saleGrowthRateLabel');
 
-    const tmiValue = values.taxMode === 'effective_rate' && values.tmi !== undefined ? values.tmi : 0;
-    const psValue = values.taxMode === 'effective_rate' && values.ps !== undefined ? values.ps : 0;
+    const tmiValue = values.tmi; // Directement utilisé
+    const psValue = values.ps;   // Directement utilisé
 
     const rentInputModeTranslated = t(values.rentInputMode);
     const rentValue = values.rentInputMode === 'fixedAmount' ? values.rentGross?.toString() : values.expectedYield?.toString() + '%';
@@ -420,7 +411,6 @@ const ImmoPage = () => {
       [t('loanInsuranceRateLabel'), loanInsuranceRateValue.toString() + '%'],
       [],
       [t('sectionTaxation')],
-      [t('taxModeLabel'), t(values.taxMode)],
       [t('tmiLabel'), tmiValue.toString() + '%'],
       [t('psLabel'), psValue.toString() + '%'],
       [],
@@ -1073,85 +1063,48 @@ const ImmoPage = () => {
                 <ChevronDown className="h-5 w-5" />
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-4 p-4">
-                <FormField
-                  control={form.control}
-                  name="taxMode"
-                  render={({ field }) => (
-                    <FormItem className="space-y-3">
-                      <FormLabel>{t('taxModeLabel')}</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex flex-col space-y-2"
-                          aria-label={t('taxModeLabel')}
-                        >
-                          <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="none" id="taxMode-none" /></FormControl>
-                            <FormLabel htmlFor="taxMode-none" className="font-normal">{t('taxModeNone')}</FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="micro_foncier_30" id="taxMode-micro_foncier_30" /></FormControl>
-                            <FormLabel htmlFor="taxMode-micro_foncier_30" className="font-normal">{t('taxModeMicroFoncier30')}</FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="micro_bic_50" id="taxMode-micro_bic_50" /></FormControl>
-                            <FormLabel htmlFor="taxMode-micro_bic_50" className="font-normal">{t('taxModeMicroBic50')}</FormLabel>
-                          </FormItem>
-                          <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl><RadioGroupItem value="effective_rate" id="taxMode-effective_rate" /></FormControl>
-                            <FormLabel htmlFor="taxMode-effective-rate" className="font-normal">{t('taxModeEffectiveRate')}</FormLabel>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {taxMode === 'effective_rate' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="tmi"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('tmiLabel')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
-                              aria-label={t('tmiLabel')}
-                            />
-                          </FormControl>
-                          <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="ps"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('psLabel')}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              step="0.1"
-                              {...field}
-                              onChange={e => field.onChange(parseFloat(e.target.value))}
-                              aria-label={t('psLabel')}
-                            />
-                          </FormControl>
-                          <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="tmi"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('tmiLabel')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            {...field}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            aria-label={t('tmiLabel')}
+                          />
+                        </FormControl>
+                        <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="ps"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('psLabel')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            {...field}
+                            onChange={e => field.onChange(parseFloat(e.target.value))}
+                            aria-label={t('psLabel')}
+                          />
+                        </FormControl>
+                        <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </CollapsibleContent>
             </Collapsible>
 
