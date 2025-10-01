@@ -46,13 +46,26 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
 
   return (
     <div className={cn("pb-12 border-r bg-sidebar flex flex-col", className)}>
-      <div className="space-y-4 py-4 flex-1"> {/* flex-1 pour pousser le bouton de bascule vers le bas */}
+      {/* Bouton de bascule en haut */}
+      <div className={cn("flex items-center p-3", isCollapsed ? "justify-center" : "justify-end")}>
+        {!isCollapsed && (
+          <h2 className="mr-auto text-xl font-semibold tracking-tight text-sidebar-primary">
+            {t('appName')}
+          </h2>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggleCollapse}
+          aria-label={isCollapsed ? t('common.expand') : t('common.collapse')}
+          className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      <div className="space-y-4 py-4 flex-1">
         <div className="px-3 py-2">
-          {!isCollapsed && ( // Afficher le nom de l'application uniquement si non réduit
-            <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
-              {t('appName')}
-            </h2>
-          )}
           <div className="space-y-1">
             {navItems.map((item) => (
               <Button
@@ -60,21 +73,21 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
                 variant="ghost"
                 className={cn(
                   "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isCollapsed ? "justify-center" : "justify-start" // Ajuster la justification
+                  isCollapsed ? "justify-center" : "justify-start"
                 )}
                 asChild
                 onClick={onLinkClick}
               >
                 <Link to={item.to}>
-                  <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} /> {/* Ajuster la marge de l'icône */}
-                  {!isCollapsed && item.label} {/* Afficher le libellé uniquement si non réduit */}
+                  <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                  {!isCollapsed && item.label}
                 </Link>
               </Button>
             ))}
           </div>
         </div>
         <div className="px-3 py-2">
-          {!isCollapsed && ( // Afficher le titre des outils uniquement si non réduit
+          {!isCollapsed && (
             <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
               {t('tools')}
             </h2>
@@ -96,18 +109,6 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
             </Button>
           </div>
         </div>
-      </div>
-      {/* Bouton de bascule en bas */}
-      <div className="p-3 border-t border-sidebar-border">
-        <Button
-          variant="ghost"
-          className="w-full justify-center text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          onClick={onToggleCollapse}
-          aria-label={isCollapsed ? t('common.expand') : t('common.collapse')}
-        >
-          {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-          {!isCollapsed && <span className="ml-2">{t('common.collapse')}</span>} {/* Ajouter un libellé si non réduit */}
-        </Button>
       </div>
     </div>
   );

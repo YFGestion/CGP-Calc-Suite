@@ -10,12 +10,12 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-background py-4 px-6 text-center text-sm text-muted-foreground flex flex-col items-center justify-center">
-      <div className="mb-2">
-        <Link to="/about" className="hover:underline">
-          {t('about')}
+      <MadeWithDyad />
+      <div className="mt-2">
+        <Link to="/about" className="hover:underline text-xs">
+          {t('disclaimerLink')}
         </Link>
       </div>
-      <MadeWithDyad />
     </footer>
   );
 }

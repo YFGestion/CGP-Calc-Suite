@@ -11,8 +11,9 @@ const AboutPage = () => {
       <CardHeader>
         <CardTitle>{t('title')}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <p>{t('content')}</p>
+        <p className="text-sm text-muted-foreground italic">{t('disclaimerFull')}</p>
       </CardContent>
     </Card>
   );
