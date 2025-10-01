@@ -125,10 +125,11 @@
       "loanAmountPositive": "Le montant du prêt doit être positif.",
       "nominalRateRange": "Le taux nominal doit être entre 0% et 10%.",
       "durationMin": "La durée doit être d'au moins 1 an.",
-      "insuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%."
+      "insuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%.",
+      "requiredField": "Ce champ est requis.",
+      "noResultsYet": "Veuillez calculer pour voir les résultats."
     },
-    "immoSentSuccess": "Données de prêt envoyées au module Immo (simulation).",
-    "immoNotReady": "Le module Immo n'est pas encore prêt à recevoir les données."
+    "immoSentSuccess": "Données de prêt envoyées au module Immo (simulation)."
   },
   "immoPage": {
     "title": "Simulateur d'Investissement Immobilier",

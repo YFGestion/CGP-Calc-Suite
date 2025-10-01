@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form'; // Corrected import
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom'; // Ajout de useNavigate
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
-import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -75,15 +75,16 @@ const CreditPage = () => {
   const { t } = useTranslation('creditPage');
   const { t: commonT } = useTranslation('common');
   const [searchParams] = useSearchParams();
-  const settings = useSettingsStore(); // Use settings store
+  const navigate = useNavigate(); // Initialisation de useNavigate
+  const settings = useSettingsStore();
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
-      loanAmount: 200000, // Default loan amount, not from settings
+      loanAmount: 200000,
       nominalRate: settings.defaultLoanRate,
       durationYears: settings.defaultLoanDurationYears,
-      applyInsurance: true, // Default to applying insurance
+      applyInsurance: true,
       insuranceMode: 'initialPct',
       insuranceRate: settings.defaultLoanInsuranceRate,
     },
@@ -94,27 +95,6 @@ const CreditPage = () => {
 
   const [results, setResults] = useState<ReturnType<typeof amortizationSchedule> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
-
-  useEffect(() => {
-    const loanAmount = searchParams.get('loanAmount');
-    const nominalRate = searchParams.get('nominalRate');
-    const durationYears = searchParams.get('durationYears');
-    const applyInsuranceParam = searchParams.get('applyInsurance');
-    const insuranceModeParam = searchParams.get('insuranceMode');
-    const insuranceRateParam = searchParams.get('insuranceRate');
-
-    let shouldSubmit = false;
-    if (loanAmount) { form.setValue('loanAmount', parseFloat(loanAmount)); shouldSubmit = true; }
-    if (nominalRate) { form.setValue('nominalRate', parseFloat(nominalRate)); shouldSubmit = true; }
-    if (durationYears) { form.setValue('durationYears', parseInt(durationYears)); shouldSubmit = true; }
-    if (applyInsuranceParam) { form.setValue('applyInsurance', applyInsuranceParam === 'true'); shouldSubmit = true; }
-    if (insuranceModeParam) { form.setValue('insuranceMode', insuranceModeParam as 'initialPct' | 'crdPct'); shouldSubmit = true; }
-    if (insuranceRateParam) { form.setValue('insuranceRate', parseFloat(insuranceRateParam)); shouldSubmit = true; }
-
-    if (shouldSubmit) {
-      form.handleSubmit(onSubmit)();
-    }
-  }, [searchParams, settings, form.handleSubmit, form.setValue]); // Add form.handleSubmit and form.setValue to dependency array
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const insuranceDetails = values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined
@@ -160,6 +140,27 @@ const CreditPage = () => {
       t('summaryContent', formattedResults)
     );
   };
+
+  useEffect(() => {
+    const loanAmount = searchParams.get('loanAmount');
+    const nominalRate = searchParams.get('nominalRate');
+    const durationYears = searchParams.get('durationYears');
+    const applyInsuranceParam = searchParams.get('applyInsurance');
+    const insuranceModeParam = searchParams.get('insuranceMode');
+    const insuranceRateParam = searchParams.get('insuranceRate');
+
+    let shouldSubmit = false;
+    if (loanAmount) { form.setValue('loanAmount', parseFloat(loanAmount)); shouldSubmit = true; }
+    if (nominalRate) { form.setValue('nominalRate', parseFloat(nominalRate)); shouldSubmit = true; }
+    if (durationYears) { form.setValue('durationYears', parseInt(durationYears)); shouldSubmit = true; }
+    if (applyInsuranceParam) { form.setValue('applyInsurance', applyInsuranceParam === 'true'); shouldSubmit = true; }
+    if (insuranceModeParam) { form.setValue('insuranceMode', insuranceModeParam as 'initialPct' | 'crdPct'); shouldSubmit = true; }
+    if (insuranceRateParam) { form.setValue('insuranceRate', parseFloat(insuranceRateParam)); shouldSubmit = true; }
+
+    if (shouldSubmit) {
+      form.handleSubmit(onSubmit)();
+    }
+  }, [searchParams, settings, form.handleSubmit, form.setValue]);
 
   const handleExportCsv = () => {
     if (!results) return;
@@ -211,8 +212,21 @@ const CreditPage = () => {
   };
 
   const handleSendToImmo = () => {
-    // For now, just show a toast as the Immo module is not set up to receive data
-    toast.info(t('immoNotReady'));
+    if (!results) {
+      toast.error(t('validation.noResultsYet'));
+      return;
+    }
+    const values = form.getValues();
+    const params = new URLSearchParams({
+      loanAmount: values.loanAmount.toString(),
+      loanRate: values.nominalRate.toString(),
+      loanDurationYears: values.durationYears.toString(),
+      loanApplyInsurance: values.applyInsurance.toString(),
+      loanInsuranceMode: values.insuranceMode || '',
+      loanInsuranceRate: (values.insuranceRate || 0).toString(),
+    });
+    navigate(`/immo?${params.toString()}`);
+    toast.success(t('immoSentSuccess'));
   };
 
   return (

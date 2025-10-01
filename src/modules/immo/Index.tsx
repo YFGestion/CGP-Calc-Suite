@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form'; // Corrected import
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { useSearchParams } from 'react-router-dom'; // Ajout de useSearchParams
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,7 +33,7 @@ import {
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, RefreshCcw } from 'lucide-react';
-import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -171,14 +172,15 @@ const formSchema = (t: (key: string) => string) => z.object({
 const ImmoPage = () => {
   const { t } = useTranslation('immoPage');
   const { t: commonT } = useTranslation('common');
-  const settings = useSettingsStore(); // Use settings store
+  const settings = useSettingsStore();
+  const [searchParams] = useSearchParams(); // Initialisation de useSearchParams
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
       price: 250000,
       applyAcqCosts: true,
-      acqCosts: 250000 * (settings.defaultAcqCostsPct / 100), // Use defaultAcqCostsPct
+      acqCosts: 250000 * (settings.defaultAcqCostsPct / 100),
       rentGross: 1000,
       rentPeriodicity: 'monthly',
       vacancyRate: 5,
@@ -305,11 +307,46 @@ const ImmoPage = () => {
     setSummaryContent(
       t('summaryContent', formattedResults)
     );
-  }, [rentSensitivity, vacancySensitivity, salePriceSensitivity, loanRateSensitivity, commonT, t]); // Add all dependencies
+  }, [rentSensitivity, vacancySensitivity, salePriceSensitivity, loanRateSensitivity, commonT, t]);
 
-  const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
+  const onSubmit = useCallback((values: z.infer<ReturnType<typeof formSchema>>) => {
     calculate(values);
-  };
+  }, [calculate]);
+
+  useEffect(() => {
+    const loanAmountParam = searchParams.get('loanAmount');
+    const loanRateParam = searchParams.get('loanRate');
+    const loanDurationYearsParam = searchParams.get('loanDurationYears');
+    const loanApplyInsuranceParam = searchParams.get('loanApplyInsurance');
+    const loanInsuranceModeParam = searchParams.get('loanInsuranceMode');
+    const loanInsuranceRateParam = searchParams.get('loanInsuranceRate');
+
+    let shouldSubmit = false;
+    if (loanAmountParam) { setValue('loanAmount', parseFloat(loanAmountParam)); shouldSubmit = true; }
+    if (loanRateParam) { setValue('loanRate', parseFloat(loanRateParam)); shouldSubmit = true; }
+    if (loanDurationYearsParam) { setValue('loanDurationYears', parseInt(loanDurationYearsParam)); shouldSubmit = true; }
+
+    if (loanApplyInsuranceParam) {
+      const applyInsuranceBool = loanApplyInsuranceParam === 'true';
+      setValue('loanApplyInsurance', applyInsuranceBool);
+      shouldSubmit = true;
+
+      if (applyInsuranceBool) {
+        if (loanInsuranceModeParam) { setValue('loanInsuranceMode', loanInsuranceModeParam as 'initialPct' | 'crdPct'); }
+        if (loanInsuranceRateParam) { setValue('loanInsuranceRate', parseFloat(loanInsuranceRateParam)); }
+      } else {
+        setValue('loanInsuranceMode', undefined);
+        setValue('loanInsuranceRate', 0);
+      }
+    }
+
+    if (shouldSubmit) {
+      setValue('applyLoan', true);
+      setTimeout(() => {
+        handleSubmit(onSubmit)();
+      }, 0);
+    }
+  }, [searchParams, setValue, handleSubmit, onSubmit]);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
