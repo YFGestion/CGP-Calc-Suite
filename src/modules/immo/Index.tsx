@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
-import { useSearchParams } from 'react-router-dom'; // Ajout de useSearchParams
+import { useSearchParams } from 'react-router-dom';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -47,10 +47,17 @@ const formSchema = (t: (key: string) => string) => z.object({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
   }).min(0, t('validation.nonNegativeNumber')).optional(),
+  
+  rentInputMode: z.enum(['fixedAmount', 'yieldPct']), // New field
   rentGross: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
-  }).min(0, t('validation.nonNegativeNumber')),
+  }).min(0, t('validation.nonNegativeNumber')).optional(), // Now optional
+  expectedYield: z.coerce.number({
+    required_error: t('validation.percentageRange', { min: 0, max: 20 }),
+    invalid_type_error: t('validation.percentageRange', { min: 0, max: 20 }),
+  }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(), // New field
+  
   rentPeriodicity: z.enum(['monthly', 'annual']),
   vacancyRate: z.coerce.number({
     required_error: t('validation.percentageRange', { min: 0, max: 100 }),
@@ -167,13 +174,24 @@ const formSchema = (t: (key: string) => string) => z.object({
     if (data.tmi === undefined || data.tmi === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.tmiPsRequired'), path: ['tmi'] });
     if (data.ps === undefined || data.ps === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.tmiPsRequired'), path: ['ps'] });
   }
+
+  // Conditional validation for rent input mode
+  if (data.rentInputMode === 'fixedAmount') {
+    if (data.rentGross === undefined || data.rentGross === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.nonNegativeNumber'), path: ['rentGross'] });
+    }
+  } else if (data.rentInputMode === 'yieldPct') {
+    if (data.expectedYield === undefined || data.expectedYield === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['expectedYield'] });
+    }
+  }
 });
 
 const ImmoPage = () => {
   const { t } = useTranslation('immoPage');
   const { t: commonT } = useTranslation('common');
   const settings = useSettingsStore();
-  const [searchParams] = useSearchParams(); // Initialisation de useSearchParams
+  const [searchParams] = useSearchParams();
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
@@ -181,7 +199,9 @@ const ImmoPage = () => {
       price: 250000,
       applyAcqCosts: true,
       acqCosts: 250000 * (settings.defaultAcqCostsPct / 100),
+      rentInputMode: 'fixedAmount', // Default to fixed amount
       rentGross: 1000,
+      expectedYield: 5, // Default for yieldPct
       rentPeriodicity: 'monthly',
       vacancyRate: 5,
       opex: 500,
@@ -218,6 +238,7 @@ const ImmoPage = () => {
   const { watch, handleSubmit, setValue, getValues, reset } = form;
 
   const applyAcqCosts = watch('applyAcqCosts');
+  const rentInputMode = watch('rentInputMode'); // Watch new field
   const rentPeriodicity = watch('rentPeriodicity');
   const applyMgmtFees = watch('applyMgmtFees');
   const mgmtFeesType = watch('mgmtFeesType');
@@ -235,10 +256,16 @@ const ImmoPage = () => {
   const [summaryContent, setSummaryContent] = useState('');
 
   const calculate = useCallback((values: z.infer<ReturnType<typeof formSchema>>) => {
-    const adjustedRentGross = values.rentGross * (values.rentPeriodicity === 'monthly' ? 12 : 1);
-    const adjustedVacancyRate = (values.vacancyRate + vacancySensitivity) / 100;
-    const adjustedRentAnnualGross = adjustedRentGross * (1 + rentSensitivity / 100);
+    let baseRentAnnualGross = 0;
+    if (values.rentInputMode === 'fixedAmount' && values.rentGross !== undefined) {
+      baseRentAnnualGross = values.rentGross * (values.rentPeriodicity === 'monthly' ? 12 : 1);
+    } else if (values.rentInputMode === 'yieldPct' && values.expectedYield !== undefined) {
+      baseRentAnnualGross = values.price * (values.expectedYield / 100);
+    }
 
+    const adjustedRentAnnualGross = baseRentAnnualGross * (1 + rentSensitivity / 100);
+    const adjustedVacancyRate = (values.vacancyRate + vacancySensitivity) / 100;
+    
     let mgmtFeesPctValue = 0;
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
       mgmtFeesPctValue = values.mgmtFeesValue / 100;
@@ -380,6 +407,11 @@ const ImmoPage = () => {
     const tmiValue = values.taxMode === 'effective_rate' && values.tmi !== undefined ? values.tmi : 0;
     const psValue = values.taxMode === 'effective_rate' && values.ps !== undefined ? values.ps : 0;
 
+    const rentInputModeTranslated = t(values.rentInputMode);
+    const rentValue = values.rentInputMode === 'fixedAmount' ? values.rentGross?.toString() : values.expectedYield?.toString() + '%';
+    const rentLabel = values.rentInputMode === 'fixedAmount' ? t('rentGrossLabel') : t('expectedYieldLabel');
+
+
     const rows = [
       [commonT('appName')],
       [t('title')],
@@ -388,7 +420,8 @@ const ImmoPage = () => {
       [t('priceLabel'), values.price.toString()],
       [t('acqCostsToggleLabel'), values.applyAcqCosts ? 'Oui' : 'Non'],
       [t('acqCostsLabel'), acqCostsValue.toString()],
-      [t('rentGrossLabel'), values.rentGross.toString()],
+      [t('rentInputModeLabel'), rentInputModeTranslated],
+      [rentLabel, rentValue],
       [t('rentPeriodicityLabel'), t(values.rentPeriodicity)],
       [t('vacancyRateLabel'), values.vacancyRate.toString() + '%'],
       [t('opexLabel'), values.opex.toString()],
@@ -547,54 +580,106 @@ const ImmoPage = () => {
                   />
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rentInputMode"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>{t('rentInputModeLabel')}</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex space-x-4"
+                          aria-label={t('rentInputModeLabel')}
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="fixedAmount" id="rentInputMode-fixedAmount" /></FormControl>
+                            <FormLabel htmlFor="rentInputMode-fixedAmount" className="font-normal">{t('fixedAmount')}</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl><RadioGroupItem value="yieldPct" id="rentInputMode-yieldPct" /></FormControl>
+                            <FormLabel htmlFor="rentInputMode-yieldPct" className="font-normal">{t('yieldPct')}</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {rentInputMode === 'fixedAmount' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="rentGross"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('rentGrossLabel')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="any"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('rentGrossLabel')}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="rentPeriodicity"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel>{t('rentPeriodicityLabel')}</FormLabel>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex space-x-4"
+                              aria-label={t('rentPeriodicityLabel')}
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl><RadioGroupItem value="monthly" id="rentPeriodicity-monthly" /></FormControl>
+                                <FormLabel htmlFor="rentPeriodicity-monthly" className="font-normal">{t('monthly')}</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl><RadioGroupItem value="annual" id="rentPeriodicity-annual" /></FormControl>
+                                <FormLabel htmlFor="rentPeriodicity-annual" className="font-normal">{t('annual')}</FormLabel>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                {rentInputMode === 'yieldPct' && (
                   <FormField
                     control={form.control}
-                    name="rentGross"
+                    name="expectedYield"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('rentGrossLabel')}</FormLabel>
+                        <FormLabel>{t('expectedYieldLabel')}</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            step="any"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                            aria-label={t('rentGrossLabel')}
+                          <Slider
+                            min={0} max={20} step={0.1}
+                            value={[field.value || 0]} onValueChange={(val) => field.onChange(val[0])}
+                            className="w-[100%]"
+                            aria-label={t('expectedYieldLabel')}
                           />
                         </FormControl>
+                        <div className="text-right text-sm text-muted-foreground">{field.value || 0}%</div>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="rentPeriodicity"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>{t('rentPeriodicityLabel')}</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex space-x-4"
-                            aria-label={t('rentPeriodicityLabel')}
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl><RadioGroupItem value="monthly" id="rentPeriodicity-monthly" /></FormControl>
-                              <FormLabel htmlFor="rentPeriodicity-monthly" className="font-normal">{t('monthly')}</FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl><RadioGroupItem value="annual" id="rentPeriodicity-annual" /></FormControl>
-                              <FormLabel htmlFor="rentPeriodicity-annual" className="font-normal">{t('annual')}</FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                )}
 
                 <FormField
                   control={form.control}
