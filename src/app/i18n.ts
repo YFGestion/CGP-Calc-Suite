@@ -12,21 +12,32 @@ const resources = {
   },
 };
 
+// Liste explicite de tous les namespaces disponibles
+const allNamespaces = [
+  'common',
+  'aboutPage',
+  'brutNetPage',
+  'epargnePage',
+  'creditPage',
+  'immoPage',
+  'endettementPage',
+  'settingsPage',
+  'homePage',
+];
+
 i18n
   .use(initReactI18next)
   .init({
     resources, // Utilise l'objet de ressources directement structuré
     lng: 'fr', // Langue par défaut
     fallbackLng: 'fr',
-    debug: true, // Ajout du mode debug pour le diagnostic
+    debug: true, // Garde le mode debug activé pour le diagnostic
     interpolation: {
       escapeValue: false, // React échappe déjà les valeurs
-      // Correction: Définir explicitement les préfixes et suffixes pour les placeholders
       prefix: '{',
       suffix: '}'
     },
-    // Déclare explicitement tous les namespaces disponibles en utilisant les clés du fichier JSON
-    ns: Object.keys(frTranslations),
+    ns: allNamespaces, // Utilise la liste explicite des namespaces
     defaultNS: 'common', // Définit 'common' comme namespace par défaut
   });
 
