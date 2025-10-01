@@ -7,7 +7,7 @@
     "endettement": "Endettement",
     "epargne": "Épargne",
     "credit": "Crédit",
-    "immo": "Immo (Effort & TRI)",
+    "immo": "Immo (Effort & TCAC)",
     "settings": "Paramètres",
     "themeToggle": "Basculer le thème",
     "languageToggle": "Basculer la langue",
@@ -188,13 +188,13 @@
     "duplicateScenarioButton": "Dupliquer Scénario",
 
     "summaryTitle": "Résumé de la simulation immobilière",
-    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit (annuel) : {avgSavingEffortDuringLoanAnnual}\n- Effort d'épargne moyen pendant le crédit (mensuel) : {avgSavingEffortDuringLoanMonthly}\n- Revenus complémentaires moyens après crédit (annuel) : {avgPostLoanIncomeAnnual}\n- Revenus complémentaires moyens après crédit (mensuel) : {avgPostLoanIncomeMonthly}\n- Prix de cession : {salePriceAtSale}\n- Prix de cession net de frais : {netSalePriceBeforeCrd}\n- Capital restant dû à la revente : {crdAtSale}\n- Capital récupéré à la revente : {capitalRecoveredAtSale}\n- Taux de Rentabilité Interne (TRI) : {irr}",
+    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit (annuel) : {avgSavingEffortDuringLoanAnnual}\n- Effort d'épargne moyen pendant le crédit (mensuel) : {avgSavingEffortDuringLoanMonthly}\n- Revenus complémentaires moyens après crédit (annuel) : {avgPostLoanIncomeAnnual}\n- Revenus complémentaires moyens après crédit (mensuel) : {avgPostLoanIncomeMonthly}\n- Prix de cession : {salePriceAtSale}\n- Prix de cession net de frais : {netSalePriceBeforeCrd}\n- Capital restant dû à la revente : {crdAtSale}\n- Capital récupéré à la revente : {capitalRecoveredAtSale}\n- Taux de Croissance Annuel Composé (TCAC) : {cagr}",
 
     "avgSavingEffortDuringLoanAnnual": "Effort d'épargne moyen pendant le crédit (annuel)",
     "avgSavingEffortDuringLoanMonthly": "Effort d'épargne moyen pendant le crédit (mensuel)",
     "avgPostLoanIncomeAnnual": "Revenus complémentaires moyens après crédit (annuel)",
     "avgPostLoanIncomeMonthly": "Revenus complémentaires moyens après crédit (mensuel)",
-    "irr": "TRI de l'effort d'épargne",
+    "cagr": "TCAC de l'effort d'épargne",
 
     "sectionResaleData": "D) Données de revente",
     "salePriceAtSale": "Prix de cession (brut)",
@@ -323,7 +323,7 @@
     "epargneCardDescription": "Projetez l'évolution de votre épargne.",
     "creditCardTitle": "Simulateur de Crédit",
     "creditCardDescription": "Obtenez le tableau d'amortissement de votre prêt.",
-    "immoCardTitle": "Immo (Effort & TRI)",
+    "immoCardTitle": "Immo (Effort & TCAC)",
     "immoCardDescription": "Analysez la rentabilité de votre investissement immobilier."
   }
 }

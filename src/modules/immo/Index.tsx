@@ -313,7 +313,7 @@ const ImmoPage = () => {
       netSalePriceBeforeCrd: formatCurrency(computedResults.netSalePriceBeforeCrd),
       crdAtSale: formatCurrency(computedResults.crdAtSale),
       capitalRecoveredAtSale: formatCurrency(computedResults.capitalRecoveredAtSale),
-      irr: isNaN(computedResults.irr) ? commonT('none') : formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      cagr: isNaN(computedResults.cagr) ? commonT('none') : formatPercent(computedResults.cagr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };
 
     setSummaryContent(
@@ -433,7 +433,7 @@ const ImmoPage = () => {
       [t('netSalePriceBeforeCrd'), formatCurrency(results.netSalePriceBeforeCrd)],
       [t('crdAtSale'), formatCurrency(results.crdAtSale)],
       [t('capitalRecoveredAtSale'), formatCurrency(results.capitalRecoveredAtSale)],
-      [t('irr'), isNaN(results.irr) ? commonT('none') : formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+      [t('cagr'), isNaN(results.cagr) ? commonT('none') : formatPercent(results.cagr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
       [],
       [t('annualTableTitle')],
       [
@@ -1197,11 +1197,11 @@ const ImmoPage = () => {
               </Card>
               <Card className="md:col-span-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('irr')}</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('cagr')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {isNaN(results.irr) ? commonT('none') : formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {isNaN(results.cagr) ? commonT('none') : formatPercent(results.cagr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>

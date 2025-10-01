@@ -1,5 +1,5 @@
 import { amortizationSchedule } from './loan';
-import { irr, round } from './utils';
+import { round } from './utils'; // Removed irr import as it's no longer used here
 
 interface LoanDetails {
   amount: number;
@@ -51,7 +51,7 @@ interface RentalCashflowIrrResult {
   annualTable: AnnualTableEntry[];
   avgSavingEffortDuringLoan: number; // Annual
   avgPostLoanIncome: number; // Annual
-  irr: number; // TRI de l'effort d'épargne
+  cagr: number; // Changed from irr to cagr
   salePriceAtSale: number; // Prix de cession brut
   netSalePriceBeforeCrd: number; // Nouveau: Prix de cession net de frais (avant remboursement CRD)
   crdAtSale: number;
@@ -194,58 +194,43 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   const avgSavingEffortDuringLoan = loanPeriodsCount > 0 ? round(totalSavingEffortDuringLoan / loanPeriodsCount, 2) : 0;
   const avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
 
-  // Calculate IRR (TRI de l'effort d'épargne)
-  let finalIrr = NaN;
+  // Calculate CAGR (TCAC) based on user's formula
+  let finalCagr = NaN;
   const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2);
-  const cashFlowsForIrr: number[] = [];
 
-  // Initial investment (outflow at t=0)
-  cashFlowsForIrr.push(-initialEquity);
-
-  for (let year = 1; year <= horizonYears; year++) {
-    const annualData = annualTable[year - 1];
-    const monthlyCashflowFromOperations = annualData.cashflow / 12;
-
-    for (let month = 1; month <= 12; month++) {
-      let currentMonthlyFlow = monthlyCashflowFromOperations;
-      // If this is the exact month of sale, add the recovered capital
-      if (year === saleYear && month === 12) { // Assuming sale happens at the end of the saleYear
-        currentMonthlyFlow = round(currentMonthlyFlow + finalCapitalRecoveredAtSale, 2);
-      }
-      cashFlowsForIrr.push(currentMonthlyFlow);
+  // Sum of all negative cashflows (efforts) over the entire horizon
+  let totalEffortOverHorizon = 0;
+  for (const entry of annualTable) {
+    if (entry.cashflow < 0) {
+      totalEffortOverHorizon += Math.abs(entry.cashflow);
     }
   }
 
-  // Handle edge cases for cashFlowsForIrr before calling irr
-  if (cashFlowsForIrr.length <= 1) {
-    if (initialEquity === 0 && finalCapitalRecoveredAtSale === 0 && cashFlowsForIrr.every(cf => cf === 0)) {
-      finalIrr = 0; // No activity, 0 return
-    } else if (initialEquity > 0 && finalCapitalRecoveredAtSale <= 0) {
-      finalIrr = -1; // Initial outflow, no recovery or negative recovery
+  const totalInvestedCapital = initialEquity + totalEffortOverHorizon;
+
+  if (horizonYears > 0 && totalInvestedCapital > 0) {
+    const base = finalCapitalRecoveredAtSale / totalInvestedCapital;
+    if (base >= 0) { // Base for Math.pow must be non-negative
+      finalCagr = Math.pow(base, 1 / horizonYears) - 1;
     } else {
-      finalIrr = NaN; // Other edge cases, e.g., only inflow or insufficient data
+      finalCagr = -1; // Represents a total loss if final value is negative
     }
-  } else {
-    const monthlyIrr = irr(cashFlowsForIrr);
-
-    if (!isNaN(monthlyIrr)) {
-      // Annualize the monthly IRR.
-      // If (1 + monthlyIrr) is negative, Math.pow will return NaN for non-integer exponents.
-      // For financial IRR, monthlyIrr should typically be > -1.
-      if (1 + monthlyIrr < 0) { // This means monthlyIrr is less than -1 (-100% loss)
-        finalIrr = -1; // Represent as -100% annual loss
-      } else {
-        finalIrr = Math.pow(1 + monthlyIrr, 12) - 1; // Annualize
-      }
-    }
-    // If monthlyIrr is NaN, finalIrr remains NaN
+  } else if (horizonYears === 0) {
+    finalCagr = 0; // No duration, no growth
+  } else if (totalInvestedCapital === 0 && finalCapitalRecoveredAtSale > 0) {
+    finalCagr = Infinity; // Infinite return if no investment but positive final value
+  } else if (totalInvestedCapital === 0 && finalCapitalRecoveredAtSale === 0) {
+    finalCagr = 0; // No investment, no return
+  } else if (totalInvestedCapital > 0 && finalCapitalRecoveredAtSale <= 0) {
+    finalCagr = -1; // Total loss
   }
+
 
   return {
     annualTable,
     avgSavingEffortDuringLoan,
     avgPostLoanIncome,
-    irr: round(finalIrr, 4), // Round IRR to 4 decimal places for percentage
+    cagr: round(finalCagr, 4), // Round CAGR to 4 decimal places for percentage
     salePriceAtSale: finalSalePriceAtSale,
     netSalePriceBeforeCrd: finalNetSalePriceBeforeCrd,
     crdAtSale: finalCrdAtSale,
