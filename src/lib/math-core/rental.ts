@@ -182,34 +182,34 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
   }
 
-  // Calculate CAGR (TCAC) based on user's formula
+  // Calculate CAGR (TCAC) based on user's formula, tied to saleYear
   let finalCagr = NaN;
   const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2);
 
-  // Sum of all negative cashflows (efforts) over the entire horizon
-  let totalEffortOverHorizon = 0;
+  // Sum of all negative cashflows (efforts) up to the saleYear
+  let totalEffortForCagr = 0;
   for (const entry of annualTable) {
-    if (entry.cashflow < 0) {
-      totalEffortOverHorizon += Math.abs(entry.cashflow);
+    if (entry.year <= saleYear && entry.cashflow < 0) {
+      totalEffortForCagr += Math.abs(entry.cashflow);
     }
   }
 
-  const totalInvestedCapital = initialEquity + totalEffortOverHorizon;
+  const totalInvestedCapitalForCagr = initialEquity + totalEffortForCagr;
 
-  if (horizonYears > 0 && totalInvestedCapital > 0) {
-    const base = finalCapitalRecoveredAtSale / totalInvestedCapital;
-    if (base >= 0) { // Base for Math.pow must be non-negative
-      finalCagr = Math.pow(base, 1 / horizonYears) - 1;
+  if (saleYear > 0 && totalInvestedCapitalForCagr > 0) {
+    const base = finalCapitalRecoveredAtSale / totalInvestedCapitalForCagr;
+    if (base >= 0) {
+      finalCagr = Math.pow(base, 1 / saleYear) - 1; // Use saleYear for the exponent
     } else {
       finalCagr = -1; // Represents a total loss if final value is negative
     }
-  } else if (horizonYears === 0) {
+  } else if (saleYear === 0) { // Should not happen due to validation, but for robustness
     finalCagr = 0; // No duration, no growth
-  } else if (totalInvestedCapital === 0 && finalCapitalRecoveredAtSale > 0) {
+  } else if (totalInvestedCapitalForCagr === 0 && finalCapitalRecoveredAtSale > 0) {
     finalCagr = Infinity; // Infinite return if no investment but positive final value
-  } else if (totalInvestedCapital === 0 && finalCapitalRecoveredAtSale === 0) {
+  } else if (totalInvestedCapitalForCagr === 0 && finalCapitalRecoveredAtSale === 0) {
     finalCagr = 0; // No investment, no return
-  } else if (totalInvestedCapital > 0 && finalCapitalRecoveredAtSale <= 0) {
+  } else if (totalInvestedCapitalForCagr > 0 && finalCapitalRecoveredAtSale <= 0) {
     finalCagr = -1; // Total loss
   }
 
