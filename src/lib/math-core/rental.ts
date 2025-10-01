@@ -15,7 +15,6 @@ interface RentalCashflowIrrParams {
   price: number; // Prix d'acquisition du bien
   acqCosts?: number; // Frais d'acquisition (notaire, agence, etc.)
   rentAnnualGross: number;
-  // vacancyRate: number; // Taux de vacance (e.g., 0.05 pour 5%) - REMOVED
   opex: number; // Dépenses d'exploitation annuelles (hors taxe foncière, gestion, travaux)
   propertyTax: number; // Taxe foncière annuelle
   mgmtFeesPct?: number; // Frais de gestion locative (pourcentage du loyer brut)
@@ -35,7 +34,6 @@ interface RentalCashflowIrrParams {
 interface AnnualTableEntry {
   year: number;
   rentGross: number;
-  // vacancy: number; // REMOVED
   rentNet: number;
   opexTotal: number;
   NOI: number; // Net Operating Income
@@ -65,7 +63,6 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     price,
     acqCosts = 0,
     rentAnnualGross,
-    // vacancyRate, // REMOVED
     opex,
     propertyTax,
     mgmtFeesPct = 0,
@@ -200,7 +197,6 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   // Calculate IRR (TRI de l'effort d'épargne)
   let finalIrr = NaN;
   const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2);
-  const numMonths = horizonYears * 12;
   const cashFlowsForIrr: number[] = [];
 
   // Initial investment (outflow at t=0)
@@ -220,23 +216,30 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     }
   }
 
-  // Check for valid cashFlowsForIrr length and content
-  if (cashFlowsForIrr.length > 1) { // Need at least initial outflow and one subsequent flow for IRR
+  // Handle edge cases for cashFlowsForIrr before calling irr
+  if (cashFlowsForIrr.length <= 1) {
+    if (initialEquity === 0 && finalCapitalRecoveredAtSale === 0 && cashFlowsForIrr.every(cf => cf === 0)) {
+      finalIrr = 0; // No activity, 0 return
+    } else if (initialEquity > 0 && finalCapitalRecoveredAtSale <= 0) {
+      finalIrr = -1; // Initial outflow, no recovery or negative recovery
+    } else {
+      finalIrr = NaN; // Other edge cases, e.g., only inflow or insufficient data
+    }
+  } else {
     const monthlyIrr = irr(cashFlowsForIrr);
 
-    if (!isNaN(monthlyIrr) && monthlyIrr > -1) {
-      finalIrr = Math.pow(1 + monthlyIrr, 12) - 1; // Annualize
-    } else if (monthlyIrr <= -1) {
-      finalIrr = -1; // -100% return
+    if (!isNaN(monthlyIrr)) {
+      // Annualize the monthly IRR.
+      // If (1 + monthlyIrr) is negative, Math.pow will return NaN for non-integer exponents.
+      // For financial IRR, monthlyIrr should typically be > -1.
+      if (1 + monthlyIrr < 0) { // This means monthlyIrr is less than -1 (-100% loss)
+        finalIrr = -1; // Represent as -100% annual loss
+      } else {
+        finalIrr = Math.pow(1 + monthlyIrr, 12) - 1; // Annualize
+      }
     }
-  } else if (initialEquity > 0 && finalCapitalRecoveredAtSale <= 0) {
-      finalIrr = -1; // Only initial outflow, no recovery
-  } else if (initialEquity <= 0 && finalCapitalRecoveredAtSale > 0) {
-      finalIrr = NaN; // Only final inflow, no initial outflow
-  } else if (initialEquity === 0 && finalCapitalRecoveredAtSale === 0 && cashFlowsForIrr.every(cf => cf === 0)) {
-      finalIrr = 0; // No activity, 0 return
+    // If monthlyIrr is NaN, finalIrr remains NaN
   }
-
 
   return {
     annualTable,
