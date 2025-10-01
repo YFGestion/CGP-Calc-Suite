@@ -228,7 +228,7 @@
       "loanRateRange": "Le taux du prêt doit être entre 0% et 10%.",
       "loanDurationMin": "La durée du prêt doit être d'au moins 1 an.",
       "loanInsuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%.",
-      "tmiPsRequired": "TMI et PS sont requis pour le taux effectif."
+      "loanAmountExceedsPrice": "Le montant du prêt ne peut pas être supérieur au prix d'acquisition."
     }
   },
   "endettementPage": {

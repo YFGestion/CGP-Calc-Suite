@@ -156,6 +156,15 @@ const formSchema = (t: (key: string) => string) => z.object({
       if (!data.loanInsuranceMode) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceMode'] });
       if (data.loanInsuranceRate === undefined || data.loanInsuranceRate === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceRate'] });
     }
+
+    // New validation: loanAmount cannot be greater than price
+    if (data.loanAmount !== undefined && data.price !== undefined && data.loanAmount > data.price) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t('validation.loanAmountExceedsPrice'),
+        path: ['loanAmount'],
+      });
+    }
   }
 
   // Conditional validation for rent input mode
@@ -179,10 +188,10 @@ const ImmoPage = () => {
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
-      price: 250000,
+      price: 100000, // Changed default
       applyAcqCosts: false,
-      acqCosts: 250000 * (settings.defaultAcqCostsPct / 100),
-      rentInputMode: 'fixedAmount',
+      acqCosts: 100000 * (settings.defaultAcqCostsPct / 100), // Adjusted based on new price
+      rentInputMode: 'yieldPct', // Changed default
       rentGross: 1000,
       expectedYield: 5,
       rentPeriodicity: 'monthly',
@@ -195,19 +204,19 @@ const ImmoPage = () => {
       horizonYears: 20,
       saleYear: 20,
       salePriceMode: 'growth',
-      saleGrowthRate: 2,
-      saleCostsPct: 7,
+      saleGrowthRate: 1, // Changed default
+      saleCostsPct: 10, // Changed default
 
       applyLoan: true,
-      loanAmount: 200000,
+      loanAmount: 80000, // Adjusted default to be less than new price
       loanRate: settings.defaultLoanRate,
       loanDurationYears: settings.defaultLoanDurationYears,
       loanApplyInsurance: true,
       loanInsuranceMode: 'initialPct',
       loanInsuranceRate: settings.defaultLoanInsuranceRate,
 
-      tmi: settings.defaultTMI, // Directement utilisé
-      ps: settings.defaultPS,   // Directement utilisé
+      tmi: settings.defaultTMI,
+      ps: settings.defaultPS,
     },
   });
 
@@ -281,8 +290,8 @@ const ImmoPage = () => {
       saleGrowthRate: saleGrowthRateValue,
       saleCostsPct: values.saleCostsPct / 100,
       loan: loanDetails,
-      tmi: values.tmi / 100, // Directement utilisé
-      ps: values.ps / 100,   // Directement utilisé
+      tmi: values.tmi / 100,
+      ps: values.ps / 100,
     });
     setResults(computedResults);
 
@@ -368,8 +377,8 @@ const ImmoPage = () => {
     const salePriceOrGrowth = values.salePriceMode === 'fixed' ? values.salePrice : values.saleGrowthRate;
     const salePriceOrGrowthLabel = values.salePriceMode === 'fixed' ? t('salePriceLabel') : t('saleGrowthRateLabel');
 
-    const tmiValue = values.tmi; // Directement utilisé
-    const psValue = values.ps;   // Directement utilisé
+    const tmiValue = values.tmi;
+    const psValue = values.ps;
 
     const rentInputModeTranslated = t(values.rentInputMode);
     const rentValue = values.rentInputMode === 'fixedAmount' ? values.rentGross?.toString() : values.expectedYield?.toString() + '%';
