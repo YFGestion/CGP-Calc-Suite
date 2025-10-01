@@ -48,15 +48,15 @@ const formSchema = (t: (key: string) => string) => z.object({
     invalid_type_error: t('validation.nonNegativeNumber'),
   }).min(0, t('validation.nonNegativeNumber')).optional(),
   
-  rentInputMode: z.enum(['fixedAmount', 'yieldPct']), // New field
+  rentInputMode: z.enum(['fixedAmount', 'yieldPct']),
   rentGross: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
-  }).min(0, t('validation.nonNegativeNumber')).optional(), // Now optional
+  }).min(0, t('validation.nonNegativeNumber')).optional(),
   expectedYield: z.coerce.number({
     required_error: t('validation.percentageRange', { min: 0, max: 20 }),
     invalid_type_error: t('validation.percentageRange', { min: 0, max: 20 }),
-  }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(), // New field
+  }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(),
   
   rentPeriodicity: z.enum(['monthly', 'annual']),
   // vacancyRate: z.coerce.number({ // REMOVED
@@ -317,10 +317,10 @@ const ImmoPage = () => {
       avgPostLoanIncomeAnnual: formatCurrency(computedResults.avgPostLoanIncome),
       avgPostLoanIncomeMonthly: formatCurrency(avgPostLoanIncomeMonthly),
       salePriceAtSale: formatCurrency(computedResults.salePriceAtSale),
-      netSalePriceBeforeCrd: formatCurrency(computedResults.netSalePriceBeforeCrd), // New field
+      netSalePriceBeforeCrd: formatCurrency(computedResults.netSalePriceBeforeCrd),
       crdAtSale: formatCurrency(computedResults.crdAtSale),
       capitalRecoveredAtSale: formatCurrency(computedResults.capitalRecoveredAtSale),
-      irr: isNaN(computedResults.irr) ? commonT('none') : formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), // Only one IRR
+      irr: isNaN(computedResults.irr) ? commonT('none') : formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };
 
     setSummaryContent(
@@ -438,10 +438,10 @@ const ImmoPage = () => {
       [t('avgPostLoanIncomeAnnual'), formatCurrency(results.avgPostLoanIncome)],
       [t('avgPostLoanIncomeMonthly'), formatCurrency(avgPostLoanIncomeMonthly)],
       [t('salePriceAtSale'), formatCurrency(results.salePriceAtSale)],
-      [t('netSalePriceBeforeCrd'), formatCurrency(results.netSalePriceBeforeCrd)], // New field
+      [t('netSalePriceBeforeCrd'), formatCurrency(results.netSalePriceBeforeCrd)],
       [t('crdAtSale'), formatCurrency(results.crdAtSale)],
       [t('capitalRecoveredAtSale'), formatCurrency(results.capitalRecoveredAtSale)],
-      [t('irr'), isNaN(results.irr) ? commonT('none') : formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })], // Only one IRR
+      [t('irr'), isNaN(results.irr) ? commonT('none') : formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
       [],
       [t('annualTableTitle')],
       [
@@ -1225,7 +1225,7 @@ const ImmoPage = () => {
                   <div className="text-2xl font-bold">{formatCurrency(results.avgPostLoanIncome / 12)}</div>
                 </CardContent>
               </Card>
-              <Card className="md:col-span-full"> {/* Make this card span full width */}
+              <Card className="md:col-span-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">{t('irr')}</CardTitle>
                 </CardHeader>
@@ -1256,7 +1256,7 @@ const ImmoPage = () => {
                   </Card>
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">{t('netSalePriceBeforeCrd')}</CardTitle> {/* New card */}
+                      <CardTitle className="text-sm font-medium">{t('netSalePriceBeforeCrd')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">{formatCurrency(results.netSalePriceBeforeCrd)}</div>
@@ -1270,7 +1270,7 @@ const ImmoPage = () => {
                       <div className="text-2xl font-bold">{formatCurrency(results.crdAtSale)}</div>
                     </CardContent>
                   </Card>
-                  <Card className="md:col-span-full"> {/* Make this card span full width */}
+                  <Card className="md:col-span-full">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">{t('capitalRecoveredAtSale')}</CardTitle>
                     </CardHeader>

@@ -53,7 +53,7 @@ interface RentalCashflowIrrResult {
   annualTable: AnnualTableEntry[];
   avgSavingEffortDuringLoan: number; // Annual
   avgPostLoanIncome: number; // Annual
-  irr: number; // TRI de l'effort d'épargne (anciennement irrSavingEffort)
+  irr: number; // TRI de l'effort d'épargne
   salePriceAtSale: number; // Prix de cession brut
   netSalePriceBeforeCrd: number; // Nouveau: Prix de cession net de frais (avant remboursement CRD)
   crdAtSale: number;
@@ -91,7 +91,7 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   }) : null;
 
   const annualTable: AnnualTableEntry[] = [];
-  const cashFlows: number[] = [-initialInvestment]; // Initial cash outflow
+  // const cashFlows: number[] = [-initialInvestment]; // Original cashflows for overall IRR - REMOVED
 
   let totalSavingEffortDuringLoan = 0;
   let loanPeriodsCount = 0;
@@ -99,12 +99,12 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   let postLoanYearsCount = 0;
 
   let finalSalePriceAtSale = 0;
-  let finalNetSalePriceBeforeCrd = 0; // New variable
+  let finalNetSalePriceBeforeCrd = 0;
   let finalCrdAtSale = 0;
   let finalCapitalRecoveredAtSale = 0;
 
   for (let year = 1; year <= horizonYears; year++) {
-    const currentRentGross = rentAnnualGross; // Assuming rent is constant for simplicity, or could add growth
+    const currentRentGross = rentAnnualGross;
     // const currentVacancy = currentRentGross * vacancyRate; // REMOVED
     const currentRentNet = currentRentGross; // No vacancy rate applied
 
@@ -125,7 +125,7 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
         interest = annualLoanData.sumInterest;
         principal = annualLoanData.sumPrincipal;
         insurance = annualLoanData.sumInsurance;
-        annuity = annualLoanData.sumPayment; // sumPayment includes principal, interest, insurance
+        annuity = annualLoanData.sumPayment;
         crdEnd = annualLoanData.crdEnd;
       }
     }
@@ -147,7 +147,6 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
         tax = taxableIncome * (tmi + ps);
         break;
       case 'effective_rate':
-        // Simplified: taxable income is NOI minus interest, capped at 0
         taxableIncome = Math.max(0, NOI - interest);
         tax = taxableIncome * (tmi + ps);
         break;
@@ -155,7 +154,7 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     tax = round(tax, 2);
 
     const cashflow = round(NOI - annuity - tax, 2);
-    cashFlows.push(cashflow);
+    // cashFlows.push(cashflow); // Original cashflows for overall IRR - REMOVED
 
     annualTable.push({
       year,
@@ -191,40 +190,50 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
         currentSalePrice = price * Math.pow(1 + saleGrowthRate, saleYear);
       }
 
-      const netSaleProceedsBeforeCrd = round(currentSalePrice * (1 - saleCostsPct), 2); // New calculation
-      const netSaleProceedsAfterCrd = round(netSaleProceedsBeforeCrd - crdEnd, 2);
-      cashFlows[cashFlows.length - 1] = round(cashFlows[cashFlows.length - 1] + netSaleProceedsAfterCrd, 2);
+      finalNetSalePriceBeforeCrd = round(currentSalePrice * (1 - saleCostsPct), 2);
+      finalCrdAtSale = round(crdEnd, 2);
+      finalCapitalRecoveredAtSale = round(finalNetSalePriceBeforeCrd - finalCrdAtSale, 2);
 
       finalSalePriceAtSale = round(currentSalePrice, 2);
-      finalNetSalePriceBeforeCrd = netSaleProceedsBeforeCrd; // Store new value
-      finalCrdAtSale = round(crdEnd, 2);
-      finalCapitalRecoveredAtSale = round(netSaleProceedsAfterCrd, 2);
     }
   }
 
   const avgSavingEffortDuringLoan = loanPeriodsCount > 0 ? round(totalSavingEffortDuringLoan / loanPeriodsCount, 2) : 0;
   const avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
 
-  // Calculate irrSavingEffort (now the only IRR)
+  // Calculate irr (now the only IRR, representing the return on saving effort + initial equity)
   let finalIrr = NaN;
-  if (avgSavingEffortDuringLoan > 0 && finalCapitalRecoveredAtSale > 0) {
-    const avgSavingEffortMonthly = avgSavingEffortDuringLoan / 12;
-    const numMonths = horizonYears * 12;
+  const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2); // Capital de départ non financé
+  const numMonths = horizonYears * 12;
+
+  // Only calculate if there's an initial equity or saving effort, and recovered capital
+  if ((initialEquity > 0 || avgSavingEffortDuringLoan > 0) && finalCapitalRecoveredAtSale !== 0) {
+    const monthlySavingEffort = avgSavingEffortDuringLoan / 12;
     const savingEffortCashFlows: number[] = [];
 
+    // Initial outflow (unfunded capital) at t=0
+    savingEffortCashFlows.push(-initialEquity);
+
+    // Monthly saving efforts (outflows) from t=1 to t=numMonths
     for (let i = 0; i < numMonths; i++) {
-      savingEffortCashFlows.push(-avgSavingEffortMonthly);
+      savingEffortCashFlows.push(-monthlySavingEffort);
     }
-    savingEffortCashFlows.push(finalCapitalRecoveredAtSale); // Final inflow
+
+    // Add final recovered capital to the last cash flow (at t=numMonths)
+    savingEffortCashFlows[numMonths] = round(savingEffortCashFlows[numMonths] + finalCapitalRecoveredAtSale, 2);
 
     const monthlyIrr = irr(savingEffortCashFlows);
-    if (!isNaN(monthlyIrr) && monthlyIrr > -1) { // Ensure monthlyIrr is valid for annualization
-      finalIrr = Math.pow(1 + monthlyIrr, 12) - 1;
+    if (!isNaN(monthlyIrr) && monthlyIrr > -1) {
+      finalIrr = Math.pow(1 + monthlyIrr, 12) - 1; // Annualize
+    } else if (monthlyIrr <= -1) { // If IRR is -100% or worse
+      finalIrr = -1;
     }
-  } else if (avgSavingEffortDuringLoan === 0 && finalCapitalRecoveredAtSale > 0) {
-    finalIrr = NaN; // Infinite return if no effort, but not a "rate of return on effort"
-  } else if (avgSavingEffortDuringLoan > 0 && finalCapitalRecoveredAtSale <= 0) {
-    finalIrr = -1; // -100% return if effort but no recovered capital or loss
+  } else if (initialEquity === 0 && avgSavingEffortDuringLoan === 0 && finalCapitalRecoveredAtSale > 0) {
+    // If no initial equity, no saving effort, but recovered capital, it's an infinite return.
+    finalIrr = NaN; // Or a very high number, NaN is safer for IRR.
+  } else if ((initialEquity > 0 || avgSavingEffortDuringLoan > 0) && finalCapitalRecoveredAtSale <= 0) {
+    // If there was effort/initial equity but no recovered capital or a loss
+    finalIrr = -1; // -100% return
   }
 
 
@@ -234,7 +243,7 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     avgPostLoanIncome,
     irr: round(finalIrr, 4), // Round IRR to 4 decimal places for percentage
     salePriceAtSale: finalSalePriceAtSale,
-    netSalePriceBeforeCrd: finalNetSalePriceBeforeCrd, // Return new value
+    netSalePriceBeforeCrd: finalNetSalePriceBeforeCrd,
     crdAtSale: finalCrdAtSale,
     capitalRecoveredAtSale: finalCapitalRecoveredAtSale,
   };

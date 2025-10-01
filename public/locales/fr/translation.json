@@ -211,7 +211,7 @@
 
     "tableHeaderYear": "Année",
     "tableHeaderRentGross": "Loyers bruts",
-    "tableHeaderVacancy": "Vacance",
+    // "tableHeaderVacancy": "Vacance", // REMOVED
     "tableHeaderRentNet": "Loyers nets",
     "tableHeaderOpexTotal": "Charges totales",
     "tableHeaderNOI": "NOI",
