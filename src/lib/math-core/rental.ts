@@ -187,7 +187,7 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     }
   }
 
-  const avgSavingEffortDuringLoan = loanPeriodsCount > 0 ? round(totalSavingEffetDuringLoan / loanPeriodsCount, 2) : 0;
+  const avgSavingEffortDuringLoan = loanPeriodsCount > 0 ? round(totalSavingEffortDuringLoan / loanPeriodsCount, 2) : 0;
   const avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
 
   const calculatedIrr = irr(cashFlows);
