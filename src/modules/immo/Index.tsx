@@ -190,7 +190,7 @@ const ImmoPage = () => {
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
       price: 250000,
-      applyAcqCosts: true,
+      applyAcqCosts: false, // Changed to false
       acqCosts: 250000 * (settings.defaultAcqCostsPct / 100),
       rentInputMode: 'fixedAmount', // Default to fixed amount
       rentGross: 1000,
@@ -199,7 +199,7 @@ const ImmoPage = () => {
       vacancyRate: 5,
       opex: 500,
       propertyTax: 1000,
-      applyMgmtFees: true,
+      applyMgmtFees: false, // Changed to false
       mgmtFeesType: 'mgmtFeesPct',
       mgmtFeesValue: 8,
       capex: 300,
@@ -246,8 +246,8 @@ const ImmoPage = () => {
       baseRentAnnualGross = values.price * (values.expectedYield / 100);
     }
 
-    const adjustedRentAnnualGross = baseRentAnnualGross; // No sensitivity
-    const adjustedVacancyRate = values.vacancyRate / 100; // No sensitivity
+    const adjustedRentAnnualGross = baseRentAnnualGross;
+    const adjustedVacancyRate = values.vacancyRate / 100;
     
     let mgmtFeesPctValue = 0;
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
@@ -260,7 +260,7 @@ const ImmoPage = () => {
     const loanDetails = values.applyLoan && values.loanAmount && values.loanRate && values.loanDurationYears
       ? {
         amount: values.loanAmount,
-        rate: values.loanRate / 100, // No sensitivity
+        rate: values.loanRate / 100,
         years: values.loanDurationYears,
         insurance: values.loanApplyInsurance && values.loanInsuranceMode && values.loanInsuranceRate !== undefined
           ? {
@@ -275,9 +275,9 @@ const ImmoPage = () => {
     let saleGrowthRateValue = values.saleGrowthRate;
 
     if (values.salePriceMode === 'fixed' && values.salePrice !== undefined) {
-      salePriceValue = values.salePrice; // No sensitivity
+      salePriceValue = values.salePrice;
     } else if (values.salePriceMode === 'growth' && values.saleGrowthRate !== undefined) {
-      saleGrowthRateValue = values.saleGrowthRate / 100; // No sensitivity
+      saleGrowthRateValue = values.saleGrowthRate / 100;
     }
 
     const computedResults = rentalCashflowIrr({
@@ -357,8 +357,6 @@ const ImmoPage = () => {
       }, 0);
     }
   }, [searchParams, setValue, handleSubmit, onSubmit]);
-
-  // Removed the useEffect for sensitivity changes as sensitivities are removed.
 
   const handleExportCsv = () => {
     if (!results) return;
@@ -460,8 +458,6 @@ const ImmoPage = () => {
     toast.info(t('scenarioDuplicated'));
     // Future implementation: copy current form state to a new scenario
   };
-
-  // Removed handleResetSensitivities as sensitivities are removed.
 
   return (
     <Card className="w-full max-w-5xl mx-auto">
@@ -1116,7 +1112,7 @@ const ImmoPage = () => {
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
                             <FormControl><RadioGroupItem value="effective_rate" id="taxMode-effective_rate" /></FormControl>
-                            <FormLabel htmlFor="taxMode-effective_rate" className="font-normal">{t('taxModeEffectiveRate')}</FormLabel>
+                            <FormLabel htmlFor="taxMode-effective-rate" className="font-normal">{t('taxModeEffectiveRate')}</FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
