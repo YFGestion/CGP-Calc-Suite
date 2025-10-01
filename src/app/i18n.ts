@@ -16,6 +16,7 @@ i18n
     resources, // Utilise l'objet de ressources directement structuré
     lng: 'fr', // Langue par défaut
     fallbackLng: 'fr',
+    debug: true, // Ajout du mode debug pour le diagnostic
     interpolation: {
       escapeValue: false, // React échappe déjà les valeurs
       // Correction: Définir explicitement les préfixes et suffixes pour les placeholders
