@@ -26,10 +26,8 @@ export function AppLayout() {
           </SheetContent>
         </Sheet>
       ) : (
-        // Sur desktop, la Sidebar est fixe
-        <div className="fixed left-0 top-0 h-full">
-          <Sidebar />
-        </div>
+        // Sur desktop, la Sidebar est fixe et prend toute la hauteur
+        <Sidebar className="fixed left-0 top-0 h-full" />
       )}
       {/* Le conteneur principal du contenu a maintenant un padding-left sur desktop */}
       <div className={`flex flex-col flex-1 ${!isMobile ? 'pl-64' : ''}`}>
