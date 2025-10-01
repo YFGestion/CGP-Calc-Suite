@@ -1305,47 +1305,6 @@ const ImmoPage = () => {
 
             <Separator className="my-4" />
 
-            <h3 className="text-lg font-semibold mb-4">{t('chartCashflowTitle')}</h3>
-            <div className="h-[300px] w-full" aria-label={t('chartCashflowTitle')}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={results.annualTable}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" label={{ value: t('tableHeaderYear'), position: 'insideBottom', offset: 0 }} />
-                  <YAxis tickFormatter={(value) => formatCurrency(value, 'fr-FR', 'EUR')} />
-                  <Tooltip formatter={(value: number) => formatCurrency(value, 'fr-FR', 'EUR')} />
-                  <Legend />
-                  <Line type="monotone" dataKey="cashflow" stroke="#8884d8" name={t('chartCashflow')} activeDot={{ r: 8 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {applyLoan && (
-              <>
-                <Separator className="my-4" />
-                <h3 className="text-lg font-semibold mb-4">{t('chartCrdTitle')}</h3>
-                <div className="h-[300px] w-full" aria-label={t('chartCrdTitle')}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={results.annualTable}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="year" label={{ value: t('tableHeaderYear'), position: 'insideBottom', offset: 0 }} />
-                      <YAxis tickFormatter={(value) => formatCurrency(value, 'fr-FR', 'EUR')} />
-                      <Tooltip formatter={(value: number) => formatCurrency(value, 'fr-FR', 'EUR')} />
-                      <Legend />
-                      <Line type="monotone" dataKey="crdEnd" stroke="#82ca9d" name={t('chartCrd')} activeDot={{ r: 8 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </>
-            )}
-
-            <Separator className="my-4" />
-
             <div className="flex flex-col sm:flex-row gap-2">
               <Button variant="outline" onClick={handleExportCsv} className="flex-1">
                 {t('exportCsvButton')}
