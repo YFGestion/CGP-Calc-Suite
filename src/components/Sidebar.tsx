@@ -14,20 +14,20 @@ import {
   Scale,
   Home,
   Info,
-  Sun,
-  Moon,
+  // Sun, // Supprimé
+  // Moon, // Supprimé
   Globe,
-  Settings, // Import Settings icon
+  Settings,
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
-import { useTheme } from 'next-themes';
+// import { useTheme } from 'next-themes'; // Supprimé
 import i18n from '@/app/i18n';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
   const { t } = useTranslation('common');
-  const { theme, setTheme } = useTheme();
+  // const { theme, setTheme } = useTheme(); // Supprimé
   const { language, setLanguage } = useAppState();
 
   const navItems = [
@@ -39,9 +39,9 @@ export function Sidebar({ className }: SidebarProps) {
     { to: '/immo', icon: LandPlot, label: t('immo') },
   ];
 
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
+  // const toggleTheme = () => { // Supprimé
+  //   setTheme(theme === 'light' ? 'dark' : 'light');
+  // };
 
   const toggleLanguage = () => {
     const newLang = language === 'fr-FR' ? 'en-US' : 'fr-FR';
@@ -77,7 +77,8 @@ export function Sidebar({ className }: SidebarProps) {
             {t('tools')}
           </h2>
           <div className="space-y-1">
-            <Button
+            {/* Bouton de bascule du thème supprimé */}
+            {/* <Button
               variant="ghost"
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               onClick={toggleTheme}
@@ -88,7 +89,7 @@ export function Sidebar({ className }: SidebarProps) {
                 <Sun className="mr-2 h-4 w-4" />
               )}
               {t('themeToggle')}
-            </Button>
+            </Button> */}
             <Button
               variant="ghost"
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

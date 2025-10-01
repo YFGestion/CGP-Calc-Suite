@@ -5,12 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { I18nextProvider } from 'react-i18next';
 import i18n from './app/i18n';
-import { ThemeProvider } from './app/theme';
+// import { ThemeProvider } from './app/theme'; // Supprimé
 import { AppLayout } from './app/AppLayout';
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/About";
-import SettingsPage from "./pages/Settings"; // Import the new SettingsPage
+import SettingsPage from "./pages/Settings";
 import BrutNetPage from "./modules/brutNet/Index";
 import EndettementPage from "./modules/endettement/Index";
 import EpargnePage from "./modules/epargne/Index";
@@ -22,7 +22,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nextProvider i18n={i18n}>
-      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      {/* <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme"> */} {/* Supprimé */}
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -36,14 +36,14 @@ const App = () => (
                 <Route path="credit" element={<CreditPage />} />
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />
-                <Route path="settings" element={<SettingsPage />} /> {/* Add the new route */}
+                <Route path="settings" element={<SettingsPage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
-      </ThemeProvider>
+      {/* </ThemeProvider> */} {/* Supprimé */}
     </I18nextProvider>
   </QueryClientProvider>
 );
