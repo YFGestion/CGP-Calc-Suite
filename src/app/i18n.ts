@@ -4,27 +4,16 @@ import { initReactI18next } from 'react-i18next';
 // Importe l'intégralité du fichier de traduction JSON
 import frTranslations from '../../public/locales/fr/translation.json';
 
-// Crée l'objet de ressources en mappant explicitement chaque clé de haut niveau
-// du fichier JSON à un namespace i18next pour la langue 'fr'.
+// Crée l'objet de ressources en mappant directement l'objet JSON importé
+// Chaque clé de haut niveau du fichier JSON (e.g., 'common', 'homePage') sera un namespace.
 const resources = {
-  fr: {
-    common: frTranslations.common,
-    compliance: frTranslations.compliance,
-    homePage: frTranslations.homePage,
-    aboutPage: frTranslations.aboutPage,
-    brutNetPage: frTranslations.brutNetPage,
-    epargnePage: frTranslations.epargnePage,
-    creditPage: frTranslations.creditPage,
-    immoPage: frTranslations.immoPage,
-    endettementPage: frTranslations.endettementPage,
-    settingsPage: frTranslations.settingsPage
-  },
+  fr: frTranslations,
 };
 
 i18n
   .use(initReactI18next)
   .init({
-    resources, // Utilise l'objet de ressources explicitement structuré
+    resources, // Utilise l'objet de ressources directement structuré
     lng: 'fr', // Langue par défaut
     fallbackLng: 'fr',
     interpolation: {
