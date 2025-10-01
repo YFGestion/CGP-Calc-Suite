@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Calculator,
   LandPlot,
@@ -13,18 +12,20 @@ import {
   Wallet,
   Scale,
   Home,
-  Info,
-  Globe,
   Settings,
+  ChevronLeft, // Icône pour réduire
+  ChevronRight, // Icône pour étendre
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-  onLinkClick?: () => void; // Nouvelle prop
+  onLinkClick?: () => void;
+  isCollapsed: boolean; // Nouvelle prop
+  onToggleCollapse: () => void; // Nouvelle prop
 }
 
-export function Sidebar({ className, onLinkClick }: SidebarProps) {
+export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
 
@@ -44,47 +45,69 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
   };
 
   return (
-    <div className={cn("pb-12 w-64 border-r bg-sidebar", className)}>
-      <div className="space-y-4 py-4">
+    <div className={cn("pb-12 border-r bg-sidebar flex flex-col", className)}>
+      <div className="space-y-4 py-4 flex-1"> {/* flex-1 pour pousser le bouton de bascule vers le bas */}
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
-            {t('appName')}
-          </h2>
+          {!isCollapsed && ( // Afficher le nom de l'application uniquement si non réduit
+            <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
+              {t('appName')}
+            </h2>
+          )}
           <div className="space-y-1">
             {navItems.map((item) => (
               <Button
                 key={item.to}
                 variant="ghost"
-                className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                className={cn(
+                  "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isCollapsed ? "justify-center" : "justify-start" // Ajuster la justification
+                )}
                 asChild
                 onClick={onLinkClick}
               >
                 <Link to={item.to}>
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
+                  <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} /> {/* Ajuster la marge de l'icône */}
+                  {!isCollapsed && item.label} {/* Afficher le libellé uniquement si non réduit */}
                 </Link>
               </Button>
             ))}
           </div>
         </div>
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
-            {t('tools')}
-          </h2>
+          {!isCollapsed && ( // Afficher le titre des outils uniquement si non réduit
+            <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
+              {t('tools')}
+            </h2>
+          )}
           <div className="space-y-1">
             <Button
               variant="ghost"
-              className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className={cn(
+                "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                isCollapsed ? "justify-center" : "justify-start"
+              )}
               asChild
               onClick={onLinkClick}
             >
               <Link to="/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                {t('settings')}
+                <Settings className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                {!isCollapsed && t('settings')}
               </Link>
             </Button>
           </div>
         </div>
+      </div>
+      {/* Bouton de bascule en bas */}
+      <div className="p-3 border-t border-sidebar-border">
+        <Button
+          variant="ghost"
+          className="w-full justify-center text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          onClick={onToggleCollapse}
+          aria-label={isCollapsed ? t('common.expand') : t('common.collapse')}
+        >
+          {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          {!isCollapsed && <span className="ml-2">{t('common.collapse')}</span>} {/* Ajouter un libellé si non réduit */}
+        </Button>
       </div>
     </div>
   );

@@ -15,7 +15,9 @@
     "copied": "Copié !",
     "results": "Résultats",
     "tools": "Outils",
-    "none": "Aucun"
+    "none": "Aucun",
+    "collapse": "Réduire",
+    "expand": "Étendre"
   },
   "compliance": {
     "banner": "Cet outil fournit des estimations à visée pédagogique. Il ne se substitue pas à un calcul réglementaire ni à un conseil fiscal ou financier. Paramètres à vérifier et à mettre à jour."
