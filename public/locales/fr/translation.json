@@ -145,7 +145,6 @@
     "rentPeriodicityLabel": "Périodicité des loyers",
     "monthly": "Mensuel",
     "annual": "Annuel",
-    "vacancyRateLabel": "Taux de vacance (%)",
     "opexLabel": "Charges non récupérables annuelles (€)",
     "propertyTaxLabel": "Taxe foncière annuelle (€)",
     "mgmtFeesToggleLabel": "Appliquer des frais de gestion",
@@ -211,7 +210,6 @@
 
     "tableHeaderYear": "Année",
     "tableHeaderRentGross": "Loyers bruts",
-    // "tableHeaderVacancy": "Vacance", // REMOVED
     "tableHeaderRentNet": "Loyers nets",
     "tableHeaderOpexTotal": "Charges totales",
     "tableHeaderNOI": "NOI",
