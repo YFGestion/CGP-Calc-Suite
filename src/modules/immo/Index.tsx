@@ -59,10 +59,10 @@ const formSchema = (t: (key: string) => string) => z.object({
   }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(), // New field
   
   rentPeriodicity: z.enum(['monthly', 'annual']),
-  vacancyRate: z.coerce.number({
-    required_error: t('validation.percentageRange', { min: 0, max: 100 }),
-    invalid_type_error: t('validation.percentageRange', { min: 0, max: 100 }),
-  }).min(0, t('validation.percentageRange', { min: 0, max: 100 })).max(100, t('validation.percentageRange', { min: 0, max: 100 })),
+  // vacancyRate: z.coerce.number({ // REMOVED
+  //   required_error: t('validation.percentageRange', { min: 0, max: 100 }),
+  //   invalid_type_error: t('validation.percentageRange', { min: 0, max: 100 }),
+  // }).min(0, t('validation.percentageRange', { min: 0, max: 100 })).max(100, t('validation.percentageRange', { min: 0, max: 100 })),
   opex: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
@@ -190,16 +190,16 @@ const ImmoPage = () => {
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
       price: 250000,
-      applyAcqCosts: false, // Changed to false
+      applyAcqCosts: false,
       acqCosts: 250000 * (settings.defaultAcqCostsPct / 100),
-      rentInputMode: 'fixedAmount', // Default to fixed amount
+      rentInputMode: 'fixedAmount',
       rentGross: 1000,
-      expectedYield: 5, // Default for yieldPct
+      expectedYield: 5,
       rentPeriodicity: 'monthly',
-      vacancyRate: 5,
+      // vacancyRate: 5, // REMOVED
       opex: 500,
       propertyTax: 1000,
-      applyMgmtFees: false, // Changed to false
+      applyMgmtFees: false,
       mgmtFeesType: 'mgmtFeesPct',
       mgmtFeesValue: 8,
       capex: 300,
@@ -226,7 +226,7 @@ const ImmoPage = () => {
   const { watch, handleSubmit, setValue, getValues, reset } = form;
 
   const applyAcqCosts = watch('applyAcqCosts');
-  const rentInputMode = watch('rentInputMode'); // Watch new field
+  const rentInputMode = watch('rentInputMode');
   const rentPeriodicity = watch('rentPeriodicity');
   const applyMgmtFees = watch('applyMgmtFees');
   const mgmtFeesType = watch('mgmtFeesType');
@@ -247,7 +247,7 @@ const ImmoPage = () => {
     }
 
     const adjustedRentAnnualGross = baseRentAnnualGross;
-    const adjustedVacancyRate = values.vacancyRate / 100;
+    // const adjustedVacancyRate = values.vacancyRate / 100; // REMOVED
     
     let mgmtFeesPctValue = 0;
     if (values.applyMgmtFees && values.mgmtFeesType === 'mgmtFeesPct' && values.mgmtFeesValue !== undefined) {
@@ -284,7 +284,7 @@ const ImmoPage = () => {
       price: values.price,
       acqCosts: values.applyAcqCosts ? values.acqCosts : 0,
       rentAnnualGross: adjustedRentAnnualGross,
-      vacancyRate: adjustedVacancyRate,
+      // vacancyRate: adjustedVacancyRate, // REMOVED
       opex: values.opex,
       propertyTax: values.propertyTax,
       mgmtFeesPct: mgmtFeesPctValue,
@@ -317,10 +317,10 @@ const ImmoPage = () => {
       avgPostLoanIncomeAnnual: formatCurrency(computedResults.avgPostLoanIncome),
       avgPostLoanIncomeMonthly: formatCurrency(avgPostLoanIncomeMonthly),
       salePriceAtSale: formatCurrency(computedResults.salePriceAtSale),
+      netSalePriceBeforeCrd: formatCurrency(computedResults.netSalePriceBeforeCrd), // New field
       crdAtSale: formatCurrency(computedResults.crdAtSale),
       capitalRecoveredAtSale: formatCurrency(computedResults.capitalRecoveredAtSale),
-      irr: formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      irrSavingEffort: isNaN(computedResults.irrSavingEffort) ? commonT('none') : formatPercent(computedResults.irrSavingEffort, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      irr: isNaN(computedResults.irr) ? commonT('none') : formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), // Only one IRR
     };
 
     setSummaryContent(
@@ -405,7 +405,7 @@ const ImmoPage = () => {
       [t('rentInputModeLabel'), rentInputModeTranslated],
       [rentLabel, rentValue],
       [t('rentPeriodicityLabel'), t(values.rentPeriodicity)],
-      [t('vacancyRateLabel'), values.vacancyRate.toString() + '%'],
+      // [t('vacancyRateLabel'), values.vacancyRate.toString() + '%'], // REMOVED
       [t('opexLabel'), values.opex.toString()],
       [t('propertyTaxLabel'), values.propertyTax.toString()],
       [t('mgmtFeesToggleLabel'), values.applyMgmtFees ? 'Oui' : 'Non'],
@@ -438,14 +438,14 @@ const ImmoPage = () => {
       [t('avgPostLoanIncomeAnnual'), formatCurrency(results.avgPostLoanIncome)],
       [t('avgPostLoanIncomeMonthly'), formatCurrency(avgPostLoanIncomeMonthly)],
       [t('salePriceAtSale'), formatCurrency(results.salePriceAtSale)],
+      [t('netSalePriceBeforeCrd'), formatCurrency(results.netSalePriceBeforeCrd)], // New field
       [t('crdAtSale'), formatCurrency(results.crdAtSale)],
       [t('capitalRecoveredAtSale'), formatCurrency(results.capitalRecoveredAtSale)],
-      [t('irr'), formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
-      [t('irrSavingEffort'), isNaN(results.irrSavingEffort) ? commonT('none') : formatPercent(results.irrSavingEffort, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+      [t('irr'), isNaN(results.irr) ? commonT('none') : formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })], // Only one IRR
       [],
       [t('annualTableTitle')],
       [
-        t('tableHeaderYear'), t('tableHeaderRentGross'), t('tableHeaderVacancy'), t('tableHeaderRentNet'),
+        t('tableHeaderYear'), t('tableHeaderRentGross'), /* t('tableHeaderVacancy'), */ t('tableHeaderRentNet'), // REMOVED
         t('tableHeaderOpexTotal'), t('tableHeaderNOI'), t('tableHeaderInterest'), t('tableHeaderPrincipal'),
         t('tableHeaderInsurance'), t('tableHeaderAnnuity'), t('tableHeaderTaxableIncome'), t('tableHeaderTax'),
         t('tableHeaderCashflow'), t('tableHeaderCrdEnd')
@@ -453,7 +453,7 @@ const ImmoPage = () => {
       ...results.annualTable.map(row => [
         row.year.toString(),
         formatCurrency(row.rentGross),
-        formatCurrency(row.vacancy),
+        // formatCurrency(row.vacancy), // REMOVED
         formatCurrency(row.rentNet),
         formatCurrency(row.opexTotal),
         formatCurrency(row.NOI),
@@ -652,7 +652,8 @@ const ImmoPage = () => {
                   />
                 )}
 
-                <FormField
+                {/* REMOVED VACANCY RATE FIELD */}
+                {/* <FormField
                   control={form.control}
                   name="vacancyRate"
                   render={({ field }) => (
@@ -670,7 +671,7 @@ const ImmoPage = () => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
 
                 <FormField
                   control={form.control}
@@ -1224,21 +1225,13 @@ const ImmoPage = () => {
                   <div className="text-2xl font-bold">{formatCurrency(results.avgPostLoanIncome / 12)}</div>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="md:col-span-full"> {/* Make this card span full width */}
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">{t('irr')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('irrSavingEffort')}</CardTitle>
-                </CardHeader>
-                <CardContent>
                   <div className="text-2xl font-bold">
-                    {isNaN(results.irrSavingEffort) ? commonT('none') : formatPercent(results.irrSavingEffort, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {isNaN(results.irr) ? commonT('none') : formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -1263,13 +1256,21 @@ const ImmoPage = () => {
                   </Card>
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">{t('netSalePriceBeforeCrd')}</CardTitle> {/* New card */}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{formatCurrency(results.netSalePriceBeforeCrd)}</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">{t('crdAtSale')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">{formatCurrency(results.crdAtSale)}</div>
                     </CardContent>
                   </Card>
-                  <Card>
+                  <Card className="md:col-span-full"> {/* Make this card span full width */}
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">{t('capitalRecoveredAtSale')}</CardTitle>
                     </CardHeader>
@@ -1295,7 +1296,7 @@ const ImmoPage = () => {
                       <TableRow>
                         <TableHead>{t('tableHeaderYear')}</TableHead>
                         <TableHead>{t('tableHeaderRentGross')}</TableHead>
-                        <TableHead>{t('tableHeaderVacancy')}</TableHead>
+                        {/* <TableHead>{t('tableHeaderVacancy')}</TableHead> */} {/* REMOVED */}
                         <TableHead>{t('tableHeaderRentNet')}</TableHead>
                         <TableHead>{t('tableHeaderOpexTotal')}</TableHead>
                         <TableHead>{t('tableHeaderNOI')}</TableHead>
@@ -1314,7 +1315,7 @@ const ImmoPage = () => {
                         <TableRow key={row.year}>
                           <TableCell>{row.year}</TableCell>
                           <TableCell>{formatCurrency(row.rentGross)}</TableCell>
-                          <TableCell>{formatCurrency(row.vacancy)}</TableCell>
+                          {/* <TableCell>{formatCurrency(row.vacancy)}</TableCell> */} {/* REMOVED */}
                           <TableCell>{formatCurrency(row.rentNet)}</TableCell>
                           <TableCell>{formatCurrency(row.opexTotal)}</TableCell>
                           <TableCell>{formatCurrency(row.NOI)}</TableCell>
