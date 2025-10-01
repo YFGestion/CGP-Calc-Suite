@@ -57,7 +57,7 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
                 variant="ghost"
                 className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 asChild
-                onClick={onLinkClick} {/* Appel de onLinkClick ici */}
+                onClick={onLinkClick}
               >
                 <Link to={item.to}>
                   <item.icon className="mr-2 h-4 w-4" />
@@ -76,7 +76,7 @@ export function Sidebar({ className, onLinkClick }: SidebarProps) {
               variant="ghost"
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               asChild
-              onClick={onLinkClick} {/* Appel de onLinkClick ici */}
+              onClick={onLinkClick}
             >
               <Link to="/settings">
                 <Settings className="mr-2 h-4 w-4" />
