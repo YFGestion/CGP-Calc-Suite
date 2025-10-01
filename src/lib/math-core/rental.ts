@@ -51,9 +51,13 @@ interface AnnualTableEntry {
 
 interface RentalCashflowIrrResult {
   annualTable: AnnualTableEntry[];
-  avgSavingEffortDuringLoan: number;
-  avgPostLoanIncome: number;
-  irr: number;
+  avgSavingEffortDuringLoan: number; // Annual
+  avgPostLoanIncome: number; // Annual
+  irr: number; // Original TRI
+  salePriceAtSale: number;
+  crdAtSale: number;
+  capitalRecoveredAtSale: number;
+  irrSavingEffort: number; // New TRI based on saving effort
 }
 
 export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashflowIrrResult => {
@@ -93,6 +97,10 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
   let loanPeriodsCount = 0;
   let postLoanIncomeSum = 0;
   let postLoanYearsCount = 0;
+
+  let finalSalePriceAtSale = 0;
+  let finalCrdAtSale = 0;
+  let finalCapitalRecoveredAtSale = 0;
 
   for (let year = 1; year <= horizonYears; year++) {
     const currentRentGross = rentAnnualGross; // Assuming rent is constant for simplicity, or could add growth
@@ -184,6 +192,10 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
 
       const netSaleProceeds = round(currentSalePrice * (1 - saleCostsPct) - crdEnd, 2);
       cashFlows[cashFlows.length - 1] = round(cashFlows[cashFlows.length - 1] + netSaleProceeds, 2);
+
+      finalSalePriceAtSale = round(currentSalePrice, 2);
+      finalCrdAtSale = round(crdEnd, 2);
+      finalCapitalRecoveredAtSale = round(netSaleProceeds, 2);
     }
   }
 
@@ -192,10 +204,40 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
 
   const calculatedIrr = irr(cashFlows);
 
+  // Calculate irrSavingEffort
+  let irrSavingEffort = NaN;
+  if (avgSavingEffortDuringLoan > 0 && finalCapitalRecoveredAtSale > 0) {
+    const avgSavingEffortMonthly = avgSavingEffortDuringLoan / 12;
+    const numMonths = horizonYears * 12;
+    const savingEffortCashFlows: number[] = [];
+
+    for (let i = 0; i < numMonths; i++) {
+      savingEffortCashFlows.push(-avgSavingEffortMonthly);
+    }
+    savingEffortCashFlows.push(finalCapitalRecoveredAtSale); // Final inflow
+
+    const monthlyIrr = irr(savingEffortCashFlows);
+    if (!isNaN(monthlyIrr) && monthlyIrr > -1) { // Ensure monthlyIrr is valid for annualization
+      irrSavingEffort = Math.pow(1 + monthlyIrr, 12) - 1;
+    }
+  } else if (avgSavingEffortDuringLoan === 0 && finalCapitalRecoveredAtSale > 0) {
+    // If no saving effort but recovered capital, it's an infinite return, or 0 if no initial investment.
+    // For this specific TRI, if there's no effort, it's not a "placement de l'effort".
+    irrSavingEffort = NaN; // Or 0 if we consider 0 effort -> 0 return
+  } else if (avgSavingEffortDuringLoan > 0 && finalCapitalRecoveredAtSale === 0) {
+    // If effort but no recovered capital, it's -100% return
+    irrSavingEffort = -1;
+  }
+
+
   return {
     annualTable,
     avgSavingEffortDuringLoan,
     avgPostLoanIncome,
     irr: round(calculatedIrr, 4), // Round IRR to 4 decimal places for percentage
+    salePriceAtSale: finalSalePriceAtSale,
+    crdAtSale: finalCrdAtSale,
+    capitalRecoveredAtSale: finalCapitalRecoveredAtSale,
+    irrSavingEffort: round(irrSavingEffort, 4),
   };
 };

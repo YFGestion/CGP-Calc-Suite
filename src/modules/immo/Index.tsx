@@ -302,6 +302,9 @@ const ImmoPage = () => {
     });
     setResults(computedResults);
 
+    const avgSavingEffortMonthly = computedResults.avgSavingEffortDuringLoan / 12;
+    const avgPostLoanIncomeMonthly = computedResults.avgPostLoanIncome / 12;
+
     const formattedResults = {
       price: formatCurrency(values.price),
       horizonYears: values.horizonYears,
@@ -309,9 +312,15 @@ const ImmoPage = () => {
       loanRate: loanDetails ? formatPercent(loanDetails.rate, 'fr-FR', { maximumFractionDigits: 1 }) : commonT('none'),
       loanDurationYears: loanDetails ? loanDetails.years : commonT('none'),
       saleYear: values.saleYear,
-      avgSavingEffortDuringLoan: formatCurrency(computedResults.avgSavingEffortDuringLoan),
-      avgPostLoanIncome: formatCurrency(computedResults.avgPostLoanIncome),
+      avgSavingEffortDuringLoanAnnual: formatCurrency(computedResults.avgSavingEffortDuringLoan),
+      avgSavingEffortDuringLoanMonthly: formatCurrency(avgSavingEffortMonthly),
+      avgPostLoanIncomeAnnual: formatCurrency(computedResults.avgPostLoanIncome),
+      avgPostLoanIncomeMonthly: formatCurrency(avgPostLoanIncomeMonthly),
+      salePriceAtSale: formatCurrency(computedResults.salePriceAtSale),
+      crdAtSale: formatCurrency(computedResults.crdAtSale),
+      capitalRecoveredAtSale: formatCurrency(computedResults.capitalRecoveredAtSale),
       irr: formatPercent(computedResults.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      irrSavingEffort: isNaN(computedResults.irrSavingEffort) ? commonT('none') : formatPercent(computedResults.irrSavingEffort, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
     };
 
     setSummaryContent(
@@ -382,6 +391,8 @@ const ImmoPage = () => {
     const rentValue = values.rentInputMode === 'fixedAmount' ? values.rentGross?.toString() : values.expectedYield?.toString() + '%';
     const rentLabel = values.rentInputMode === 'fixedAmount' ? t('rentGrossLabel') : t('expectedYieldLabel');
 
+    const avgSavingEffortMonthly = results.avgSavingEffortDuringLoan / 12;
+    const avgPostLoanIncomeMonthly = results.avgPostLoanIncome / 12;
 
     const rows = [
       [commonT('appName')],
@@ -422,9 +433,15 @@ const ImmoPage = () => {
       [t('psLabel'), psValue.toString() + '%'],
       [],
       [commonT('results')],
-      [t('avgSavingEffortDuringLoan'), formatCurrency(results.avgSavingEffortDuringLoan)],
-      [t('avgPostLoanIncome'), formatCurrency(results.avgPostLoanIncome)],
+      [t('avgSavingEffortDuringLoanAnnual'), formatCurrency(results.avgSavingEffortDuringLoan)],
+      [t('avgSavingEffortDuringLoanMonthly'), formatCurrency(avgSavingEffortMonthly)],
+      [t('avgPostLoanIncomeAnnual'), formatCurrency(results.avgPostLoanIncome)],
+      [t('avgPostLoanIncomeMonthly'), formatCurrency(avgPostLoanIncomeMonthly)],
+      [t('salePriceAtSale'), formatCurrency(results.salePriceAtSale)],
+      [t('crdAtSale'), formatCurrency(results.crdAtSale)],
+      [t('capitalRecoveredAtSale'), formatCurrency(results.capitalRecoveredAtSale)],
       [t('irr'), formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+      [t('irrSavingEffort'), isNaN(results.irrSavingEffort) ? commonT('none') : formatPercent(results.irrSavingEffort, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
       [],
       [t('annualTableTitle')],
       [
@@ -1177,7 +1194,7 @@ const ImmoPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('avgSavingEffortDuringLoan')}</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('avgSavingEffortDuringLoanAnnual')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{formatCurrency(results.avgSavingEffortDuringLoan)}</div>
@@ -1185,10 +1202,26 @@ const ImmoPage = () => {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{t('avgPostLoanIncome')}</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t('avgSavingEffortDuringLoanMonthly')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(results.avgSavingEffortDuringLoan / 12)}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('avgPostLoanIncomeAnnual')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{formatCurrency(results.avgPostLoanIncome)}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('avgPostLoanIncomeMonthly')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(results.avgPostLoanIncome / 12)}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -1199,7 +1232,54 @@ const ImmoPage = () => {
                   <div className="text-2xl font-bold">{formatPercent(results.irr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </CardContent>
               </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('irrSavingEffort')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {isNaN(results.irrSavingEffort) ? commonT('none') : formatPercent(results.irrSavingEffort, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            <Separator className="my-4" />
+
+            <Collapsible defaultOpen className="space-y-2">
+              <CollapsibleTrigger className="flex items-center justify-between w-full font-semibold text-xl py-2 border-b" aria-label={t('sectionResaleData')}>
+                {t('sectionResaleData')}
+                <ChevronDown className="h-5 w-5" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">{t('salePriceAtSale')}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{formatCurrency(results.salePriceAtSale)}</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">{t('crdAtSale')}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{formatCurrency(results.crdAtSale)}</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">{t('capitalRecoveredAtSale')}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{formatCurrency(results.capitalRecoveredAtSale)}</div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             <Separator className="my-4" />
 
