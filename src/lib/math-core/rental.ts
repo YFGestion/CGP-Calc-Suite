@@ -15,8 +15,8 @@ interface RentalCashflowIrrParams {
   price: number; // Prix d'acquisition du bien
   acqCosts?: number; // Frais d'acquisition (notaire, agence, etc.)
   rentAnnualGross: number;
-  opex: number; // Dépenses d'exploitation annuelles (hors taxe foncière, gestion, travaux)
-  propertyTax: number; // Taxe foncière annuelle
+  opex?: number; // Dépenses d'exploitation annuelles (hors taxe foncière, gestion, travaux) - Made optional
+  propertyTax?: number; // Taxe foncière annuelle - Made optional
   mgmtFeesPct?: number; // Frais de gestion locative (pourcentage du loyer brut)
   capex: number; // Dépenses de travaux/entretien annuelles (provision)
   horizonYears: number; // Durée de la projection
@@ -62,8 +62,8 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     price,
     acqCosts = 0,
     rentAnnualGross,
-    opex,
-    propertyTax,
+    opex = 0, // Default to 0 if not provided
+    propertyTax = 0, // Default to 0 if not provided
     mgmtFeesPct = 0,
     capex,
     horizonYears,

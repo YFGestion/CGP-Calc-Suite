@@ -59,14 +59,15 @@ const formSchema = (t: (key: string) => string) => z.object({
   }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(),
   
   rentPeriodicity: z.enum(['monthly', 'annual']),
+  applyOpexAndTax: z.boolean(), // New field
   opex: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
-  }).min(0, t('validation.nonNegativeNumber')),
+  }).min(0, t('validation.nonNegativeNumber')).optional(),
   propertyTax: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
-  }).min(0, t('validation.nonNegativeNumber')),
+  }).min(0, t('validation.nonNegativeNumber')).optional(),
   applyMgmtFees: z.boolean(),
   mgmtFeesType: z.enum(['mgmtFeesPct', 'mgmtFeesFixed']).optional(),
   mgmtFeesValue: z.coerce.number({
@@ -133,6 +134,10 @@ const formSchema = (t: (key: string) => string) => z.object({
   if (data.applyAcqCosts && (data.acqCosts === undefined || data.acqCosts === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['acqCosts'] });
   }
+  if (data.applyOpexAndTax) { // New validation for opex and propertyTax
+    if (data.opex === undefined || data.opex === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['opex'] });
+    if (data.propertyTax === undefined || data.propertyTax === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['propertyTax'] });
+  }
   if (data.applyMgmtFees && (!data.mgmtFeesType || data.mgmtFeesValue === undefined || data.mgmtFeesValue === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['mgmtFeesType'] });
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['mgmtFeesValue'] });
@@ -195,6 +200,7 @@ const ImmoPage = () => {
       rentGross: 1000,
       expectedYield: 5,
       rentPeriodicity: 'monthly',
+      applyOpexAndTax: true, // Default to applying opex and tax
       opex: 500,
       propertyTax: 1000,
       applyMgmtFees: false,
@@ -225,6 +231,7 @@ const ImmoPage = () => {
   const applyAcqCosts = watch('applyAcqCosts');
   const rentInputMode = watch('rentInputMode');
   const rentPeriodicity = watch('rentPeriodicity');
+  const applyOpexAndTax = watch('applyOpexAndTax'); // Watch new field
   const applyMgmtFees = watch('applyMgmtFees');
   const mgmtFeesType = watch('mgmtFeesType');
   const salePriceMode = watch('salePriceMode');
@@ -279,8 +286,8 @@ const ImmoPage = () => {
       price: values.price,
       acqCosts: values.applyAcqCosts ? values.acqCosts : 0,
       rentAnnualGross: adjustedRentAnnualGross,
-      opex: values.opex,
-      propertyTax: values.propertyTax,
+      opex: values.applyOpexAndTax ? values.opex : 0, // Pass 0 if switch is off
+      propertyTax: values.applyOpexAndTax ? values.propertyTax : 0, // Pass 0 if switch is off
       mgmtFeesPct: mgmtFeesPctValue,
       capex: values.capex,
       horizonYears: values.horizonYears,
@@ -368,6 +375,9 @@ const ImmoPage = () => {
     const mgmtFeesValue = values.applyMgmtFees && values.mgmtFeesValue !== undefined ? values.mgmtFeesValue : 0;
     const mgmtFeesTypeTranslated = values.applyMgmtFees && values.mgmtFeesType ? t(values.mgmtFeesType) : 'N/A';
 
+    const opexValue = values.applyOpexAndTax && values.opex !== undefined ? values.opex : 0; // Export actual value or 0
+    const propertyTaxValue = values.applyOpexAndTax && values.propertyTax !== undefined ? values.propertyTax : 0; // Export actual value or 0
+
     const loanAmountValue = values.applyLoan && values.loanAmount !== undefined ? values.loanAmount : 0;
     const loanRateValue = values.applyLoan && values.loanRate !== undefined ? values.loanRate : 0;
     const loanDurationYearsValue = values.applyLoan && values.loanDurationYears !== undefined ? values.loanDurationYears : 0;
@@ -398,8 +408,9 @@ const ImmoPage = () => {
       [t('rentInputModeLabel'), rentInputModeTranslated],
       [rentLabel, rentValue],
       [t('rentPeriodicityLabel'), t(values.rentPeriodicity)],
-      [t('opexLabel'), values.opex.toString()],
-      [t('propertyTaxLabel'), values.propertyTax.toString()],
+      [t('applyOpexAndTaxToggleLabel'), values.applyOpexAndTax ? 'Oui' : 'Non'], // Export new switch state
+      [t('opexLabel'), opexValue.toString()],
+      [t('propertyTaxLabel'), propertyTaxValue.toString()],
       [t('mgmtFeesToggleLabel'), values.applyMgmtFees ? 'Oui' : 'Non'],
       [t('mgmtFeesTypeLabel'), mgmtFeesTypeTranslated],
       [t('mgmtFeesValueLabel'), mgmtFeesValue.toString()],
@@ -644,42 +655,65 @@ const ImmoPage = () => {
 
                 <FormField
                   control={form.control}
-                  name="opex"
+                  name="applyOpexAndTax"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('opexLabel')}</FormLabel>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base" htmlFor="applyOpexAndTax-switch">{t('applyOpexAndTaxToggleLabel')}</FormLabel>
+                      </div>
                       <FormControl>
-                        <Input
-                          type="number"
-                          step="any"
-                          {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value))}
-                          aria-label={t('opexLabel')}
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="applyOpexAndTax-switch"
+                          aria-label={t('applyOpexAndTaxToggleLabel')}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="propertyTax"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('propertyTaxLabel')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="any"
-                          {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value))}
-                          aria-label={t('propertyTaxLabel')}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {applyOpexAndTax && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="opex"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('opexLabel')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="any"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('opexLabel')}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="propertyTax"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('propertyTaxLabel')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="any"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('propertyTaxLabel')}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
 
                 <FormField
                   control={form.control}
