@@ -42,6 +42,7 @@ import { useDeleteScenario } from '@/hooks/useDeleteScenario';
 import { useSession } from '@/components/SessionContextProvider';
 import { Scenario } from '@/types/scenario';
 import { getScenarioSummary, getModulePath, getModuleTab, formatDateTime } from '@/lib/scenario-utils';
+import { showInfo } from '@/utils/toast'; // Import showInfo from utility
 
 const ScenarioHistoryPage = () => {
   const { t } = useTranslation(['scenarioHistoryPage', 'common']);
@@ -98,7 +99,7 @@ const ScenarioHistoryPage = () => {
     }
 
     navigate(targetPath);
-    t('common:scenarioReloaded'); // Display toast message
+    showInfo(t('common:scenarioReloaded')); // Display toast message
   };
 
   if (isSessionLoading || isScenariosLoading) {

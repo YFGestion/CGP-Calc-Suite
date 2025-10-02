@@ -4,8 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { showSuccess, showInfo } from '@/utils/toast'; // Import toast utility functions
 
 interface SessionContextType {
   session: Session | null;
@@ -30,14 +30,14 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
         setUser(currentSession.user);
         if (location.pathname === '/login') {
           navigate('/'); // Redirect to home page after successful login
-          toast.success(t('loggedInSuccess'));
+          showSuccess(t('loggedInSuccess'));
         }
       } else {
         setSession(null);
         setUser(null);
         if (location.pathname !== '/login' && location.pathname !== '/about' && location.pathname !== '/') {
           navigate('/login'); // Redirect to login if not authenticated and not on public pages
-          toast.info(t('loggedOutInfo'));
+          showInfo(t('loggedOutInfo'));
         }
       }
       setIsLoading(false);

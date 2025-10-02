@@ -2,9 +2,9 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Scenario } from '@/types/scenario';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useSaveScenario } from './useSaveScenario'; // Import the existing save hook
+import { showSuccess, showError } from '@/utils/toast'; // Import toast utility functions
 
 interface DuplicateScenarioParams {
   scenario: Scenario;
@@ -32,10 +32,10 @@ export const useDuplicateScenario = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scenarios'] }); // Refresh the list of scenarios
-      toast.success(t('scenarioDuplicatedSuccess'));
+      showSuccess(t('scenarioDuplicatedSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || t('scenarioDuplicatedError'));
+      showError(error.message || t('scenarioDuplicatedError'));
     },
   });
 };

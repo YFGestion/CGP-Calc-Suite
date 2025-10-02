@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Copy as CopyIcon } from 'lucide-react';
-import { toast } from 'sonner'; // Using sonner for toasts
+import { showSuccess, showError } from '@/utils/toast'; // Using toast utility functions
 
 interface CopyBlockProps {
   title: string;
@@ -20,10 +20,10 @@ export const CopyBlock: React.FC<CopyBlockProps> = ({ title, content, className 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(content);
-      toast.success(t('common.copied'));
+      showSuccess(t('common.copied'));
     } catch (err) {
       console.error('Failed to copy text: ', err);
-      toast.error("Échec de la copie.");
+      showError("Échec de la copie.");
     }
   };
 

@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { showSuccess, showError } from '@/utils/toast'; // Import toast utility functions
 
 interface DeleteScenarioParams {
   id: string;
@@ -36,10 +36,10 @@ export const useDeleteScenario = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scenarios'] }); // Invalidate 'scenarios' queries to refresh the list
-      toast.success(t('scenarioDeletedSuccess'));
+      showSuccess(t('scenarioDeletedSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || t('scenarioDeletedError'));
+      showError(error.message || t('scenarioDeletedError'));
     },
   });
 };

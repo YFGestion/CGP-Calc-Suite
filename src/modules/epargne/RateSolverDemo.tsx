@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -14,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { CopyBlock } from '@/lib/copy';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { solveAnnualRateFromAnnuityFV } from '@/lib/math-core/irr'; // Import the new function
+import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -83,7 +83,7 @@ const RateSolverDemo = () => {
         t('summaryContent', formattedResults)
       );
     } catch (error: any) {
-      toast.error(error.message || t('calculationError'));
+      showError(error.message || t('calculationError'));
       setResults(null);
       setSummaryContent('');
     }
@@ -92,9 +92,9 @@ const RateSolverDemo = () => {
   const handleCopySummary = () => {
     if (summaryContent) {
       navigator.clipboard.writeText(summaryContent);
-      toast.success(commonT('copied'));
+      showSuccess(commonT('copied'));
     } else {
-      toast.error(t('noResultsToCopy'));
+      showError(t('noResultsToCopy'));
     }
   };
 

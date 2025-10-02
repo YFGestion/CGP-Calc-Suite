@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Scenario } from '@/types/scenario';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { showSuccess, showError } from '@/utils/toast'; // Import toast utility functions
 
 // Define the payload type for the mutation, allowing 'id' to be optional for new scenarios
 type ScenarioPayload = Omit<Scenario, 'user_id' | 'created_at' | 'updated_at'> & { id?: string };
@@ -58,10 +58,10 @@ export const useSaveScenario = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scenarios'] }); // Invalidate 'scenarios' queries to refresh the list
-      toast.success(t('scenarioSavedSuccess'));
+      showSuccess(t('scenarioSavedSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || t('scenarioSavedError'));
+      showError(error.message || t('scenarioSavedError'));
     },
   });
 };

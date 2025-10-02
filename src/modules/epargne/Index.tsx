@@ -23,6 +23,7 @@ import { formatCurrency, formatPercent } from '@/lib/format';
 import { savingsProjection } from '@/lib/math-core/savings';
 import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
 import { UpgradeMessage } from '@/components/UpgradeMessage'; // Import UpgradeMessage
+import { showError } from '@/utils/toast'; // Import showError from utility
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -84,7 +85,7 @@ const EpargnePage = () => {
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     // Example: Restrict a feature to premium users
     if (!isPremium) {
-      toast.error(commonT('premiumFeatureLocked'));
+      showError(commonT('premiumFeatureLocked'));
       return;
     }
 
@@ -120,7 +121,7 @@ const EpargnePage = () => {
 
     // Example: Restrict CSV export to premium users
     if (!isPremium) {
-      toast.error(commonT('premiumFeatureLocked'));
+      showError(commonT('premiumFeatureLocked'));
       return;
     }
 

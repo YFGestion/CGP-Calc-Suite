@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'; // Corrected import
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -31,6 +30,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
+import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -220,7 +220,7 @@ const EndettementPage = () => {
 
   const handleSendToCredit = () => {
     if (!results) {
-      toast.error(t('validation.noResultsYet'));
+      showError(t('validation.noResultsYet'));
       return;
     }
     const values = form.getValues();
@@ -233,7 +233,7 @@ const EndettementPage = () => {
       insuranceRate: (values.loanInsuranceRate || 0).toString(),
     });
     navigate(`/credit?${params.toString()}`);
-    toast.success(t('creditSentSuccess'));
+    showSuccess(t('creditSentSuccess'));
   };
 
   return (

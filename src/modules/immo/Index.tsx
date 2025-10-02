@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
@@ -41,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { showInfo } from '@/utils/toast'; // Import showInfo from utility
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -491,7 +490,7 @@ const ImmoPage = () => {
   };
 
   const handleDuplicateScenario = () => {
-    toast.info(t('scenarioDuplicated'));
+    showInfo(t('scenarioDuplicated'));
     // Future implementation: copy current form state to a new scenario
   };
 

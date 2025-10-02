@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
 import { useSearchParams, useNavigate } from 'react-router-dom'; // Ajout de useNavigate
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +30,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -213,7 +213,7 @@ const CreditPage = () => {
 
   const handleSendToImmo = () => {
     if (!results) {
-      toast.error(t('validation.noResultsYet'));
+      showError(t('validation.noResultsYet'));
       return;
     }
     const values = form.getValues();
@@ -221,12 +221,12 @@ const CreditPage = () => {
       loanAmount: values.loanAmount.toString(),
       loanRate: values.nominalRate.toString(),
       loanDurationYears: values.durationYears.toString(),
-      loanApplyInsurance: values.applyInsurance.toString(),
-      loanInsuranceMode: values.insuranceMode || '',
-      loanInsuranceRate: (values.insuranceRate || 0).toString(),
+      applyInsurance: values.applyInsurance.toString(),
+      insuranceMode: values.insuranceMode || '',
+      insuranceRate: (values.insuranceRate || 0).toString(),
     });
     navigate(`/immo?${params.toString()}`);
-    toast.success(t('immoSentSuccess'));
+    showSuccess(t('immoSentSuccess'));
   };
 
   return (

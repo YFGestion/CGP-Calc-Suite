@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Scenario } from '@/types/scenario';
-import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { showSuccess, showError } from '@/utils/toast'; // Import toast utility functions
 
 interface UpdateScenarioParams {
   id: string;
@@ -43,10 +43,10 @@ export const useUpdateScenario = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['scenarios'] }); // Invalidate 'scenarios' list
       queryClient.invalidateQueries({ queryKey: ['scenario', variables.id] }); // Invalidate specific scenario
-      toast.success(t('scenarioUpdatedSuccess'));
+      showSuccess(t('scenarioUpdatedSuccess'));
     },
     onError: (error) => {
-      toast.error(error.message || t('scenarioUpdateError'));
+      showError(error.message || t('scenarioUpdateError'));
     },
   });
 };
