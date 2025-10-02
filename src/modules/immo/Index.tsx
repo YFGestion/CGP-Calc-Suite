@@ -34,6 +34,14 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, RefreshCcw } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -222,7 +230,7 @@ const ImmoPage = () => {
       loanInsuranceMode: 'initialPct',
       loanInsuranceRate: settings.defaultLoanInsuranceRate,
 
-      tmi: settings.defaultTMI,
+      tmi: 30, // Default TMI to 30
       ps: settings.defaultPS,
     },
   });
@@ -238,6 +246,14 @@ const ImmoPage = () => {
   const salePriceMode = watch('salePriceMode');
   const applyLoan = watch('applyLoan');
   const loanApplyInsurance = watch('loanApplyInsurance');
+  const price = watch('price'); // Watch price for loan amount update
+
+  // Effect to update loanAmount when price changes, if applyLoan is true
+  useEffect(() => {
+    if (applyLoan && price !== undefined) {
+      setValue('loanAmount', price);
+    }
+  }, [price, applyLoan, setValue]);
 
   const [results, setResults] = useState<ReturnType<typeof rentalCashflowIrr> | null>(null);
   const [summaryContent, setSummaryContent] = useState('');
@@ -1107,48 +1123,50 @@ const ImmoPage = () => {
                 <ChevronDown className="h-5 w-5" />
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-4 p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="tmi"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('tmiLabel')}</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="tmi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('tmiLabel')}</FormLabel>
+                      <Select onValueChange={value => field.onChange(parseFloat(value))} value={field.value.toString()}>
                         <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                            aria-label={t('tmiLabel')}
-                          />
+                          <SelectTrigger aria-label={t('tmiLabel')}>
+                            <SelectValue placeholder={t('tmiLabel')} />
+                          </SelectTrigger>
                         </FormControl>
-                        <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="ps"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('psLabel')}</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            {...field}
-                            onChange={e => field.onChange(parseFloat(e.target.value))}
-                            aria-label={t('psLabel')}
-                          />
-                        </FormControl>
-                        <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <SelectContent>
+                          <SelectItem value="0">0%</SelectItem>
+                          <SelectItem value="11">11%</SelectItem>
+                          <SelectItem value="30">30%</SelectItem>
+                          <SelectItem value="41">41%</SelectItem>
+                          <SelectItem value="45">45%</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="ps"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('psLabel')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                          aria-label={t('psLabel')}
+                        />
+                      </FormControl>
+                      <div className="text-right text-sm text-muted-foreground">{field.value}%</div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CollapsibleContent>
             </Collapsible>
 
