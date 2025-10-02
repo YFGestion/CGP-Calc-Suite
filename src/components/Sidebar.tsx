@@ -31,13 +31,12 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
 
   const navItems = [
     { to: '/', icon: Home, label: t('home') },
-    { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') }, // New item for Autres Calculs
-    // Removed: { to: '/brut-net', icon: Scale, label: t('brutNet') },
-    { to: '/endettement', icon: Wallet, label: t('endettement') },
     { to: '/epargne', icon: PiggyBank, label: t('epargne') },
-    // Removed: { to: '/epargne/rate-solver', icon: Percent, label: t('rateSolver') },
+    { to: '/endettement', icon: Wallet, label: t('endettement') },
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
+    { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') },
+    { to: '/settings', icon: Settings, label: t('settings') }, // Moved Settings here
   ];
 
   const toggleLanguage = () => {
@@ -88,29 +87,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
             ))}
           </div>
         </div>
-        <div className="px-3 py-2">
-          {!isCollapsed && (
-            <h2 className="mb-2 px-4 text-xl font-semibold tracking-tight text-sidebar-primary">
-              {t('tools')}
-            </h2>
-          )}
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                isCollapsed ? "justify-center" : "justify-start"
-              )}
-              asChild
-              onClick={onLinkClick}
-            >
-              <Link to="/settings">
-                <Settings className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                {!isCollapsed && t('settings')}
-              </Link>
-            </Button>
-          </div>
-        </div>
+        {/* Removed the "Tools" section as Settings is now part of navItems */}
       </div>
     </div>
   );
