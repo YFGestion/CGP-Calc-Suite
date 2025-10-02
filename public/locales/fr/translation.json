@@ -31,6 +31,8 @@
     "scenarioDeletedError": "Échec de la suppression du scénario.",
     "scenarioDuplicatedSuccess": "Scénario dupliqué avec succès !",
     "scenarioDuplicatedError": "Échec de la duplication du scénario.",
+    "scenarioUpdatedSuccess": "Scénario mis à jour avec succès !",
+    "scenarioUpdateError": "Échec de la mise à jour du scénario.",
     "scenarioReloaded": "Scénario rechargé avec succès !",
     "openMenu": "Ouvrir le menu",
     "login": "Connexion",
