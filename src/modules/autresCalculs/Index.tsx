@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import BrutNetPage from '@/modules/brutNet/Index';
 import RateSolverDemo from '@/modules/epargne/RateSolverDemo';
+import TvaCalculator from '@/modules/autresCalculs/TvaCalculator'; // New import
 
 const AutresCalculsPage = () => {
   const { t } = useTranslation('autresCalculsPage');
@@ -19,15 +20,19 @@ const AutresCalculsPage = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="brut-net" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3"> {/* Adjusted grid-cols to 3 */}
             <TabsTrigger value="brut-net">{t('brutNetTab')}</TabsTrigger>
             <TabsTrigger value="rate-solver">{t('rateSolverTab')}</TabsTrigger>
+            <TabsTrigger value="tva-calculator">{t('tvaCalculatorTab')}</TabsTrigger> {/* New tab */}
           </TabsList>
           <TabsContent value="brut-net">
             <BrutNetPage />
           </TabsContent>
           <TabsContent value="rate-solver">
             <RateSolverDemo />
+          </TabsContent>
+          <TabsContent value="tva-calculator"> {/* New tab content */}
+            <TvaCalculator />
           </TabsContent>
         </Tabs>
       </CardContent>

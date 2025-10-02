@@ -346,6 +346,26 @@
   "autresCalculsPage": {
     "title": "Autres Calculs",
     "brutNetTab": "Brut → Net",
-    "rateSolverTab": "Taux Épargne (TRI)"
+    "rateSolverTab": "Taux Épargne (TRI)",
+    "tvaCalculatorTab": "Calculateur TVA"
+  },
+  "tvaCalculatorPage": {
+    "title": "Calculateur TVA (HT/TTC)",
+    "priceInputLabel": "Montant (HT ou TTC)",
+    "vatRateLabel": "Taux de TVA (%)",
+    "priceTypeLabel": "Le montant saisi est",
+    "ht": "Hors Taxe (HT)",
+    "ttc": "Toutes Taxes Comprises (TTC)",
+    "calculateButton": "Calculer",
+    "exportCsvButton": "Exporter CSV",
+    "summaryTitle": "Résumé du calcul TVA",
+    "priceHT": "Prix HT",
+    "vatAmount": "Montant TVA",
+    "priceTTC": "Prix TTC",
+    "summaryContent": "Résumé du Calcul TVA\n\nInputs :\n- Montant saisi : {priceInput} ({priceType})\n- Taux de TVA : {vatRate}\n\nRésultats :\n- Prix HT : {priceHT}\n- Montant TVA : {vatAmount}\n- Prix TTC : {priceTTC}",
+    "validation": {
+      "positiveNumber": "Doit être un nombre positif.",
+      "vatRateRange": "Le taux de TVA doit être entre 0% et 100%."
+    }
   }
 }
