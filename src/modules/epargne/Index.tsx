@@ -21,6 +21,8 @@ import { CopyBlock } from '@/lib/copy';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { savingsProjection } from '@/lib/math-core/savings';
+import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
+import { UpgradeMessage } from '@/components/UpgradeMessage'; // Import UpgradeMessage
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -31,7 +33,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   periodicDeposit: z.coerce.number({
     required_error: t('validation.periodicDepositNonNegative'),
     invalid_type_error: t('validation.periodicDepositNonNegative'),
-  }).min(0, t('validation.periodicDepositNonNegative')),
+  }).min(0, t('validation.nonNegativeNumber')),
   periodicity: z.enum(['monthly', 'quarterly', 'yearly']),
   duration: z.coerce.number({
     required_error: t('validation.durationMin'),
@@ -59,6 +61,7 @@ const formSchema = (t: (key: string) => string) => z.object({
 const EpargnePage = () => {
   const { t } = useTranslation('epargnePage');
   const { t: commonT } = useTranslation('common');
+  const { isPremium, isLoading: isRoleLoading } = useUserRole(); // Use the hook
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
@@ -79,6 +82,12 @@ const EpargnePage = () => {
   const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
+    // Example: Restrict a feature to premium users
+    if (!isPremium) {
+      toast.error(commonT('premiumFeatureLocked'));
+      return;
+    }
+
     const computedResults = savingsProjection({
       initial: values.initialDeposit,
       periodic: values.periodicDeposit,
@@ -109,6 +118,12 @@ const EpargnePage = () => {
   const handleExportCsv = () => {
     if (!results) return;
 
+    // Example: Restrict CSV export to premium users
+    if (!isPremium) {
+      toast.error(commonT('premiumFeatureLocked'));
+      return;
+    }
+
     const values = form.getValues();
     const entryFeeValue = values.applyEntryFee && values.entryFee !== undefined ? values.entryFee : 0;
 
@@ -135,6 +150,15 @@ const EpargnePage = () => {
 
     exportCsv('epargne-projection.csv', rows);
   };
+
+  if (isRoleLoading) {
+    return (
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader><CardTitle>{t('title')}</CardTitle></CardHeader>
+        <CardContent className="text-center py-8">{commonT('loading')}</CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -370,6 +394,12 @@ const EpargnePage = () => {
               </Button>
             </div>
             <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+          </div>
+        )}
+
+        {!isPremium && (
+          <div className="mt-8">
+            <UpgradeMessage />
           </div>
         )}
       </CardContent>
