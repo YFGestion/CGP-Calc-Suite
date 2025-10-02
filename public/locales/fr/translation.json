@@ -26,7 +26,19 @@
     "saveScenarioError": "Erreur lors de la sauvegarde du scénario",
     "scenarioSavedSuccess": "Scénario sauvegardé avec succès !",
     "scenarioSavedError": "Échec de la sauvegarde du scénario.",
-    "fetchScenariosError": "Erreur lors de la récupération des scénarios."
+    "fetchScenariosError": "Erreur lors de la récupération des scénarios.",
+    "scenarioDeletedSuccess": "Scénario supprimé avec succès !",
+    "scenarioDeletedError": "Échec de la suppression du scénario.",
+    "scenarioDuplicatedSuccess": "Scénario dupliqué avec succès !",
+    "scenarioDuplicatedError": "Échec de la duplication du scénario.",
+    "scenarioReloaded": "Scénario rechargé avec succès !",
+    "openMenu": "Ouvrir le menu",
+    "scenarioHistory": "Historique des Scénarios",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "dashboard": "Tableau de bord",
+    "loggedInSuccess": "Connexion réussie ! Bienvenue.",
+    "loggedOutInfo": "Vous avez été déconnecté. Veuillez vous reconnecter."
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -400,5 +412,40 @@
     "summaryCredit": "Coût total: {totalCost}, Mensualité: {monthlyPayment}",
     "summaryImmo": "TRI: {cagr}, Capital récupéré: {capitalRecoveredAtSale}",
     "summaryGeneric": "Résumé non disponible"
+  },
+  "loginPage": {
+    "title": "Connexion / Inscription",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "emailPlaceholder": "votre.email@exemple.com",
+    "passwordPlaceholder": "Votre mot de passe",
+    "signInButton": "Se connecter",
+    "signingInButton": "Connexion en cours...",
+    "signInLink": "Déjà un compte ? Connectez-vous",
+    "signUpButton": "S'inscrire",
+    "signingUpButton": "Inscription en cours...",
+    "signUpLink": "Pas encore de compte ? Inscrivez-vous",
+    "forgotPasswordLink": "Mot de passe oublié ?",
+    "sendResetPasswordButton": "Envoyer les instructions de réinitialisation",
+    "sendingResetPasswordButton": "Envoi en cours...",
+    "resetPasswordConfirmation": "Vérifiez votre e-mail pour le lien de réinitialisation du mot de passe.",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Votre nouveau mot de passe",
+    "updatePasswordButton": "Mettre à jour le mot de passe",
+    "updatingPasswordButton": "Mise à jour en cours...",
+    "sendMagicLinkButton": "Envoyer le lien magique",
+    "sendingMagicLinkButton": "Envoi en cours...",
+    "magicLinkLink": "Se connecter avec un lien magique",
+    "magicLinkConfirmation": "Vérifiez votre e-mail pour le lien magique.",
+    "phonePlaceholder": "Votre numéro de téléphone",
+    "tokenPlaceholder": "Votre code OTP",
+    "verifyOtpButton": "Vérifier le code OTP",
+    "verifyingOtpButton": "Vérification en cours...",
+    "verifyOtpLink": "Vérifier le code OTP"
+  },
+  "dashboardPage": {
+    "title": "Tableau de bord",
+    "welcomeMessage": "Bienvenue",
+    "content": "Ceci est votre tableau de bord personnel. Vous pouvez y accéder après vous être connecté."
   }
 }

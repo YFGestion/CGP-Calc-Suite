@@ -2,8 +2,10 @@
 
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react"; // Import useEffect
+import { useSession } from "@/components/SessionContextProvider"; // Import useSession
 import {
   Calculator,
   LandPlot,
@@ -14,6 +16,14 @@ import {
 
 const Index = () => {
   const { t } = useTranslation('homePage'); // Spécifie le namespace 'homePage'
+  const { session, isLoading } = useSession(); // Get session and loading state
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && session) {
+      navigate('/dashboard'); // Redirect to dashboard if authenticated
+    }
+  }, [session, isLoading, navigate]);
 
   const moduleCards = [
     {
@@ -47,6 +57,10 @@ const Index = () => {
       icon: LayoutGrid,
     },
   ];
+
+  if (isLoading || session) {
+    return null; // Or a loading spinner, while checking session or redirecting
+  }
 
   return (
     <div className="flex flex-col items-center justify-center p-4">

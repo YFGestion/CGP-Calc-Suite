@@ -15,9 +15,15 @@ import {
   ChevronLeft, // Icône pour réduire
   ChevronRight, // Icône pour étendre
   LayoutGrid, // New icon for 'Autres calculs'
+  History, // New icon for Scenario History
+  LogIn, // New icon for Login
+  LogOut, // New icon for Logout
+  LayoutDashboard, // New icon for Dashboard
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
+import { useSession } from '@/components/SessionContextProvider'; // Import useSession
+import { supabase } from '@/integrations/supabase/client'; // Import supabase client
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   onLinkClick?: () => void;
@@ -28,6 +34,12 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
+  const { session, isLoading } = useSession(); // Get session and loading state
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    if (onLinkClick) onLinkClick(); // Close sidebar on mobile
+  };
 
   const navItems = [
     { to: '/', icon: Home, label: t('home') },
@@ -36,8 +48,18 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
     { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') },
-    { to: '/settings', icon: Settings, label: t('settings') }, // Moved Settings here
+    { to: '/scenario-history', icon: History, label: t('scenarioHistory') },
+    { to: '/settings', icon: Settings, label: t('settings') },
   ];
+
+  const authItems = session ?
+    [
+      { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard') },
+      { onClick: handleLogout, icon: LogOut, label: t('logout') },
+    ] :
+    [
+      { to: '/login', icon: LogIn, label: t('login') },
+    ];
 
   const toggleLanguage = () => {
     const newLang = language === 'fr-FR' ? 'en-US' : 'fr-FR';
@@ -87,7 +109,45 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
             ))}
           </div>
         </div>
-        {/* Removed the "Tools" section as Settings is now part of navItems */}
+        <div className="px-3 py-2">
+          <h2 className={cn("mb-2 px-4 text-lg font-semibold tracking-tight text-sidebar-foreground", isCollapsed && "sr-only")}>
+            {t('tools')}
+          </h2>
+          <div className="space-y-1">
+            {authItems.map((item, index) => (
+              item.to ? (
+                <Button
+                  key={item.to}
+                  variant="ghost"
+                  className={cn(
+                    "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isCollapsed ? "justify-center" : "justify-start"
+                  )}
+                  asChild
+                  onClick={onLinkClick}
+                >
+                  <Link to={item.to}>
+                    <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                    {!isCollapsed && item.label}
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  key={`auth-action-${index}`}
+                  variant="ghost"
+                  className={cn(
+                    "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isCollapsed ? "justify-center" : "justify-start"
+                  )}
+                  onClick={item.onClick}
+                >
+                  <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                  {!isCollapsed && item.label}
+                </Button>
+              )
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
