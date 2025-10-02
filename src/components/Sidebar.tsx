@@ -12,33 +12,31 @@ import {
   Wallet,
   Home,
   Settings,
-  ChevronLeft, // Icône pour réduire
-  ChevronRight, // Icône pour étendre
-  LayoutGrid, // New icon for 'Autres calculs'
-  // History, // Removed icon for Scenario History
-  LogIn, // New icon for Login
-  LogOut, // New icon for Logout
-  LayoutDashboard, // New icon for Dashboard
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
-import { useSession } from '@/components/SessionContextProvider'; // Import useSession
-import { supabase } from '@/integrations/supabase/client'; // Import supabase client
+import { useSession } from '@/components/SessionContextProvider';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   onLinkClick?: () => void;
-  isCollapsed: boolean; // Nouvelle prop
-  onToggleCollapse: () => void; // Nouvelle prop
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
-  const { session, isLoading } = useSession(); // Get session and loading state
+  const { session } = useSession();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    if (onLinkClick) onLinkClick(); // Close sidebar on mobile
+    if (onLinkClick) onLinkClick();
   };
 
   const navItems = [
@@ -48,13 +46,11 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
     { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') },
-    // Removed: { to: '/scenario-history', icon: History, label: t('scenarioHistory') },
     { to: '/settings', icon: Settings, label: t('settings') },
   ];
 
   const authItems = session ?
     [
-      { to: '/dashboard', icon: LayoutDashboard, label: t('dashboard') },
       { onClick: handleLogout, icon: LogOut, label: t('logout') },
     ] :
     [
@@ -69,7 +65,6 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
 
   return (
     <div className={cn("pb-12 border-r bg-sidebar flex flex-col", className)}>
-      {/* Bouton de bascule en haut */}
       <div className={cn("flex items-center p-3", isCollapsed ? "justify-center" : "justify-end")}>
         {!isCollapsed && (
           <h2 className="mr-auto text-xl font-semibold tracking-tight text-sidebar-primary">

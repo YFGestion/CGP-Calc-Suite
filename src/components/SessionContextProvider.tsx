@@ -29,7 +29,7 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
         setSession(currentSession);
         setUser(currentSession.user);
         if (location.pathname === '/login') {
-          navigate('/dashboard'); // Redirect to dashboard after successful login
+          navigate('/'); // Redirect to home page after successful login
           toast.success(t('loggedInSuccess'));
         }
       } else {
@@ -49,7 +49,7 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
         setSession(initialSession);
         setUser(initialSession.user);
         if (location.pathname === '/login') {
-          navigate('/dashboard');
+          navigate('/'); // Redirect to home page
         }
       }
       setIsLoading(false);

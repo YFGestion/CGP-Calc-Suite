@@ -35,7 +35,6 @@
     "openMenu": "Ouvrir le menu",
     "login": "Connexion",
     "logout": "Déconnexion",
-    "dashboard": "Tableau de bord",
     "loggedInSuccess": "Connexion réussie ! Bienvenue.",
     "loggedOutInfo": "Vous avez été déconnecté. Veuillez vous reconnecter."
   },
@@ -441,10 +440,5 @@
     "verifyOtpButton": "Vérifier le code OTP",
     "verifyingOtpButton": "Vérification en cours...",
     "verifyOtpLink": "Vérifier le code OTP"
-  },
-  "dashboardPage": {
-    "title": "Tableau de bord",
-    "welcomeMessage": "Bienvenue",
-    "content": "Ceci est votre tableau de bord personnel. Vous pouvez y accéder après vous être connecté."
   }
 }

@@ -26,9 +26,7 @@ const allNamespaces = [
   'rateSolverPage',
   'autresCalculsPage',
   'tvaCalculatorPage',
-  // 'scenarioHistoryPage', // Removed namespace
-  'loginPage', // New namespace
-  'dashboardPage', // New namespace
+  'loginPage',
 ];
 
 i18n

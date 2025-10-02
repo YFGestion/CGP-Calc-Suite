@@ -15,10 +15,8 @@ import EpargnePage from "./modules/epargne/Index";
 import CreditPage from "./modules/credit/Index";
 import ImmoPage from "./modules/immo/Index";
 import AutresCalculsPage from "./modules/autresCalculs/Index";
-// import ScenarioHistory from "./components/ScenarioHistory"; // Removed import
-import LoginPage from "./pages/Login"; // New import
-import DashboardPage from "./pages/Dashboard"; // New import
-import { SessionContextProvider } from "./components/SessionContextProvider"; // New import
+import LoginPage from "./pages/Login";
+import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
 
@@ -29,12 +27,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SessionContextProvider> {/* Wrap the entire app with SessionContextProvider */}
+          <SessionContextProvider>
             <Routes>
-              <Route path="/login" element={<LoginPage />} /> {/* Login page outside AppLayout */}
+              <Route path="/login" element={<LoginPage />} />
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Index />} />
-                <Route path="dashboard" element={<DashboardPage />} /> {/* New dashboard route */}
                 <Route path="autres-calculs" element={<AutresCalculsPage />} />
                 <Route path="endettement" element={<EndettementPage />} />
                 <Route path="epargne" element={<EpargnePage />} />
@@ -42,7 +39,6 @@ const App = () => (
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />
                 <Route path="settings" element={<SettingsPage />} />
-                {/* Removed: <Route path="scenario-history" element={<ScenarioHistory />} /> */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>

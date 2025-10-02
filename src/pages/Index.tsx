@@ -2,28 +2,18 @@
 
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react"; // Import useEffect
-import { useSession } from "@/components/SessionContextProvider"; // Import useSession
 import {
   Calculator,
   LandPlot,
   PiggyBank,
   Wallet,
-  LayoutGrid, // Import LayoutGrid for 'Autres calculs'
+  LayoutGrid,
 } from 'lucide-react';
 
 const Index = () => {
-  const { t } = useTranslation('homePage'); // Spécifie le namespace 'homePage'
-  const { session, isLoading } = useSession(); // Get session and loading state
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isLoading && session) {
-      navigate('/dashboard'); // Redirect to dashboard if authenticated
-    }
-  }, [session, isLoading, navigate]);
+  const { t } = useTranslation('homePage');
 
   const moduleCards = [
     {
@@ -51,16 +41,12 @@ const Index = () => {
       icon: LandPlot,
     },
     {
-      title: t('autresCalculsCardTitle'), // New card for Autres Calculs
+      title: t('autresCalculsCardTitle'),
       description: t('autresCalculsCardDescription'),
       link: '/autres-calculs',
       icon: LayoutGrid,
     },
   ];
-
-  if (isLoading || session) {
-    return null; // Or a loading spinner, while checking session or redirecting
-  }
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
