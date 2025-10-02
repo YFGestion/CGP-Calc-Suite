@@ -68,7 +68,7 @@ const Login = () => {
                 },
                 forgotten_password: {
                   email_label: t('emailLabel'),
-                  password_label: t:('passwordLabel'),
+                  password_label: t('passwordLabel'),
                   email_input_placeholder: t('emailPlaceholder'),
                   button_label: t('sendResetPasswordButton'),
                   loading_button_label: t('sendingResetPasswordButton'),
