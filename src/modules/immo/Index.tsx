@@ -1136,11 +1136,11 @@ const ImmoPage = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="0">0%</SelectItem>
-                          <SelectItem value="11">11%</SelectItem>
-                          <SelectItem value="30">30%</SelectItem>
-                          <SelectItem value="41">41%</SelectItem>
-                          <SelectItem value="45">45%</SelectItem>
+                          <SelectItem value="0">0</SelectItem>
+                          <SelectItem value="11">11</SelectItem>
+                          <SelectItem value="30">30</SelectItem>
+                          <SelectItem value="41">41</SelectItem>
+                          <SelectItem value="45">45</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
