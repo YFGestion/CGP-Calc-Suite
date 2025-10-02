@@ -17,6 +17,7 @@ import { useIsMobile } from '@/hooks/use-mobile'; // Import the hook
 import BrutNetPage from '@/modules/brutNet/Index';
 import RateSolverDemo from '@/modules/epargne/RateSolverDemo';
 import TvaCalculator from '@/modules/autresCalculs/TvaCalculator';
+import ScenarioHistory from '@/components/ScenarioHistory'; // Import the new component
 
 const AutresCalculsPage = () => {
   const { t } = useTranslation('autresCalculsPage');
@@ -39,6 +40,7 @@ const AutresCalculsPage = () => {
                 <SelectItem value="brut-net">{t('brutNetTab')}</SelectItem>
                 <SelectItem value="rate-solver">{t('rateSolverTab')}</SelectItem>
                 <SelectItem value="tva-calculator">{t('tvaCalculatorTab')}</SelectItem>
+                <SelectItem value="scenario-history">{t('scenarioHistoryTab')}</SelectItem>
               </SelectContent>
             </Select>
           ) : (
@@ -46,6 +48,7 @@ const AutresCalculsPage = () => {
               <TabsTrigger value="brut-net">{t('brutNetTab')}</TabsTrigger>
               <TabsTrigger value="rate-solver">{t('rateSolverTab')}</TabsTrigger>
               <TabsTrigger value="tva-calculator">{t('tvaCalculatorTab')}</TabsTrigger>
+              <TabsTrigger value="scenario-history">{t('scenarioHistoryTab')}</TabsTrigger>
             </TabsList>
           )}
           <TabsContent value="brut-net">
@@ -56,6 +59,9 @@ const AutresCalculsPage = () => {
           </TabsContent>
           <TabsContent value="tva-calculator">
             <TvaCalculator />
+          </TabsContent>
+          <TabsContent value="scenario-history">
+            <ScenarioHistory />
           </TabsContent>
         </Tabs>
       </CardContent>

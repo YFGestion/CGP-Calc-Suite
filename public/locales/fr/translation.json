@@ -20,7 +20,19 @@
     "collapse": "Réduire",
     "expand": "Étendre",
     "disclaimerLink": "Mentions légales / Avertissement",
-    "autresCalculs": "Autres calculs"
+    "autresCalculs": "Autres calculs",
+    "authError": "Erreur d'authentification",
+    "notAuthenticatedError": "Vous devez être connecté pour effectuer cette action.",
+    "saveScenarioError": "Erreur lors de la sauvegarde du scénario",
+    "scenarioSavedSuccess": "Scénario sauvegardé avec succès !",
+    "scenarioSavedError": "Échec de la sauvegarde du scénario.",
+    "fetchScenariosError": "Erreur lors de la récupération des scénarios.",
+    "scenarioDeletedSuccess": "Scénario supprimé avec succès !",
+    "scenarioDeletedError": "Échec de la suppression du scénario.",
+    "scenarioDuplicatedSuccess": "Scénario dupliqué avec succès !",
+    "scenarioDuplicatedError": "Échec de la duplication du scénario.",
+    "scenarioReloaded": "Scénario rechargé avec succès !",
+    "openMenu": "Ouvrir le menu"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -349,7 +361,8 @@
     "title": "Autres Calculs",
     "brutNetTab": "Brut → Net",
     "rateSolverTab": "Taux Épargne (TRI)",
-    "tvaCalculatorTab": "Calculateur TVA"
+    "tvaCalculatorTab": "Calculateur TVA",
+    "scenarioHistoryTab": "Historique des Scénarios"
   },
   "tvaCalculatorPage": {
     "title": "Calculateur TVA (HT/TTC)",
@@ -369,5 +382,30 @@
       "positiveNumber": "Doit être un nombre positif.",
       "vatRateRange": "Le taux de TVA doit être entre 0% et 100%."
     }
+  },
+  "scenarioHistoryPage": {
+    "title": "Historique des Scénarios",
+    "noScenarios": "Aucun scénario enregistré pour le moment.",
+    "loading": "Chargement des scénarios...",
+    "error": "Erreur lors du chargement des scénarios.",
+    "tableHeaderClientName": "Nom du client",
+    "tableHeaderModule": "Module",
+    "tableHeaderCreatedAt": "Créé le",
+    "tableHeaderUpdatedAt": "Mis à jour le",
+    "tableHeaderSummary": "Résumé des résultats",
+    "tableHeaderActions": "Actions",
+    "actionDuplicate": "Dupliquer",
+    "actionDelete": "Supprimer",
+    "actionReload": "Recharger",
+    "deleteConfirmTitle": "Confirmer la suppression",
+    "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce scénario ? Cette action est irréversible.",
+    "deleteConfirmCancel": "Annuler",
+    "deleteConfirmAction": "Supprimer",
+    "notAuthenticated": "Veuillez vous connecter pour voir et gérer vos scénarios.",
+    "summaryEpargne": "Capital final: {finalCapital}, Gains: {grossGains}",
+    "summaryEndettement": "Capital max: {affordablePrincipal}, Mensualité max: {maxPayment}",
+    "summaryCredit": "Coût total: {totalCost}, Mensualité: {monthlyPayment}",
+    "summaryImmo": "TRI: {cagr}, Capital récupéré: {capitalRecoveredAtSale}",
+    "summaryGeneric": "Résumé non disponible"
   }
 }
