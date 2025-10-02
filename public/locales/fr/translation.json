@@ -6,9 +6,9 @@
     "brutNet": "Brut → Net",
     "endettement": "Endettement",
     "epargne": "Épargne",
-    "rateSolver": "Taux Épargne (TCAC)",
+    "rateSolver": "Taux Épargne (TRI)",
     "credit": "Crédit",
-    "immo": "Immo (Effort & TCAC)",
+    "immo": "Immo (Effort & TRI)",
     "settings": "Paramètres",
     "themeToggle": "Basculer le thème",
     "languageToggle": "Basculer la langue",
@@ -86,17 +86,17 @@
     }
   },
   "rateSolverPage": {
-    "title": "Calculateur de Taux d'Épargne (TCAC)",
-    "description": "Calcule le taux annuel moyen (TCAC) nécessaire pour atteindre un capital final donné, avec des versements mensuels réguliers.",
+    "title": "Calculateur de Taux de Rendement Interne (TRI)",
+    "description": "Calcule le taux annuel moyen (TRI) nécessaire pour atteindre un capital final donné, avec des versements mensuels réguliers.",
     "finalCapitalLabel": "Capital final cible (€)",
     "initialCapitalLabel": "Capital initial (€)",
     "monthlyContributionLabel": "Versement mensuel (€)",
     "yearsLabel": "Durée (années)",
     "calculateButton": "Calculer le taux",
     "monthlyRate": "Taux mensuel",
-    "annualRate": "Taux annuel équivalent (TCAC)",
+    "annualRate": "Taux annuel équivalent (TRI)",
     "summaryTitle": "Résumé du calcul de taux d'épargne",
-    "summaryContent": "Résumé du Calcul de Taux d'Épargne\n\nInputs :\n- Capital final cible : {finalCapital}\n- Capital initial : {initialCapital}\n- Versement mensuel : {monthlyContribution}\n- Durée : {years} ans\n\nRésultats :\n- Taux mensuel : {rMonthly}\n- Taux annuel équivalent (TCAC) : {rAnnual}",
+    "summaryContent": "Résumé du Calcul de Taux d'Épargne\n\nInputs :\n- Capital final cible : {finalCapital}\n- Capital initial : {initialCapital}\n- Versement mensuel : {monthlyContribution}\n- Durée : {years} ans\n\nRésultats :\n- Taux mensuel : {rMonthly}\n- Taux annuel équivalent (TRI) : {rAnnual}",
     "calculationError": "Une erreur est survenue lors du calcul du taux. Veuillez vérifier vos entrées.",
     "noResultsToCopy": "Aucun résultat à copier. Veuillez effectuer un calcul d'abord.",
     "validation": {
@@ -206,13 +206,13 @@
     "duplicateScenarioButton": "Dupliquer Scénario",
 
     "summaryTitle": "Résumé de la simulation immobilière",
-    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n- TMI : {tmi} / PS : {ps}\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit (annuel) : {avgSavingEffortDuringLoanAnnual}\n- Effort d'épargne moyen pendant le crédit (mensuel) : {avgSavingEffortDuringLoanMonthly}\n- Revenus complémentaires moyens après crédit (annuel) : {avgPostLoanIncomeAnnual}\n- Revenus complémentaires moyens après crédit (mensuel) : {avgPostLoanIncomeMonthly}\n- Prix de cession : {salePriceAtSale}\n- Prix de cession net de frais : {netSalePriceBeforeCrd}\n- Capital restant dû à la revente : {crdAtSale}\n- Capital récupéré à la revente : {capitalRecoveredAtSale}\n- Taux de Croissance Annuel Composé (TCAC) : {cagr}",
+    "summaryContent": "Résumé de la Simulation Immobilière\n\nInputs :\n- Prix d'acquisition : {price}\n- Horizon de projection : {horizonYears} ans\n- Année de revente : {saleYear}\n- Prêt : {loanAmount} à {loanRate} sur {loanDurationYears} ans\n- TMI : {tmi} / PS : {ps}\n\nRésultats :\n- Effort d'épargne moyen pendant le crédit (annuel) : {avgSavingEffortDuringLoanAnnual}\n- Effort d'épargne moyen pendant le crédit (mensuel) : {avgSavingEffortDuringLoanMonthly}\n- Revenus complémentaires moyens après crédit (annuel) : {avgPostLoanIncomeAnnual}\n- Revenus complémentaires moyens après crédit (mensuel) : {avgPostLoanIncomeMonthly}\n- Prix de cession : {salePriceAtSale}\n- Prix de cession net de frais : {netSalePriceBeforeCrd}\n- Capital restant dû à la revente : {crdAtSale}\n- Capital récupéré à la revente : {capitalRecoveredAtSale}\n- Taux de Rendement Interne (TRI) : {cagr}",
 
     "avgSavingEffortDuringLoanAnnual": "Effort d'épargne moyen pendant le crédit (annuel)",
     "avgSavingEffortDuringLoanMonthly": "Effort d'épargne moyen pendant le crédit (mensuel)",
     "avgPostLoanIncomeAnnual": "Revenus complémentaires moyens après crédit (annuel)",
     "avgPostLoanIncomeMonthly": "Revenus complémentaires moyens après crédit (mensuel)",
-    "cagr": "TCAC de l'effort d'épargne",
+    "cagr": "TRI de l'effort d'épargne",
 
     "sectionResaleData": "D) Données de revente",
     "salePriceAtSale": "Prix de cession (brut)",
@@ -339,7 +339,7 @@
     "epargneCardDescription": "Projetez l'évolution de votre épargne.",
     "creditCardTitle": "Simulateur de Crédit",
     "creditCardDescription": "Obtenez le tableau d'amortissement de votre prêt.",
-    "immoCardTitle": "Immo (Effort & TCAC)",
+    "immoCardTitle": "Immo (Effort & TRI)",
     "immoCardDescription": "Analysez la rentabilité de votre investissement immobilier."
   }
 }
