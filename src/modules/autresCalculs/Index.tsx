@@ -20,10 +20,10 @@ const AutresCalculsPage = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="brut-net" className="w-full">
-          <TabsList className="grid w-full grid-cols-3"> {/* Adjusted grid-cols to 3 */}
+          <TabsList className="flex flex-wrap justify-center w-full gap-2"> {/* Changed for responsiveness */}
             <TabsTrigger value="brut-net">{t('brutNetTab')}</TabsTrigger>
             <TabsTrigger value="rate-solver">{t('rateSolverTab')}</TabsTrigger>
-            <TabsTrigger value="tva-calculator">{t('tvaCalculatorTab')}</TabsTrigger> {/* New tab */}
+            <TabsTrigger value="tva-calculator">{t('tvaCalculatorTab')}</TabsTrigger>
           </TabsList>
           <TabsContent value="brut-net">
             <BrutNetPage />
@@ -31,7 +31,7 @@ const AutresCalculsPage = () => {
           <TabsContent value="rate-solver">
             <RateSolverDemo />
           </TabsContent>
-          <TabsContent value="tva-calculator"> {/* New tab content */}
+          <TabsContent value="tva-calculator">
             <TvaCalculator />
           </TabsContent>
         </Tabs>
