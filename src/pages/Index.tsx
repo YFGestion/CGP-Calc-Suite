@@ -9,7 +9,7 @@ import {
   LandPlot,
   PiggyBank,
   Wallet,
-  Scale,
+  LayoutGrid, // Import LayoutGrid for 'Autres calculs'
 } from 'lucide-react';
 
 const Index = () => {
@@ -17,22 +17,16 @@ const Index = () => {
 
   const moduleCards = [
     {
-      title: t('brutNetCardTitle'),
-      description: t('brutNetCardDescription'),
-      link: '/brut-net',
-      icon: Scale,
+      title: t('epargneCardTitle'),
+      description: t('epargneCardDescription'),
+      link: '/epargne',
+      icon: PiggyBank,
     },
     {
       title: t('endettementCardTitle'),
       description: t('endettementCardDescription'),
       link: '/endettement',
       icon: Wallet,
-    },
-    {
-      title: t('epargneCardTitle'),
-      description: t('epargneCardDescription'),
-      link: '/epargne',
-      icon: PiggyBank,
     },
     {
       title: t('creditCardTitle'),
@@ -45,6 +39,12 @@ const Index = () => {
       description: t('immoCardDescription'),
       link: '/immo',
       icon: LandPlot,
+    },
+    {
+      title: t('autresCalculsCardTitle'), // New card for Autres Calculs
+      description: t('autresCalculsCardDescription'),
+      link: '/autres-calculs',
+      icon: LayoutGrid,
     },
   ];
 

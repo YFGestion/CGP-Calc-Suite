@@ -341,7 +341,9 @@
     "creditCardTitle": "Simulateur de Crédit",
     "creditCardDescription": "Obtenez le tableau d'amortissement de votre prêt.",
     "immoCardTitle": "Immo (Effort & TRI)",
-    "immoCardDescription": "Analysez la rentabilité de votre investissement immobilier."
+    "immoCardDescription": "Analysez la rentabilité de votre investissement immobilier.",
+    "autresCalculsCardTitle": "Autres Calculs",
+    "autresCalculsCardDescription": "Accédez à des calculateurs supplémentaires comme Brut → Net et Taux Épargne (TRI)."
   },
   "autresCalculsPage": {
     "title": "Autres Calculs",
