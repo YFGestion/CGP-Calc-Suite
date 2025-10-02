@@ -373,7 +373,8 @@
     "title": "Autres Calculs",
     "brutNetTab": "Brut → Net",
     "rateSolverTab": "Taux Épargne (TRI)",
-    "tvaCalculatorTab": "Calculateur TVA"
+    "tvaCalculatorTab": "Calculateur TVA",
+    "scenarioHistoryTab": "Historique des Scénarios"
   },
   "tvaCalculatorPage": {
     "title": "Calculateur TVA (HT/TTC)",
@@ -396,6 +397,7 @@
   },
   "scenarioHistoryPage": {
     "title": "Historique des Scénarios",
+    "description": "Gérez et rechargez vos scénarios de calculs sauvegardés.",
     "noScenarios": "Aucun scénario enregistré pour le moment.",
     "loading": "Chargement des scénarios...",
     "error": "Erreur lors du chargement des scénarios.",
