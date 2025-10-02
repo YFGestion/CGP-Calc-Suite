@@ -1,5 +1,6 @@
 import { amortizationSchedule } from './loan';
 import { round } from './utils';
+import { solveAnnualRateFromAnnuityFV } from './irr'; // Import the new IRR solver
 
 interface LoanDetails {
   amount: number;
@@ -182,38 +183,36 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
   }
 
-  // Calculate CAGR (TCAC) based on user's formula
+  // Calculate CAGR (TCAC) using the new solveAnnualRateFromAnnuityFV function
   let finalCagr = NaN;
-  const capitalInitial = round(price + acqCosts - (loan?.amount || 0), 2);
+  const capitalInitialForCagr = round(price + acqCosts - (loan?.amount || 0), 2);
 
   // Sum of all negative cashflows (efforts) up to the saleYear
-  let totalNegativeCashflows = 0;
+  let totalNegativeCashflowsForCagr = 0;
   for (const entry of annualTable) {
     if (entry.year <= saleYear && entry.cashflow < 0) {
-      totalNegativeCashflows += Math.abs(entry.cashflow);
+      totalNegativeCashflowsForCagr += Math.abs(entry.cashflow);
     }
   }
 
   // EpargneMensuelle = moyenne mensuelle des cashflows négatifs sur la durée de revente
-  const epargneMensuelle = (saleYear > 0) ? (totalNegativeCashflows / (saleYear * 12)) : 0;
+  const epargneMensuelleForCagr = (saleYear > 0) ? (totalNegativeCashflowsForCagr / (saleYear * 12)) : 0;
 
-  const denominator = capitalInitial + (epargneMensuelle * 12 * saleYear);
-
-  if (saleYear > 0 && denominator > 0) {
-    const base = finalCapitalRecoveredAtSale / denominator;
-    if (base >= 0) {
-      finalCagr = Math.pow(base, 1 / saleYear) - 1;
-    } else {
-      finalCagr = -1; // Represents a total loss if final value is negative
+  if (saleYear > 0) {
+    try {
+      const { rAnnual } = solveAnnualRateFromAnnuityFV({
+        finalCapital: finalCapitalRecoveredAtSale,
+        initialCapital: capitalInitialForCagr,
+        monthlyContribution: epargneMensuelleForCagr,
+        years: saleYear,
+      });
+      finalCagr = rAnnual;
+    } catch (error) {
+      console.error("Error calculating CAGR with solveAnnualRateFromAnnuityFV:", error);
+      finalCagr = NaN; // Set to NaN if calculation fails
     }
-  } else if (saleYear === 0) {
+  } else {
     finalCagr = 0; // No duration, no growth
-  } else if (denominator === 0 && finalCapitalRecoveredAtSale > 0) {
-    finalCagr = Infinity; // Infinite return if no investment but positive final value
-  } else if (denominator === 0 && finalCapitalRecoveredAtSale === 0) {
-    finalCagr = 0; // No investment, no return
-  } else if (denominator > 0 && finalCapitalRecoveredAtSale <= 0) {
-    finalCagr = -1; // Total loss
   }
 
   return {
