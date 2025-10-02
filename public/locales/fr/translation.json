@@ -36,7 +36,12 @@
     "login": "Connexion",
     "logout": "Déconnexion",
     "loggedInSuccess": "Connexion réussie ! Bienvenue.",
-    "loggedOutInfo": "Vous avez été déconnecté. Veuillez vous reconnecter."
+    "loggedOutInfo": "Vous avez été déconnecté. Veuillez vous reconnecter.",
+    "fetchUserRoleError": "Erreur lors de la récupération du rôle utilisateur",
+    "upgradeMessageTitle": "Débloquez les fonctionnalités Premium",
+    "upgradeMessageDescription": "Passez à un plan supérieur pour accéder à toutes les fonctionnalités avancées de CGP Calc Suite.",
+    "upgradeButton": "Mettre à niveau maintenant",
+    "premiumFeatureLocked": "Cette fonctionnalité est réservée aux utilisateurs Premium."
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
