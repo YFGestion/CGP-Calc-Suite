@@ -16,7 +16,8 @@ import CreditPage from "./modules/credit/Index";
 import ImmoPage from "./modules/immo/Index";
 import AutresCalculsPage from "./modules/autresCalculs/Index";
 import LoginPage from "./pages/Login";
-import ProfilePage from "./pages/Profile"; // Import ProfilePage
+import ProfilePage from "./pages/Profile";
+import ScenarioHistoryPage from "./pages/ScenarioHistory"; // Import ScenarioHistoryPage
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
@@ -40,7 +41,8 @@ const App = () => (
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />
                 <Route path="settings" element={<SettingsPage />} />
-                <Route path="profile" element={<ProfilePage />} /> {/* Added ProfilePage route */}
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="scenarios" element={<ScenarioHistoryPage />} /> {/* Added ScenarioHistoryPage route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>

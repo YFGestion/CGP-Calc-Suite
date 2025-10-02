@@ -17,13 +17,13 @@ import {
   LayoutGrid,
   LogIn,
   LogOut,
-  UserCircle, // Added UserCircle icon
+  UserCircle,
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
 import { useUser } from '@/hooks/useUser';
-import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
-import { Badge } from '@/components/ui/badge'; // Import Badge
+import { useUserRole } from '@/hooks/useUserRole';
+import { Badge } from '@/components/ui/badge';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   onLinkClick?: () => void;
@@ -35,7 +35,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
   const { id: userId, signOut } = useUser();
-  const { isPremium } = useUserRole(); // Get premium status
+  const { isPremium } = useUserRole();
 
   const handleLogout = async () => {
     await signOut();
@@ -135,7 +135,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
                   asChild
                   onClick={onLinkClick}
                 >
-                  <Link to="/autres-calculs?tab=scenario-history">
+                  <Link to="/scenarios"> {/* Updated link */}
                     <LayoutGrid className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
                     {!isCollapsed && t('myScenarios')}
                   </Link>

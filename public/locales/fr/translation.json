@@ -378,8 +378,7 @@
     "title": "Autres Calculs",
     "brutNetTab": "Brut → Net",
     "rateSolverTab": "Taux Épargne (TRI)",
-    "tvaCalculatorTab": "Calculateur TVA",
-    "scenarioHistoryTab": "Historique des Scénarios"
+    "tvaCalculatorTab": "Calculateur TVA"
   },
   "tvaCalculatorPage": {
     "title": "Calculateur TVA (HT/TTC)",

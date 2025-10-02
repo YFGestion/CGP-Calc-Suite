@@ -49,9 +49,10 @@ export const getModulePath = (moduleName: string): string => {
     case 'endettement': return '/endettement';
     case 'credit': return '/credit';
     case 'immo': return '/immo';
-    case 'brutNet': return '/autres-calculs'; // BrutNet is under AutresCalculs
-    case 'rateSolver': return '/autres-calculs'; // RateSolver is under AutresCalculs
-    case 'tvaCalculator': return '/autres-calculs'; // TvaCalculator is under AutresCalculs
+    case 'brutNet': return '/autres-calculs';
+    case 'rateSolver': return '/autres-calculs';
+    case 'tvaCalculator': return '/autres-calculs';
+    case 'scenario-history': return '/scenarios'; // Updated path for scenario history
     default: return '/';
   }
 };
@@ -61,7 +62,7 @@ export const getModuleTab = (moduleName: string): string | undefined => {
     case 'brutNet': return 'brut-net';
     case 'rateSolver': return 'rate-solver';
     case 'tvaCalculator': return 'tva-calculator';
-    default: return undefined;
+    default: return undefined; // ScenarioHistory is now a page, not a tab
   }
 };
 

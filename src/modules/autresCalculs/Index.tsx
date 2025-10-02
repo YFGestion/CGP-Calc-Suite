@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom'; // Added useSearchParams
+import { useSearchParams } from 'react-router-dom';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,15 +18,14 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import BrutNetPage from '@/modules/brutNet/Index';
 import RateSolverDemo from '@/modules/epargne/RateSolverDemo';
 import TvaCalculator from '@/modules/autresCalculs/TvaCalculator';
-import ScenarioHistory from '@/components/ScenarioHistory'; // Import ScenarioHistory
+// Removed ScenarioHistory import as it's now a standalone page
 
 const AutresCalculsPage = () => {
   const { t } = useTranslation('autresCalculsPage');
   const isMobile = useIsMobile();
-  const [searchParams] = useSearchParams(); // Initialize useSearchParams
-  const [activeTab, setActiveTab] = useState("brut-net"); // State to manage active tab
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("brut-net");
 
-  // Effect to read 'tab' parameter from URL and set activeTab
   useEffect(() => {
     const tabParam = searchParams.get('tab');
     if (tabParam) {
@@ -50,7 +49,6 @@ const AutresCalculsPage = () => {
                 <SelectItem value="brut-net">{t('brutNetTab')}</SelectItem>
                 <SelectItem value="rate-solver">{t('rateSolverTab')}</SelectItem>
                 <SelectItem value="tva-calculator">{t('tvaCalculatorTab')}</SelectItem>
-                <SelectItem value="scenario-history">{t('scenarioHistoryTab')}</SelectItem> {/* Added */}
               </SelectContent>
             </Select>
           ) : (
@@ -58,7 +56,6 @@ const AutresCalculsPage = () => {
               <TabsTrigger value="brut-net">{t('brutNetTab')}</TabsTrigger>
               <TabsTrigger value="rate-solver">{t('rateSolverTab')}</TabsTrigger>
               <TabsTrigger value="tva-calculator">{t('tvaCalculatorTab')}</TabsTrigger>
-              <TabsTrigger value="scenario-history">{t('scenarioHistoryTab')}</TabsTrigger> {/* Added */}
             </TabsList>
           )}
           <TabsContent value="brut-net">
@@ -69,9 +66,6 @@ const AutresCalculsPage = () => {
           </TabsContent>
           <TabsContent value="tva-calculator">
             <TvaCalculator />
-          </TabsContent>
-          <TabsContent value="scenario-history"> {/* Added */}
-            <ScenarioHistory />
           </TabsContent>
         </Tabs>
       </CardContent>
