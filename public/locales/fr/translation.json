@@ -32,7 +32,8 @@
     "scenarioDuplicatedSuccess": "Scénario dupliqué avec succès !",
     "scenarioDuplicatedError": "Échec de la duplication du scénario.",
     "scenarioReloaded": "Scénario rechargé avec succès !",
-    "openMenu": "Ouvrir le menu"
+    "openMenu": "Ouvrir le menu",
+    "scenarioHistory": "Historique des Scénarios"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -361,8 +362,7 @@
     "title": "Autres Calculs",
     "brutNetTab": "Brut → Net",
     "rateSolverTab": "Taux Épargne (TRI)",
-    "tvaCalculatorTab": "Calculateur TVA",
-    "scenarioHistoryTab": "Historique des Scénarios"
+    "tvaCalculatorTab": "Calculateur TVA"
   },
   "tvaCalculatorPage": {
     "title": "Calculateur TVA (HT/TTC)",

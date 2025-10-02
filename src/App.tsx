@@ -18,6 +18,7 @@ import CreditPage from "./modules/credit/Index";
 import ImmoPage from "./modules/immo/Index";
 // import RateSolverDemo from "./modules/epargne/RateSolverDemo"; // Moved to AutresCalculs
 import AutresCalculsPage from "./modules/autresCalculs/Index"; // New import
+import ScenarioHistory from "./components/ScenarioHistory"; // New import for ScenarioHistory
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="scenario-history" element={<ScenarioHistory />} /> {/* New route for ScenarioHistory */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>
