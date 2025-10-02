@@ -20,8 +20,7 @@ import {
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
-import { useSession } from '@/components/SessionContextProvider';
-import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/hooks/useUser'; // Import the new useUser hook
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   onLinkClick?: () => void;
@@ -32,10 +31,10 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
-  const { session } = useSession();
+  const { id: userId, signOut } = useUser(); // Use the new useUser hook
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     if (onLinkClick) onLinkClick();
   };
 
@@ -49,7 +48,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/settings', icon: Settings, label: t('settings') },
   ];
 
-  const authItems = session ?
+  const authItems = userId ? // Check if user is logged in using userId from useUser
     [
       { onClick: handleLogout, icon: LogOut, label: t('logout') },
     ] :
