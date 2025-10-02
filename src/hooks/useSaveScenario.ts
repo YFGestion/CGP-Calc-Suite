@@ -6,8 +6,11 @@ import { Scenario } from '@/types/scenario';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
+// Define the payload type for the mutation, allowing 'id' to be optional for new scenarios
+type ScenarioPayload = Omit<Scenario, 'user_id' | 'created_at' | 'updated_at'> & { id?: string };
+
 interface SaveScenarioParams {
-  scenario: Omit<Scenario, 'id' | 'user_id' | 'created_at' | 'updated_at'>;
+  scenario: ScenarioPayload;
 }
 
 export const useSaveScenario = () => {
@@ -25,16 +28,27 @@ export const useSaveScenario = () => {
         throw new Error(t('notAuthenticatedError'));
       }
 
-      const scenarioToSave = {
-        ...scenario,
-        user_id: user.id,
-      };
+      const { id, ...scenarioData } = scenario; // Destructure id from scenario payload
 
-      const { data, error } = await supabase
-        .from('scenarios')
-        .insert(scenarioToSave)
-        .select()
-        .single();
+      let data;
+      let error;
+
+      if (id) {
+        // If an ID is provided, update the existing scenario
+        ({ data, error } = await supabase
+          .from('scenarios')
+          .update({ ...scenarioData, user_id: user.id, updated_at: new Date().toISOString() }) // Explicitly set updated_at
+          .eq('id', id)
+          .select()
+          .single());
+      } else {
+        // If no ID is provided, insert a new scenario
+        ({ data, error } = await supabase
+          .from('scenarios')
+          .insert({ ...scenarioData, user_id: user.id })
+          .select()
+          .single());
+      }
 
       if (error) {
         throw new Error(t('saveScenarioError') + ': ' + error.message);
@@ -43,7 +57,7 @@ export const useSaveScenario = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scenarios'] }); // Invalide les requêtes 'scenarios' pour rafraîchir la liste
+      queryClient.invalidateQueries({ queryKey: ['scenarios'] }); // Invalidate 'scenarios' queries to refresh the list
       toast.success(t('scenarioSavedSuccess'));
     },
     onError: (error) => {
