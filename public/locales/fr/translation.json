@@ -41,7 +41,8 @@
     "upgradeMessageTitle": "Débloquez les fonctionnalités Premium",
     "upgradeMessageDescription": "Passez à un plan supérieur pour accéder à toutes les fonctionnalités avancées de CGP Calc Suite.",
     "upgradeButton": "Mettre à niveau maintenant",
-    "premiumFeatureLocked": "Cette fonctionnalité est réservée aux utilisateurs Premium."
+    "premiumFeatureLocked": "Cette fonctionnalité est réservée aux utilisateurs Premium.",
+    "copySuffix": "copie"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
