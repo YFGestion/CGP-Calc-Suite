@@ -77,7 +77,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   capex: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
-  }).min(0, t('validation.nonNegativeNumber')),
+  }).min(0, t('validation.nonNegativeNumber')).optional(), // Made optional as it's now conditional
   horizonYears: z.coerce.number({
     required_error: t('validation.durationMin'),
     invalid_type_error: t('validation.durationMin'),
@@ -137,6 +137,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   if (data.applyOpexAndTax) { // New validation for opex and propertyTax
     if (data.opex === undefined || data.opex === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['opex'] });
     if (data.propertyTax === undefined || data.propertyTax === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['propertyTax'] });
+    if (data.capex === undefined || data.capex === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['capex'] }); // Added capex validation
   }
   if (data.applyMgmtFees && (!data.mgmtFeesType || data.mgmtFeesValue === undefined || data.mgmtFeesValue === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['mgmtFeesType'] });
@@ -200,7 +201,7 @@ const ImmoPage = () => {
       rentGross: 1000,
       expectedYield: 5,
       rentPeriodicity: 'monthly',
-      applyOpexAndTax: true, // Default to applying opex and tax
+      applyOpexAndTax: false, // Default to NOT applying opex and tax
       opex: 500,
       propertyTax: 1000,
       applyMgmtFees: false,
@@ -289,7 +290,7 @@ const ImmoPage = () => {
       opex: values.applyOpexAndTax ? values.opex : 0, // Pass 0 if switch is off
       propertyTax: values.applyOpexAndTax ? values.propertyTax : 0, // Pass 0 if switch is off
       mgmtFeesPct: mgmtFeesPctValue,
-      capex: values.capex,
+      capex: values.applyOpexAndTax ? values.capex : 0, // Pass 0 if switch is off
       horizonYears: values.horizonYears,
       saleYear: values.saleYear,
       salePriceMode: values.salePriceMode,
@@ -377,6 +378,7 @@ const ImmoPage = () => {
 
     const opexValue = values.applyOpexAndTax && values.opex !== undefined ? values.opex : 0; // Export actual value or 0
     const propertyTaxValue = values.applyOpexAndTax && values.propertyTax !== undefined ? values.propertyTax : 0; // Export actual value or 0
+    const capexValue = values.applyOpexAndTax && values.capex !== undefined ? values.capex : 0; // Export actual value or 0
 
     const loanAmountValue = values.applyLoan && values.loanAmount !== undefined ? values.loanAmount : 0;
     const loanRateValue = values.applyLoan && values.loanRate !== undefined ? values.loanRate : 0;
@@ -411,10 +413,10 @@ const ImmoPage = () => {
       [t('applyOpexAndTaxToggleLabel'), values.applyOpexAndTax ? 'Oui' : 'Non'], // Export new switch state
       [t('opexLabel'), opexValue.toString()],
       [t('propertyTaxLabel'), propertyTaxValue.toString()],
+      [t('capexLabel'), capexValue.toString()], // Export capex
       [t('mgmtFeesToggleLabel'), values.applyMgmtFees ? 'Oui' : 'Non'],
       [t('mgmtFeesTypeLabel'), mgmtFeesTypeTranslated],
       [t('mgmtFeesValueLabel'), mgmtFeesValue.toString()],
-      [t('capexLabel'), values.capex.toString()],
       [t('horizonYearsLabel'), values.horizonYears.toString()],
       [t('saleYearLabel'), values.saleYear.toString()],
       [t('salePriceModeLabel'), t(values.salePriceMode === 'fixed' ? 'salePriceFixed' : 'salePriceGrowth')],
@@ -712,6 +714,25 @@ const ImmoPage = () => {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="capex"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('capexLabel')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="any"
+                              {...field}
+                              onChange={e => field.onChange(parseFloat(e.target.value))}
+                              aria-label={t('capexLabel')}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </>
                 )}
 
@@ -784,26 +805,6 @@ const ImmoPage = () => {
                     />
                   </>
                 )}
-
-                <FormField
-                  control={form.control}
-                  name="capex"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('capexLabel')}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="any"
-                          {...field}
-                          onChange={e => field.onChange(parseFloat(e.target.value))}
-                          aria-label={t('capexLabel')}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField

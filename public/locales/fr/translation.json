@@ -145,7 +145,7 @@
     "rentPeriodicityLabel": "Périodicité des loyers",
     "monthly": "Mensuel",
     "annual": "Annuel",
-    "applyOpexAndTaxToggleLabel": "Appliquer des charges (non récupérables & foncière)",
+    "applyOpexAndTaxToggleLabel": "Appliquer des charges récurrentes",
     "opexLabel": "Charges non récupérables annuelles (€)",
     "propertyTaxLabel": "Taxe foncière annuelle (€)",
     "mgmtFeesToggleLabel": "Appliquer des frais de gestion",
