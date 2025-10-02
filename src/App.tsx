@@ -11,12 +11,13 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AboutPage from "./pages/About";
 import SettingsPage from "./pages/Settings";
-import BrutNetPage from "./modules/brutNet/Index";
+// import BrutNetPage from "./modules/brutNet/Index"; // Moved to AutresCalculs
 import EndettementPage from "./modules/endettement/Index";
 import EpargnePage from "./modules/epargne/Index";
 import CreditPage from "./modules/credit/Index";
 import ImmoPage from "./modules/immo/Index";
-import RateSolverDemo from "./modules/epargne/RateSolverDemo"; // New import
+// import RateSolverDemo from "./modules/epargne/RateSolverDemo"; // Moved to AutresCalculs
+import AutresCalculsPage from "./modules/autresCalculs/Index"; // New import
 
 const queryClient = new QueryClient();
 
@@ -31,10 +32,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<Index />} />
-                <Route path="brut-net" element={<BrutNetPage />} />
+                <Route path="autres-calculs" element={<AutresCalculsPage />} /> {/* New route for AutresCalculs */}
+                {/* Removed: <Route path="brut-net" element={<BrutNetPage />} /> */}
                 <Route path="endettement" element={<EndettementPage />} />
                 <Route path="epargne" element={<EpargnePage />} />
-                <Route path="epargne/rate-solver" element={<RateSolverDemo />} /> {/* New route */}
+                {/* Removed: <Route path="epargne/rate-solver" element={<RateSolverDemo />} /> */}
                 <Route path="credit" element={<CreditPage />} />
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />

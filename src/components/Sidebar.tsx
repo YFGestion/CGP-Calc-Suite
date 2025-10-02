@@ -10,12 +10,11 @@ import {
   LandPlot,
   PiggyBank,
   Wallet,
-  Scale,
   Home,
   Settings,
   ChevronLeft, // Icône pour réduire
   ChevronRight, // Icône pour étendre
-  Percent, // New icon for rate solver
+  LayoutGrid, // New icon for 'Autres calculs'
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
@@ -32,10 +31,11 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
 
   const navItems = [
     { to: '/', icon: Home, label: t('home') },
-    { to: '/brut-net', icon: Scale, label: t('brutNet') },
+    { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') }, // New item for Autres Calculs
+    // Removed: { to: '/brut-net', icon: Scale, label: t('brutNet') },
     { to: '/endettement', icon: Wallet, label: t('endettement') },
     { to: '/epargne', icon: PiggyBank, label: t('epargne') },
-    { to: '/epargne/rate-solver', icon: Percent, label: t('rateSolver') }, // New item
+    // Removed: { to: '/epargne/rate-solver', icon: Percent, label: t('rateSolver') },
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
   ];

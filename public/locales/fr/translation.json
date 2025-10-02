@@ -19,7 +19,8 @@
     "none": "Aucun",
     "collapse": "Réduire",
     "expand": "Étendre",
-    "disclaimerLink": "Mentions légales / Avertissement"
+    "disclaimerLink": "Mentions légales / Avertissement",
+    "autresCalculs": "Autres calculs"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -341,5 +342,10 @@
     "creditCardDescription": "Obtenez le tableau d'amortissement de votre prêt.",
     "immoCardTitle": "Immo (Effort & TRI)",
     "immoCardDescription": "Analysez la rentabilité de votre investissement immobilier."
+  },
+  "autresCalculsPage": {
+    "title": "Autres Calculs",
+    "brutNetTab": "Brut → Net",
+    "rateSolverTab": "Taux Épargne (TRI)"
   }
 }
