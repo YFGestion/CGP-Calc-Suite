@@ -44,7 +44,12 @@
     "upgradeMessageDescription": "Passez à un plan supérieur pour accéder à toutes les fonctionnalités avancées de CGP Calc Suite.",
     "upgradeButton": "Mettre à niveau maintenant",
     "premiumFeatureLocked": "Cette fonctionnalité est réservée aux utilisateurs Premium.",
-    "copySuffix": "copie"
+    "copySuffix": "copie",
+    "mySpace": "Mon espace",
+    "profile": "Profil",
+    "myScenarios": "Mes scénarios",
+    "premium": "Premium",
+    "free": "Gratuit"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -450,5 +455,14 @@
     "verifyOtpButton": "Vérifier le code OTP",
     "verifyingOtpButton": "Vérification en cours...",
     "verifyOtpLink": "Vérifier le code OTP"
+  },
+  "profilePage": {
+    "title": "Mon Profil",
+    "description": "Gérez les informations de votre compte.",
+    "email": "E-mail",
+    "role": "Rôle",
+    "registrationDate": "Date d'inscription",
+    "loading": "Chargement du profil...",
+    "notAuthenticated": "Vous devez être connecté pour voir votre profil."
   }
 }

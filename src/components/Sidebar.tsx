@@ -17,10 +17,13 @@ import {
   LayoutGrid,
   LogIn,
   LogOut,
+  UserCircle, // Added UserCircle icon
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
-import { useUser } from '@/hooks/useUser'; // Import the new useUser hook
+import { useUser } from '@/hooks/useUser';
+import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
+import { Badge } from '@/components/ui/badge'; // Import Badge
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   onLinkClick?: () => void;
@@ -31,7 +34,8 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
-  const { id: userId, signOut } = useUser(); // Use the new useUser hook
+  const { id: userId, signOut } = useUser();
+  const { isPremium } = useUserRole(); // Get premium status
 
   const handleLogout = async () => {
     await signOut();
@@ -47,14 +51,6 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') },
     { to: '/settings', icon: Settings, label: t('settings') },
   ];
-
-  const authItems = userId ? // Check if user is logged in using userId from useUser
-    [
-      { onClick: handleLogout, icon: LogOut, label: t('logout') },
-    ] :
-    [
-      { to: '/login', icon: LogIn, label: t('login') },
-    ];
 
   const toggleLanguage = () => {
     const newLang = language === 'fr-FR' ? 'en-US' : 'fr-FR';
@@ -103,15 +99,15 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
             ))}
           </div>
         </div>
+
         <div className="px-3 py-2">
           <h2 className={cn("mb-2 px-4 text-lg font-semibold tracking-tight text-sidebar-foreground", isCollapsed && "sr-only")}>
-            {t('tools')}
+            {t('mySpace')}
           </h2>
           <div className="space-y-1">
-            {authItems.map((item, index) => (
-              item.to ? (
+            {userId ? (
+              <>
                 <Button
-                  key={item.to}
                   variant="ghost"
                   className={cn(
                     "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -120,26 +116,58 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
                   asChild
                   onClick={onLinkClick}
                 >
-                  <Link to={item.to}>
-                    <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                    {!isCollapsed && item.label}
+                  <Link to="/profile">
+                    <UserCircle className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                    {!isCollapsed && (
+                      <span className="flex items-center">
+                        {t('profile')}
+                        {isPremium && <Badge variant="secondary" className="ml-2 bg-yellow-500 text-white">{t('premium')}</Badge>}
+                      </span>
+                    )}
                   </Link>
                 </Button>
-              ) : (
                 <Button
-                  key={`auth-action-${index}`}
                   variant="ghost"
                   className={cn(
                     "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     isCollapsed ? "justify-center" : "justify-start"
                   )}
-                  onClick={item.onClick}
+                  asChild
+                  onClick={onLinkClick}
                 >
-                  <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                  {!isCollapsed && item.label}
+                  <Link to="/autres-calculs?tab=scenario-history">
+                    <LayoutGrid className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                    {!isCollapsed && t('myScenarios')}
+                  </Link>
                 </Button>
-              )
-            ))}
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isCollapsed ? "justify-center" : "justify-start"
+                  )}
+                  onClick={handleLogout}
+                >
+                  <LogOut className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                  {!isCollapsed && t('logout')}
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isCollapsed ? "justify-center" : "justify-start"
+                )}
+                asChild
+                onClick={onLinkClick}
+              >
+                <Link to="/login">
+                  <LogIn className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                  {!isCollapsed && t('login')}
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

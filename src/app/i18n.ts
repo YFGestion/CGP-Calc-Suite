@@ -27,7 +27,8 @@ const allNamespaces = [
   'autresCalculsPage',
   'tvaCalculatorPage',
   'loginPage',
-  'scenarioHistoryPage', // Added new namespace
+  'scenarioHistoryPage',
+  'profilePage', // Added new namespace
 ];
 
 i18n
