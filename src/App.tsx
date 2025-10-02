@@ -15,7 +15,7 @@ import EpargnePage from "./modules/epargne/Index";
 import CreditPage from "./modules/credit/Index";
 import ImmoPage from "./modules/immo/Index";
 import AutresCalculsPage from "./modules/autresCalculs/Index";
-import ScenarioHistory from "./components/ScenarioHistory";
+// import ScenarioHistory from "./components/ScenarioHistory"; // Removed import
 import LoginPage from "./pages/Login"; // New import
 import DashboardPage from "./pages/Dashboard"; // New import
 import { SessionContextProvider } from "./components/SessionContextProvider"; // New import
@@ -42,7 +42,7 @@ const App = () => (
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />
                 <Route path="settings" element={<SettingsPage />} />
-                <Route path="scenario-history" element={<ScenarioHistory />} />
+                {/* Removed: <Route path="scenario-history" element={<ScenarioHistory />} /> */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>

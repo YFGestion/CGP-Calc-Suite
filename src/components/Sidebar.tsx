@@ -15,7 +15,7 @@ import {
   ChevronLeft, // Icône pour réduire
   ChevronRight, // Icône pour étendre
   LayoutGrid, // New icon for 'Autres calculs'
-  History, // New icon for Scenario History
+  // History, // Removed icon for Scenario History
   LogIn, // New icon for Login
   LogOut, // New icon for Logout
   LayoutDashboard, // New icon for Dashboard
@@ -48,7 +48,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
     { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') },
-    { to: '/scenario-history', icon: History, label: t('scenarioHistory') },
+    // Removed: { to: '/scenario-history', icon: History, label: t('scenarioHistory') },
     { to: '/settings', icon: Settings, label: t('settings') },
   ];
 
