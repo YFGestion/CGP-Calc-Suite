@@ -182,37 +182,39 @@ export const rentalCashflowIrr = (params: RentalCashflowIrrParams): RentalCashfl
     avgPostLoanIncome = postLoanYearsCount > 0 ? round(postLoanIncomeSum / postLoanYearsCount, 2) : 0;
   }
 
-  // Calculate CAGR (TCAC) based on user's formula, tied to saleYear
+  // Calculate CAGR (TCAC) based on user's formula
   let finalCagr = NaN;
-  const initialEquity = round(price + acqCosts - (loan?.amount || 0), 2);
+  const capitalInitial = round(price + acqCosts - (loan?.amount || 0), 2);
 
   // Sum of all negative cashflows (efforts) up to the saleYear
-  let totalEffortForCagr = 0;
+  let totalNegativeCashflows = 0;
   for (const entry of annualTable) {
     if (entry.year <= saleYear && entry.cashflow < 0) {
-      totalEffortForCagr += Math.abs(entry.cashflow);
+      totalNegativeCashflows += Math.abs(entry.cashflow);
     }
   }
 
-  const totalInvestedCapitalForCagr = initialEquity + totalEffortForCagr;
+  // EpargneMensuelle = moyenne mensuelle des cashflows négatifs sur la durée de revente
+  const epargneMensuelle = (saleYear > 0) ? (totalNegativeCashflows / (saleYear * 12)) : 0;
 
-  if (saleYear > 0 && totalInvestedCapitalForCagr > 0) {
-    const base = finalCapitalRecoveredAtSale / totalInvestedCapitalForCagr;
+  const denominator = capitalInitial + (epargneMensuelle * 12 * saleYear);
+
+  if (saleYear > 0 && denominator > 0) {
+    const base = finalCapitalRecoveredAtSale / denominator;
     if (base >= 0) {
-      finalCagr = Math.pow(base, 1 / saleYear) - 1; // Use saleYear for the exponent
+      finalCagr = Math.pow(base, 1 / saleYear) - 1;
     } else {
       finalCagr = -1; // Represents a total loss if final value is negative
     }
-  } else if (saleYear === 0) { // Should not happen due to validation, but for robustness
+  } else if (saleYear === 0) {
     finalCagr = 0; // No duration, no growth
-  } else if (totalInvestedCapitalForCagr === 0 && finalCapitalRecoveredAtSale > 0) {
+  } else if (denominator === 0 && finalCapitalRecoveredAtSale > 0) {
     finalCagr = Infinity; // Infinite return if no investment but positive final value
-  } else if (totalInvestedCapitalForCagr === 0 && finalCapitalRecoveredAtSale === 0) {
+  } else if (denominator === 0 && finalCapitalRecoveredAtSale === 0) {
     finalCagr = 0; // No investment, no return
-  } else if (totalInvestedCapitalForCagr > 0 && finalCapitalRecoveredAtSale <= 0) {
+  } else if (denominator > 0 && finalCapitalRecoveredAtSale <= 0) {
     finalCagr = -1; // Total loss
   }
-
 
   return {
     annualTable,
