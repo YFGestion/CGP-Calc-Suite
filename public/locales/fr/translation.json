@@ -26,14 +26,7 @@
     "saveScenarioError": "Erreur lors de la sauvegarde du scénario",
     "scenarioSavedSuccess": "Scénario sauvegardé avec succès !",
     "scenarioSavedError": "Échec de la sauvegarde du scénario.",
-    "fetchScenariosError": "Erreur lors de la récupération des scénarios.",
-    "scenarioDeletedSuccess": "Scénario supprimé avec succès !",
-    "scenarioDeletedError": "Échec de la suppression du scénario.",
-    "scenarioDuplicatedSuccess": "Scénario dupliqué avec succès !",
-    "scenarioDuplicatedError": "Échec de la duplication du scénario.",
-    "scenarioReloaded": "Scénario rechargé avec succès !",
-    "openMenu": "Ouvrir le menu",
-    "scenarioHistory": "Historique des Scénarios"
+    "fetchScenariosError": "Erreur lors de la récupération des scénarios."
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",

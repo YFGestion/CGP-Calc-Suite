@@ -15,7 +15,6 @@ import {
   ChevronLeft, // Icône pour réduire
   ChevronRight, // Icône pour étendre
   LayoutGrid, // New icon for 'Autres calculs'
-  History, // New icon for Scenario History
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
@@ -37,7 +36,6 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
     { to: '/autres-calculs', icon: LayoutGrid, label: t('autresCalculs') },
-    { to: '/scenario-history', icon: History, label: t('scenarioHistory') }, {/* New nav item */}
     { to: '/settings', icon: Settings, label: t('settings') }, // Moved Settings here
   ];
 
