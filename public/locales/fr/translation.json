@@ -6,6 +6,7 @@
     "brutNet": "Brut → Net",
     "endettement": "Endettement",
     "epargne": "Épargne",
+    "rateSolver": "Taux Épargne (TCAC)",
     "credit": "Crédit",
     "immo": "Immo (Effort & TCAC)",
     "settings": "Paramètres",
@@ -82,6 +83,27 @@
       "durationMin": "La durée doit être d'au moins 1 an.",
       "returnRateRange": "Le rendement annuel doit être entre -10% et 20%.",
       "entryFeeRange": "Les frais d'entrée doivent être entre 0% et 10%."
+    }
+  },
+  "rateSolverPage": {
+    "title": "Calculateur de Taux d'Épargne (TCAC)",
+    "description": "Calcule le taux annuel moyen (TCAC) nécessaire pour atteindre un capital final donné, avec des versements mensuels réguliers.",
+    "finalCapitalLabel": "Capital final cible (€)",
+    "initialCapitalLabel": "Capital initial (€)",
+    "monthlyContributionLabel": "Versement mensuel (€)",
+    "yearsLabel": "Durée (années)",
+    "calculateButton": "Calculer le taux",
+    "monthlyRate": "Taux mensuel",
+    "annualRate": "Taux annuel équivalent (TCAC)",
+    "summaryTitle": "Résumé du calcul de taux d'épargne",
+    "summaryContent": "Résumé du Calcul de Taux d'Épargne\n\nInputs :\n- Capital final cible : {finalCapital}\n- Capital initial : {initialCapital}\n- Versement mensuel : {monthlyContribution}\n- Durée : {years} ans\n\nRésultats :\n- Taux mensuel : {rMonthly}\n- Taux annuel équivalent (TCAC) : {rAnnual}",
+    "calculationError": "Une erreur est survenue lors du calcul du taux. Veuillez vérifier vos entrées.",
+    "noResultsToCopy": "Aucun résultat à copier. Veuillez effectuer un calcul d'abord.",
+    "validation": {
+      "positiveNumber": "Doit être un nombre positif.",
+      "nonNegativeNumber": "Ne peut pas être négatif.",
+      "durationMin": "La durée doit être d'au moins 1 an.",
+      "noCapitalOrContribution": "Impossible d'atteindre un capital final positif sans capital initial ni contributions."
     }
   },
   "creditPage": {

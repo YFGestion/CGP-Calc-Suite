@@ -23,6 +23,7 @@ const allNamespaces = [
   'endettementPage',
   'settingsPage',
   'homePage',
+  'rateSolverPage', // New namespace
 ];
 
 i18n

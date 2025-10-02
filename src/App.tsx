@@ -16,6 +16,7 @@ import EndettementPage from "./modules/endettement/Index";
 import EpargnePage from "./modules/epargne/Index";
 import CreditPage from "./modules/credit/Index";
 import ImmoPage from "./modules/immo/Index";
+import RateSolverDemo from "./modules/epargne/RateSolverDemo"; // New import
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="brut-net" element={<BrutNetPage />} />
                 <Route path="endettement" element={<EndettementPage />} />
                 <Route path="epargne" element={<EpargnePage />} />
+                <Route path="epargne/rate-solver" element={<RateSolverDemo />} /> {/* New route */}
                 <Route path="credit" element={<CreditPage />} />
                 <Route path="immo" element={<ImmoPage />} />
                 <Route path="about" element={<AboutPage />} />

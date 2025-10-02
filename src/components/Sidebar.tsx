@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronLeft, // Icône pour réduire
   ChevronRight, // Icône pour étendre
+  Percent, // New icon for rate solver
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
@@ -34,6 +35,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
     { to: '/brut-net', icon: Scale, label: t('brutNet') },
     { to: '/endettement', icon: Wallet, label: t('endettement') },
     { to: '/epargne', icon: PiggyBank, label: t('epargne') },
+    { to: '/epargne/rate-solver', icon: Percent, label: t('rateSolver') }, // New item
     { to: '/credit', icon: Calculator, label: t('credit') },
     { to: '/immo', icon: LandPlot, label: t('immo') },
   ];
