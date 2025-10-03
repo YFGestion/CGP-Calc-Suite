@@ -130,7 +130,8 @@ const ProfilePage = () => {
               {isUpdatingProfile ? commonT('loading') : t('updateProfileButton')}
             </Button>
           </form>
-        </CardContent>
+        </Form>
+      </CardContent>
     </Card>
   );
 };
