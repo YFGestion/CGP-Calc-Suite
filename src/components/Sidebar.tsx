@@ -18,6 +18,7 @@ import {
   LogIn,
   LogOut,
   UserCircle,
+  ShieldCheck, // Added ShieldCheck icon for admin
 } from 'lucide-react';
 import { useAppState } from '@/store/useAppState';
 import i18n from '@/app/i18n';
@@ -35,7 +36,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
   const { t } = useTranslation('common');
   const { language, setLanguage } = useAppState();
   const { id: userId, signOut } = useUser();
-  const { isPremium } = useUserRole();
+  const { role: currentUserRole, isPremium } = useUserRole(); // Get current user's role
 
   const handleLogout = async () => {
     await signOut();
@@ -135,11 +136,27 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
                   asChild
                   onClick={onLinkClick}
                 >
-                  <Link to="/scenarios"> {/* Updated link */}
+                  <Link to="/scenarios">
                     <LayoutGrid className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
                     {!isCollapsed && t('myScenarios')}
                   </Link>
                 </Button>
+                {currentUserRole === 'admin' && ( // Conditional rendering for admin link
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                      isCollapsed ? "justify-center" : "justify-start"
+                    )}
+                    asChild
+                    onClick={onLinkClick}
+                  >
+                    <Link to="/admin">
+                      <ShieldCheck className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                      {!isCollapsed && t('adminDashboard')}
+                    </Link>
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   className={cn(

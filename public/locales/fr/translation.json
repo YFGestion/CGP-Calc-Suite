@@ -49,7 +49,9 @@
     "profile": "Profil",
     "myScenarios": "Mes scénarios",
     "premium": "Premium",
-    "free": "Gratuit"
+    "free": "Gratuit",
+    "admin": "Admin",
+    "adminDashboard": "Administration"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -198,7 +200,7 @@
     "monthly": "Mensuel",
     "annual": "Annuel",
     "applyOpexAndTaxToggleLabel": "Appliquer des charges récurrentes",
-    "opexLabel": "Charges non récupérables annuelles (€)",
+    "opexLabel": "Dépenses d'exploitation annuelles (€)",
     "propertyTaxLabel": "Taxe foncière annuelle (€)",
     "mgmtFeesToggleLabel": "Appliquer des frais de gestion",
     "mgmtFeesTypeLabel": "Type de frais de gestion",
@@ -463,5 +465,22 @@
     "registrationDate": "Date d'inscription",
     "loading": "Chargement du profil...",
     "notAuthenticated": "Vous devez être connecté pour voir votre profil."
+  },
+  "adminDashboard": {
+    "title": "Tableau de bord d'administration",
+    "description": "Gérez les rôles des utilisateurs de l'application.",
+    "notAdminError": "Accès refusé. Seuls les administrateurs peuvent accéder à cette page.",
+    "fetchUsersError": "Erreur lors de la récupération des utilisateurs.",
+    "updateRoleError": "Erreur lors de la mise à jour du rôle de l'utilisateur.",
+    "roleUpdateSuccess": "Rôle de l'utilisateur mis à jour avec succès !",
+    "roleUpdateError": "Échec de la mise à jour du rôle de l'utilisateur.",
+    "tableHeaderEmail": "E-mail",
+    "tableHeaderFirstName": "Prénom",
+    "tableHeaderLastName": "Nom",
+    "tableHeaderRole": "Rôle",
+    "tableHeaderCreatedAt": "Créé le",
+    "tableHeaderLastLogin": "Dernière connexion",
+    "selectRole": "Sélectionner un rôle",
+    "refreshUsers": "Actualiser les utilisateurs"
   }
 }

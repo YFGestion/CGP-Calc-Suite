@@ -17,7 +17,8 @@ import ImmoPage from "./modules/immo/Index";
 import AutresCalculsPage from "./modules/autresCalculs/Index";
 import LoginPage from "./pages/Login";
 import ProfilePage from "./pages/Profile";
-import ScenarioHistoryPage from "./pages/ScenarioHistory"; // Import ScenarioHistoryPage
+import ScenarioHistoryPage from "./pages/ScenarioHistory";
+import AdminDashboard from "./pages/AdminDashboard"; // Import AdminDashboard
 import { SessionContextProvider } from "./components/SessionContextProvider";
 
 const queryClient = new QueryClient();
@@ -42,7 +43,8 @@ const App = () => (
                 <Route path="about" element={<AboutPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="profile" element={<ProfilePage />} />
-                <Route path="scenarios" element={<ScenarioHistoryPage />} /> {/* Added ScenarioHistoryPage route */}
+                <Route path="scenarios" element={<ScenarioHistoryPage />} />
+                <Route path="admin" element={<AdminDashboard />} /> {/* Added AdminDashboard route */}
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>
