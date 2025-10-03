@@ -24,6 +24,8 @@ const formSchema = (t: (key: string) => string) => z.object({
 const ProfilePage = () => {
   const { t } = useTranslation('profilePage');
   const { t: commonT } = useTranslation('common');
+  const { t: loginT } = useTranslation('loginPage'); // Import loginPage namespace for placeholders
+
   const { email, firstName, lastName, isLoading: isUserLoading, id: userId } = useUser();
   const { role, isPremium, isLoading: isRoleLoading } = useUserRole();
   const { user, isLoading: isSessionLoading } = useUser(); // To get created_at
@@ -105,7 +107,7 @@ const ProfilePage = () => {
                 <FormItem>
                   <FormLabel>{t('firstName')}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder={t('loginPage.firstNamePlaceholder')} />
+                    <Input {...field} placeholder={loginT('firstNamePlaceholder')} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -118,7 +120,7 @@ const ProfilePage = () => {
                 <FormItem>
                   <FormLabel>{t('lastName')}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder={t('loginPage.lastNamePlaceholder')} />
+                    <Input {...field} placeholder={loginT('lastNamePlaceholder')} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
