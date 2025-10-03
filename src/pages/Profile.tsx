@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useUser } from '@/hooks/useUser';
 import { useUserRole } from '@/hooks/useUserRole';
 import { formatDateTime } from '@/lib/scenario-utils'; // Reusing formatDateTime
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge'; // Keep import for other uses if any, but remove from rendering here
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -90,7 +90,7 @@ const ProfilePage = () => {
           <span className="font-medium">{t('role')} :</span>
           <span className="flex items-center">
             {role ? commonT(role) : commonT('free')}
-            {isPremium && <Badge variant="secondary" className="ml-2 bg-yellow-500 text-white">{commonT('premium')}</Badge>}
+            {/* Removed the Badge component here */}
           </span>
         </div>
         <div className="flex justify-between items-center">
@@ -130,8 +130,7 @@ const ProfilePage = () => {
               {isUpdatingProfile ? commonT('loading') : t('updateProfileButton')}
             </Button>
           </form>
-        </Form>
-      </CardContent>
+        </CardContent>
     </Card>
   );
 };
