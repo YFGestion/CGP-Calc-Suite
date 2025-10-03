@@ -55,23 +55,49 @@ serve(async (req) => {
       });
     }
 
-    // Fetch all profiles
-    const { data: profiles, error: fetchError } = await supabaseClient
+    // 1. Fetch all profiles from public.profiles
+    const { data: profilesData, error: fetchProfilesError } = await supabaseClient
       .from('profiles')
-      .select('id, first_name, last_name, email:auth.users(email), role, created_at, updated_at, last_login'); // Join with auth.users to get email
+      .select('id, first_name, last_name, role, created_at, updated_at, last_login');
 
-    if (fetchError) {
-      console.error('Supabase fetch error:', fetchError);
-      return new Response(JSON.stringify({ error: fetchError.message }), {
+    if (fetchProfilesError) {
+      console.error('Supabase profiles fetch error:', fetchProfilesError);
+      return new Response(JSON.stringify({ error: fetchProfilesError.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Flatten the email from the joined table
-    const formattedProfiles = profiles?.map(profile => ({
+    if (!profilesData || profilesData.length === 0) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 2. Extract all user IDs
+    const userIds = profilesData.map(p => p.id);
+
+    // 3. Fetch corresponding emails from auth.users using the service_role_key
+    const { data: authUsersData, error: fetchAuthUsersError } = await supabaseClient
+      .from('users') // Querying the 'users' table directly in the 'auth' schema
+      .select('id, email')
+      .in('id', userIds);
+
+    if (fetchAuthUsersError) {
+      console.error('Supabase auth.users fetch error:', fetchAuthUsersError);
+      return new Response(JSON.stringify({ error: fetchAuthUsersError.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const emailMap = new Map(authUsersData?.map(u => [u.id, u.email]));
+
+    // 4. Combine the data
+    const formattedProfiles = profilesData.map(profile => ({
       ...profile,
-      email: (profile.email as { email: string } | null)?.email || null,
+      email: emailMap.get(profile.id) || null,
     }));
 
     return new Response(JSON.stringify(formattedProfiles), {
