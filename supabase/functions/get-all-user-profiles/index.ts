@@ -75,27 +75,20 @@ serve(async (req) => {
       });
     }
 
-    // 2. Extract all user IDs
-    const userIds = profilesData.map(p => p.id);
-
-    // 3. Fetch corresponding emails from auth.users using the service_role_key
-    // The service_role_key allows direct access to auth.users without explicit schema() call
-    const { data: authUsersData, error: fetchAuthUsersError } = await supabaseClient
-      .from('users') // This implicitly refers to auth.users when using service_role_key
-      .select('id, email')
-      .in('id', userIds);
+    // 2. Fetch all users from auth.users using admin API
+    const { data: authUsersData, error: fetchAuthUsersError } = await supabaseClient.auth.admin.listUsers();
 
     if (fetchAuthUsersError) {
-      console.error('Supabase auth.users fetch error:', fetchAuthUsersError);
+      console.error('Supabase auth.admin.listUsers error:', fetchAuthUsersError);
       return new Response(JSON.stringify({ error: fetchAuthUsersError.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const emailMap = new Map(authUsersData?.map(u => [u.id, u.email]));
+    const emailMap = new Map(authUsersData.users.map(u => [u.id, u.email]));
 
-    // 4. Combine the data
+    // 3. Combine the data
     const formattedProfiles = profilesData.map(profile => ({
       ...profile,
       email: emailMap.get(profile.id) || null,
