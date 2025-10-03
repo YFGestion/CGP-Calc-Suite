@@ -79,9 +79,9 @@ serve(async (req) => {
     const userIds = profilesData.map(p => p.id);
 
     // 3. Fetch corresponding emails from auth.users using the service_role_key
-    // Explicitly specify the 'auth' schema for the 'users' table
+    // The service_role_key allows direct access to auth.users without explicit schema() call
     const { data: authUsersData, error: fetchAuthUsersError } = await supabaseClient
-      .from('users', { schema: 'auth' }) // Corrected: specify schema directly in from()
+      .from('users') // This implicitly refers to auth.users when using service_role_key
       .select('id, email')
       .in('id', userIds);
 
