@@ -122,7 +122,7 @@ export function Sidebar({ className, onLinkClick, isCollapsed, onToggleCollapse 
                     {!isCollapsed && (
                       <span className="flex items-center">
                         {t('profile')}
-                        {currentUserRole === 'admin' && <Badge variant="secondary" className="ml-2 bg-yellow-500 text-white">{t('admin')}</Badge>}
+                        {currentUserRole === 'admin' && <Badge variant="secondary" className="ml-2 bg-indigo-600 text-white">{t('admin')}</Badge>}
                         {currentUserRole === 'premium' && <Badge variant="secondary" className="ml-2 bg-yellow-500 text-white">{t('premium')}</Badge>}
                       </span>
                     )}
