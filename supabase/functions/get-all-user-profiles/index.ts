@@ -79,8 +79,10 @@ serve(async (req) => {
     const userIds = profilesData.map(p => p.id);
 
     // 3. Fetch corresponding emails from auth.users using the service_role_key
+    // Explicitly query the 'auth' schema for the 'users' table
     const { data: authUsersData, error: fetchAuthUsersError } = await supabaseClient
-      .from('users') // Querying the 'users' table directly in the 'auth' schema
+      .schema('auth') // Specify the 'auth' schema
+      .from('users')
       .select('id, email')
       .in('id', userIds);
 
