@@ -47,7 +47,8 @@ export const useUpdateProfile = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] }); // Invalidate the user query to refetch profile data
+      // Invalider spécifiquement la requête du profil utilisateur pour forcer la mise à jour
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] }); 
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] }); // Invalidate admin users list if applicable
       showSuccess(t('profileUpdateSuccess'));
     },
