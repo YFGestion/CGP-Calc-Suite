@@ -65,6 +65,22 @@ const Login = () => {
                   button_label: t('signUpButton'),
                   loading_button_label: t('signingUpButton'),
                   link_text: t('signUpLink'),
+                  form_fields: [
+                    {
+                      name: 'first_name',
+                      label: t('firstNameLabel'),
+                      placeholder: t('firstNamePlaceholder'),
+                      type: 'text',
+                      required: false, // Make optional for now, can be changed to true
+                    },
+                    {
+                      name: 'last_name',
+                      label: t('lastNameLabel'),
+                      placeholder: t('lastNamePlaceholder'),
+                      type: 'text',
+                      required: false, // Make optional for now, can be changed to true
+                    },
+                  ],
                 },
                 forgotten_password: {
                   email_label: t('emailLabel'),
