@@ -51,7 +51,8 @@
     "premium": "Premium",
     "free": "Gratuit",
     "admin": "Admin",
-    "adminDashboard": "Administration"
+    "adminDashboard": "Administration",
+    "hello": "Bonjour"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
