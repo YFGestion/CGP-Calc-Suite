@@ -6,6 +6,7 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/app/i18n'; // Import the i18n instance
 
 const Login = () => {
   const { t } = useTranslation('loginPage');
@@ -46,6 +47,7 @@ const Login = () => {
               },
             }}
             theme="light" // Using light theme, can be dynamic with next-themes if re-added
+            i18n={i18n} // Pass the i18n instance here
             localization={{
               variables: {
                 sign_in: {
@@ -69,16 +71,16 @@ const Login = () => {
                     {
                       name: 'first_name',
                       label: t('firstNameLabel'),
-                      placeholder: t('firstNamePlaceholder'),
+                      placeholder: 'firstNamePlaceholder', // Use raw key
                       type: 'text',
-                      required: false, // Make optional for now, can be changed to true
+                      required: false,
                     },
                     {
                       name: 'last_name',
                       label: t('lastNameLabel'),
-                      placeholder: t('lastNamePlaceholder'),
+                      placeholder: 'lastNamePlaceholder', // Use raw key
                       type: 'text',
-                      required: false, // Make optional for now, can be changed to true
+                      required: false,
                     },
                   ],
                 },
