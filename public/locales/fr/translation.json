@@ -26,7 +26,6 @@
     "saveScenarioError": "Erreur lors de la sauvegarde du scénario",
     "scenarioSavedSuccess": "Scénario sauvegardé avec succès !",
     "scenarioSavedError": "Échec de la sauvegarde du scénario.",
-    "fetchScenariosError": "Erreur lors de la récupération des scénarios.",
     "scenarioDeletedSuccess": "Scénario supprimé avec succès !",
     "scenarioDeletedError": "Échec de la suppression du scénario.",
     "scenarioDuplicatedSuccess": "Scénario dupliqué avec succès !",
@@ -52,7 +51,8 @@
     "free": "Gratuit",
     "admin": "Admin",
     "adminDashboard": "Administration",
-    "hello": "Bonjour"
+    "hello": "Bonjour",
+    "saveScenarioButton": "Sauvegarder le scénario"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -492,5 +492,16 @@
     "tableHeaderLastLogin": "Dernière connexion",
     "selectRole": "Sélectionner un rôle",
     "refreshUsers": "Actualiser les utilisateurs"
+  },
+  "scenarioTitleModal": {
+    "title": "Créer un nouveau scénario",
+    "description": "Donnez un nom à votre scénario pour le sauvegarder et le retrouver plus tard.",
+    "scenarioNameLabel": "Nom du scénario",
+    "scenarioNamePlaceholder": "Ex: Mon projet immobilier 2024",
+    "saveButton": "Sauvegarder le scénario",
+    "validation": {
+      "scenarioTitleRequired": "Le nom du scénario est requis.",
+      "scenarioTitleTooLong": "Le nom du scénario ne peut pas dépasser 100 caractères."
+    }
   }
 }

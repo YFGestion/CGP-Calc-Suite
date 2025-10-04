@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { CopyBlock } from '@/lib/copy';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -221,6 +222,14 @@ const TvaCalculator = () => {
               <Button variant="outline" onClick={handleExportCsv} className="flex-1">
                 {t('exportCsvButton')}
               </Button>
+              {/* Add ScenarioTitleModal here */}
+              <ScenarioTitleModal
+                moduleName="tvaCalculator"
+                currentInputs={form.getValues()}
+                currentOutputs={results}
+                triggerButtonLabel={commonT('saveScenarioButton')}
+                disabled={!results}
+              />
             </div>
             <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
           </div>

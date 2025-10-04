@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { showInfo } from '@/utils/toast'; // Import showInfo from utility
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -1323,9 +1324,14 @@ const ImmoPage = () => {
               <Button variant="outline" onClick={handleExportCsv} className="flex-1">
                 {t('exportCsvButton')}
               </Button>
-              <Button variant="outline" onClick={handleDuplicateScenario} className="flex-1">
-                {t('duplicateScenarioButton')}
-              </Button>
+              {/* Replace existing duplicate button with ScenarioTitleModal */}
+              <ScenarioTitleModal
+                moduleName="immo"
+                currentInputs={form.getValues()}
+                currentOutputs={results}
+                triggerButtonLabel={commonT('saveScenarioButton')}
+                disabled={!results}
+              />
             </div>
             <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
           </div>

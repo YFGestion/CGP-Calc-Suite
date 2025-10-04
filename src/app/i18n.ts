@@ -29,7 +29,8 @@ const allNamespaces = [
   'loginPage',
   'scenarioHistoryPage',
   'profilePage',
-  'adminDashboard', // Added new namespace
+  'adminDashboard',
+  'scenarioTitleModal', // Added new namespace
 ];
 
 i18n

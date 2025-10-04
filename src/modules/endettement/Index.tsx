@@ -31,6 +31,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -607,6 +608,14 @@ const EndettementPage = () => {
               <Button variant="outline" onClick={handleSendToCredit} className="flex-1">
                 {t('sendToCreditButton')}
               </Button>
+              {/* Add ScenarioTitleModal here */}
+              <ScenarioTitleModal
+                moduleName="endettement"
+                currentInputs={form.getValues()}
+                currentOutputs={results}
+                triggerButtonLabel={commonT('saveScenarioButton')}
+                disabled={!results}
+              />
             </div>
             <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
           </div>

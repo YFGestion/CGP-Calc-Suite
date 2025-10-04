@@ -14,6 +14,7 @@ import { CopyBlock } from '@/lib/copy';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { solveAnnualRateFromAnnuityFV } from '@/lib/math-core/irr'; // Import the new function
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -201,6 +202,14 @@ const RateSolverDemo = () => {
                 <span className="font-medium">{formatPercent(results.rAnnual, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
+
+            <ScenarioTitleModal
+              moduleName="rateSolver"
+              currentInputs={form.getValues()}
+              currentOutputs={results}
+              triggerButtonLabel={commonT('saveScenarioButton')}
+              disabled={!results}
+            />
 
             <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
           </div>
