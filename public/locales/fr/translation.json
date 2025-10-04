@@ -53,7 +53,11 @@
     "adminDashboard": "Administration",
     "hello": "Bonjour",
     "saveScenarioButton": "Sauvegarder le scénario",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "selectTags": "Sélectionner des tags...",
+    "searchOrAddTags": "Rechercher ou ajouter des tags...",
+    "noTagFound": "Aucun tag trouvé.",
+    "addTag": "Ajouter '{tag}'"
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -521,7 +525,8 @@
     "backToScenarios": "Retour à l'historique des scénarios",
     "error": "Erreur lors du chargement du scénario.",
     "loadScenario": "Charger le scénario",
-    "loadScenarioButton": "Recharger dans le module"
+    "loadScenarioButton": "Recharger dans le module",
+    "editMetadata": "Modifier les métadonnées"
   },
   "scenarioTitleEditor": {
     "scenarioNameLabel": "Nouveau nom du scénario",
@@ -530,6 +535,18 @@
     "validation": {
       "scenarioTitleRequired": "Le nom du scénario est requis.",
       "scenarioTitleTooLong": "Le nom du scénario ne peut pas dépasser 100 caractères."
+    }
+  },
+  "scenarioMetadataForm": {
+    "descriptionLabel": "Description du scénario",
+    "descriptionPlaceholder": "Ajoutez une description détaillée de votre scénario...",
+    "tagsLabel": "Tags",
+    "tagsPlaceholder": "Ajouter des tags (ex: immobilier, épargne)",
+    "saveButton": "Enregistrer les métadonnées",
+    "validation": {
+      "descriptionTooLong": "La description ne peut pas dépasser 500 caractères.",
+      "tagRequired": "Un tag ne peut pas être vide.",
+      "tooManyTags": "Vous ne pouvez pas ajouter plus de 10 tags."
     }
   }
 }

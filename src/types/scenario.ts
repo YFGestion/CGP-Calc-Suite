@@ -3,6 +3,8 @@ export type Scenario = {
   user_id: string; // UUID of the user who owns the scenario
   module: string; // e.g., "Investissement locatif", "Épargne", "Crédit"
   client_name: string;
+  description: string | null; // Added description field
+  tags: string[]; // Added tags field (array of strings)
   inputs: Record<string, unknown>; // Object to store module-specific inputs
   outputs: Record<string, unknown>; // Object to store calculated results
   created_at: string; // ISO timestamp

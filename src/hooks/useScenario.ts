@@ -26,7 +26,7 @@ export const useScenario = (id: string | undefined) => {
 
       const { data, error } = await supabase
         .from('scenarios')
-        .select('*')
+        .select('*') // Select all columns, including new ones
         .eq('id', id)
         .eq('user_id', user.id) // Ensure user can only fetch their own scenarios
         .single();
@@ -40,7 +40,11 @@ export const useScenario = (id: string | undefined) => {
         throw new Error(t('fetchScenariosError') + ': ' + error.message);
       }
 
-      return data;
+      // Ensure tags are an array of strings, even if null or not an array from DB
+      const tags = Array.isArray(data.tags) ? data.tags.map(String) : [];
+      const description = data.description || null;
+
+      return { ...data, tags, description };
     },
     enabled: !!id, // Only run the query if an ID is provided
     staleTime: 1000 * 60 * 5, // Cache scenario for 5 minutes

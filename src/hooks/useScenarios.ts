@@ -24,7 +24,7 @@ export const useScenarios = () => {
 
       const { data, error } = await supabase
         .from('scenarios')
-        .select('*')
+        .select('*') // Select all columns, including new ones
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
@@ -32,7 +32,14 @@ export const useScenarios = () => {
         throw new Error(t('fetchScenariosError') + ': ' + error.message);
       }
 
-      return data || [];
+      // Ensure tags are an array of strings for each scenario
+      const scenariosWithFormattedMetadata = data?.map(scenario => ({
+        ...scenario,
+        tags: Array.isArray(scenario.tags) ? scenario.tags.map(String) : [],
+        description: scenario.description || null,
+      })) || [];
+
+      return scenariosWithFormattedMetadata;
     },
     // Refetch every 5 minutes to keep the list fresh, or adjust as needed
     staleTime: 1000 * 60 * 5,

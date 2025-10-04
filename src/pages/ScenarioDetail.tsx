@@ -13,9 +13,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useScenario } from '@/hooks/useScenario';
-import { formatDateTime, reloadScenarioInModule } from '@/lib/scenario-utils'; // Import reloadScenarioInModule
-import { ScenarioTitleEditor } from '@/components/ScenarioTitleEditor'; // Import the new editor
-import { RefreshCcw } from 'lucide-react'; // Import RefreshCcw icon
+import { formatDateTime, reloadScenarioInModule } from '@/lib/scenario-utils';
+import { ScenarioTitleEditor } from '@/components/ScenarioTitleEditor';
+import { ScenarioMetadataForm } from '@/components/ScenarioMetadataForm'; // Import new component
+import { RefreshCcw } from 'lucide-react';
 
 const ScenarioDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -84,17 +85,28 @@ const ScenarioDetail = () => {
           <ScenarioTitleEditor
             scenarioId={scenario.id}
             initialTitle={scenario.client_name}
-            onTitleUpdated={(newTitle) => {
-              // Optionally update local state or refetch if needed,
-              // but useUpdateScenario already invalidates queries.
-              console.log(`Scenario title updated to: ${newTitle}`);
+            onTitleUpdated={() => {
+              // No need to do anything here, useUpdateScenario invalidates queries
             }}
           />
         </div>
 
         <Separator />
 
-        {/* Replaced outputs display with a button */}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">{t('editMetadata')}</h3> {/* New translation key */}
+          <ScenarioMetadataForm
+            scenarioId={scenario.id}
+            initialDescription={scenario.description}
+            initialTags={scenario.tags}
+            onMetadataUpdated={() => {
+              // No need to do anything here, useUpdateScenario invalidates queries
+            }}
+          />
+        </div>
+
+        <Separator />
+
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">{t('loadScenario')}</h3>
           <Button onClick={handleReloadClick} className="w-full">
