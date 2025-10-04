@@ -30,7 +30,9 @@ const allNamespaces = [
   'scenarioHistoryPage',
   'profilePage',
   'adminDashboard',
-  'scenarioTitleModal', // Added new namespace
+  'scenarioTitleModal',
+  'scenarioDetailPage', // Added new namespace
+  'scenarioTitleEditor', // Added new namespace
 ];
 
 i18n

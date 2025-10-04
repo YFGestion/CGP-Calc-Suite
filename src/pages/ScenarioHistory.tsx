@@ -65,6 +65,10 @@ const ScenarioHistoryPage = () => {
     duplicateScenario({ scenario });
   };
 
+  const handleViewClick = (scenario: Scenario) => {
+    navigate(`/scenarios/${scenario.id}`);
+  };
+
   const handleReloadClick = (scenario: Scenario) => {
     const modulePath = getModulePath(scenario.module);
     const moduleTab = getModuleTab(scenario.module);
@@ -164,7 +168,7 @@ const ScenarioHistoryPage = () => {
                   {t('tableHeaderUpdatedAt')}: {formatDateTime(scenario.updated_at)}
                 </p>
                 <div className="flex items-center justify-between mt-auto">
-                  <Button variant="outline" size="sm" onClick={() => handleReloadClick(scenario)}>
+                  <Button variant="outline" size="sm" onClick={() => handleViewClick(scenario)}>
                     <Eye className="mr-2 h-4 w-4" />
                     {t('actionView')}
                   </Button>
@@ -176,6 +180,10 @@ const ScenarioHistoryPage = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleReloadClick(scenario)}>
+                        <RefreshCcw className="mr-2 h-4 w-4" />
+                        <span>{t('actionReload')}</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDuplicateClick(scenario)}>
                         <Copy className="mr-2 h-4 w-4" />
                         <span>{t('actionDuplicate')}</span>

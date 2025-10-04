@@ -504,5 +504,29 @@
       "scenarioTitleRequired": "Le nom du scénario est requis.",
       "scenarioTitleTooLong": "Le nom du scénario ne peut pas dépasser 100 caractères."
     }
+  },
+  "scenarioDetailPage": {
+    "title": "Détail du Scénario",
+    "description": "Affichez et modifiez les informations de votre scénario.",
+    "scenarioNotFound": "Scénario introuvable ou vous n'avez pas les permissions pour le voir.",
+    "scenarioInfo": "Informations sur le scénario",
+    "scenarioName": "Nom du scénario",
+    "module": "Module",
+    "createdAt": "Créé le",
+    "updatedAt": "Mis à jour le",
+    "editTitle": "Modifier le titre du scénario",
+    "inputs": "Inputs du scénario",
+    "outputs": "Outputs du scénario",
+    "backToScenarios": "Retour à l'historique des scénarios",
+    "error": "Erreur lors du chargement du scénario."
+  },
+  "scenarioTitleEditor": {
+    "scenarioNameLabel": "Nouveau nom du scénario",
+    "scenarioNamePlaceholder": "Saisissez le nouveau nom du scénario",
+    "saveButton": "Enregistrer le nouveau titre",
+    "validation": {
+      "scenarioTitleRequired": "Le nom du scénario est requis.",
+      "scenarioTitleTooLong": "Le nom du scénario ne peut pas dépasser 100 caractères."
+    }
   }
 }
