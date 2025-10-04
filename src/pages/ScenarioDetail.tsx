@@ -94,7 +94,7 @@ const ScenarioDetail = () => {
         <Separator />
 
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">{t('editMetadata')}</h3> {/* New translation key */}
+          <h3 className="text-lg font-semibold">{t('editAdditionalInfo')}</h3> {/* Updated translation key */}
           <ScenarioMetadataForm
             scenarioId={scenario.id}
             initialDescription={scenario.description}

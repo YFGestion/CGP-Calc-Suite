@@ -526,7 +526,7 @@
     "error": "Erreur lors du chargement du scénario.",
     "loadScenario": "Charger le scénario",
     "loadScenarioButton": "Recharger dans le module",
-    "editMetadata": "Modifier les métadonnées"
+    "editAdditionalInfo": "Modifier les informations supplémentaires"
   },
   "scenarioTitleEditor": {
     "scenarioNameLabel": "Nouveau nom du scénario",
@@ -542,7 +542,7 @@
     "descriptionPlaceholder": "Ajoutez une description détaillée de votre scénario...",
     "tagsLabel": "Tags",
     "tagsPlaceholder": "Ajouter des tags (ex: immobilier, épargne)",
-    "saveButton": "Enregistrer les métadonnées",
+    "saveButton": "Enregistrer les informations supplémentaires",
     "validation": {
       "descriptionTooLong": "La description ne peut pas dépasser 500 caractères.",
       "tagRequired": "Un tag ne peut pas être vide.",
