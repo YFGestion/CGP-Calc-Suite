@@ -8,9 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { showSuccess, showError } from '@/utils/toast';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import i18n from '@/app/i18n'; // Import i18n instance for formatting
+import { cn } from '@/lib/utils'; // Import cn for conditional class merging
 
 interface ModuleSummaryExporterProps {
   moduleName: string; // e.g., "epargne", "immo"
@@ -21,25 +29,69 @@ interface ModuleSummaryExporterProps {
   recommendations?: string; // Optional recommendations text
 }
 
-// Helper function to generate HTML table summary based on module
+type SummaryStyle = 'auditPatrimonial' | 'preconisationRapide' | 'lettreDeMission';
+
+// Helper function to generate HTML table summary based on module and style
 const generateHtmlTableSummary = (
   moduleName: string,
   moduleTitle: string,
   inputs: Record<string, unknown>,
   outputs: Record<string, unknown> | null,
   recommendations: string | undefined,
-  t: (key: string, options?: Record<string, unknown>) => string
+  t: (key: string, options?: Record<string, unknown>) => string,
+  style: SummaryStyle
 ): string => {
-  let html = `<h3 class="text-lg font-semibold mb-2">${moduleTitle}</h3>`;
-  html += `<p class="text-sm text-muted-foreground mb-4">${t('moduleSummaryExporter:generatedOn', { date: new Date().toLocaleDateString(i18n.language) })}</p>`;
+  // Base classes for different styles
+  const baseClasses = {
+    auditPatrimonial: {
+      container: 'font-sans text-base',
+      h3: 'text-lg font-bold mb-2',
+      h4: 'text-md font-semibold mt-4 mb-2',
+      p: 'text-sm text-justify mb-4',
+      table: 'w-full border-collapse text-sm',
+      th: 'border border-gray-300 p-2 text-left bg-accent text-accent-foreground',
+      td: 'border border-gray-300 p-2',
+    },
+    preconisationRapide: {
+      container: 'font-sans text-sm',
+      h3: 'text-base font-semibold mb-1',
+      h4: 'text-sm font-medium mt-3 mb-1',
+      p: 'text-xs mb-2',
+      table: 'w-full border-collapse text-xs',
+      th: 'border border-gray-200 p-1 text-left bg-muted text-muted-foreground',
+      td: 'border border-gray-200 p-1',
+    },
+    lettreDeMission: {
+      container: 'font-serif text-base leading-relaxed',
+      h3: 'text-xl font-bold text-center mb-4 uppercase',
+      h4: 'text-lg font-semibold mt-6 mb-3 border-b pb-1',
+      p: 'text-base mb-3',
+      table: 'w-full border-collapse text-sm my-4',
+      th: 'border border-gray-400 p-2 text-left bg-gray-100 font-bold',
+      td: 'border border-gray-400 p-2',
+    },
+  };
+
+  const currentClasses = baseClasses[style];
+
+  let html = `<div class="${currentClasses.container}">`;
+
+  if (style === 'lettreDeMission') {
+    html += `<div class="text-right text-xs mb-8">Fait à [Lieu], le ${new Date().toLocaleDateString(i18n.language)}</div>`;
+    html += `<h3 class="${currentClasses.h3}">${moduleTitle}</h3>`;
+    html += `<p class="${currentClasses.p}">${t('moduleSummaryExporter:formalSalutation')}</p>`;
+  } else {
+    html += `<h3 class="${currentClasses.h3}">${moduleTitle}</h3>`;
+    html += `<p class="${currentClasses.p}">${t('moduleSummaryExporter:generatedOn', { date: new Date().toLocaleDateString(i18n.language) })}</p>`;
+  }
 
   // Inputs Section
-  html += `<h4 class="text-md font-semibold mt-4 mb-2">${t('moduleSummaryExporter:keyInputs')}</h4>`;
-  html += `<table class="w-full border-collapse text-sm"><thead><tr><th class="border p-2 text-left bg-accent text-accent-foreground">${t('moduleSummaryExporter:parameter')}</th><th class="border p-2 text-left bg-accent text-accent-foreground">${t('moduleSummaryExporter:value')}</th></tr></thead><tbody>`;
+  html += `<h4 class="${currentClasses.h4}">${t('moduleSummaryExporter:keyInputs')}</h4>`;
+  html += `<table class="${currentClasses.table}"><thead><tr><th class="${currentClasses.th}">${t('moduleSummaryExporter:parameter')}</th><th class="${currentClasses.th}">${t('moduleSummaryExporter:value')}</th></tr></thead><tbody>`;
 
   const addInputRow = (labelKey: string, value: unknown, formatter?: (val: unknown) => string) => {
     const formattedValue = formatter ? formatter(value) : String(value);
-    html += `<tr><td class="border p-2">${t(labelKey)}</td><td class="border p-2">${formattedValue}</td></tr>`;
+    html += `<tr><td class="${currentClasses.td}">${t(labelKey)}</td><td class="${currentClasses.td}">${formattedValue}</td></tr>`;
   };
 
   switch (moduleName) {
@@ -140,18 +192,18 @@ const generateHtmlTableSummary = (
       addInputRow('tvaCalculatorPage:priceTypeLabel', inputs.priceType, (val) => t(`tvaCalculatorPage:${val as string}`));
       break;
     default:
-      html += `<tr><td class="border p-2" colspan="2">${t('moduleSummaryExporter:noSpecificInputs')}</td></tr>`;
+      html += `<tr><td class="${currentClasses.td}" colspan="2">${t('moduleSummaryExporter:noSpecificInputs')}</td></tr>`;
   }
   html += `</tbody></table>`;
 
   // Results Section
   if (outputs) {
-    html += `<h4 class="text-md font-semibold mt-4 mb-2">${t('moduleSummaryExporter:keyResults')}</h4>`;
-    html += `<table class="w-full border-collapse text-sm"><thead><tr><th class="border p-2 text-left bg-accent text-accent-foreground">${t('moduleSummaryExporter:metric')}</th><th class="border p-2 text-left bg-accent text-accent-foreground">${t('moduleSummaryExporter:value')}</th></tr></thead><tbody>`;
+    html += `<h4 class="${currentClasses.h4}">${t('moduleSummaryExporter:keyResults')}</h4>`;
+    html += `<table class="${currentClasses.table}"><thead><tr><th class="${currentClasses.th}">${t('moduleSummaryExporter:metric')}</th><th class="${currentClasses.th}">${t('moduleSummaryExporter:value')}</th></tr></thead><tbody>`;
 
     const addOutputRow = (labelKey: string, value: unknown, formatter?: (val: unknown) => string) => {
       const formattedValue = formatter ? formatter(value) : String(value);
-      html += `<tr><td class="border p-2">${t(labelKey)}</td><td class="border p-2">${formattedValue}</td></tr>`;
+      html += `<tr><td class="${currentClasses.td}">${t(labelKey)}</td><td class="${currentClasses.td}">${formattedValue}</td></tr>`;
     };
 
     switch (moduleName) {
@@ -193,17 +245,23 @@ const generateHtmlTableSummary = (
         addOutputRow('tvaCalculatorPage:priceTTC', outputs.priceTTC, (val) => formatCurrency(val as number));
         break;
       default:
-        html += `<tr><td class="border p-2" colspan="2">${t('moduleSummaryExporter:noSpecificResults')}</td></tr>`;
+        html += `<tr><td class="${currentClasses.td}" colspan="2">${t('moduleSummaryExporter:noSpecificResults')}</td></tr>`;
     }
     html += `</tbody></table>`;
   }
 
   // Recommendations Section
   if (recommendations) {
-    html += `<h4 class="text-md font-semibold mt-4 mb-2">${t('moduleSummaryExporter:recommendations')}</h4>`;
-    html += `<p class="text-sm">${recommendations}</p>`;
+    html += `<h4 class="${currentClasses.h4}">${t('moduleSummaryExporter:recommendations')}</h4>`;
+    html += `<p class="${currentClasses.p}">${recommendations}</p>`;
   }
 
+  if (style === 'lettreDeMission') {
+    html += `<p class="${currentClasses.p} mt-8">${t('moduleSummaryExporter:formalClosing')}</p>`;
+    html += `<p class="${currentClasses.p} mt-4"><strong>[Votre Nom/Nom du CGP]</strong></p>`;
+  }
+
+  html += `</div>`; // Close container div
   return html;
 };
 
@@ -217,9 +275,25 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
 }) => {
   const { t } = useTranslation(['common', 'moduleSummaryExporter']);
   const [activeTab, setActiveTab] = useState('text');
+  const [selectedStyle, setSelectedStyle] = useState<SummaryStyle>('auditPatrimonial');
 
-  const fullTextSummary = `${summaryText}\n\n${recommendations ? `${t('moduleSummaryExporter:recommendations')}:\n${recommendations}` : ''}`;
-  const htmlTableSummary = generateHtmlTableSummary(moduleName, moduleTitle, inputs, outputs, recommendations, t);
+  const getFullTextSummary = (style: SummaryStyle) => {
+    let text = '';
+    if (style === 'lettreDeMission') {
+      text += `${t('moduleSummaryExporter:formalSalutation')}\n\n`;
+    }
+    text += summaryText;
+    if (recommendations) {
+      text += `\n\n${t('moduleSummaryExporter:recommendations')}:\n${recommendations}`;
+    }
+    if (style === 'lettreDeMission') {
+      text += `\n\n${t('moduleSummaryExporter:formalClosing')}\n[Votre Nom/Nom du CGP]`;
+    }
+    return text;
+  };
+
+  const fullTextSummary = getFullTextSummary(selectedStyle);
+  const htmlTableSummary = generateHtmlTableSummary(moduleName, moduleTitle, inputs, outputs, recommendations, t, selectedStyle);
 
   const handleCopy = async (content: string) => {
     try {
@@ -238,6 +312,20 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
         <CardDescription>{t('moduleSummaryExporter:description')}</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4">
+          <FormLabel>{t('moduleSummaryExporter:selectStyleLabel')}</FormLabel>
+          <Select value={selectedStyle} onValueChange={(value: SummaryStyle) => setSelectedStyle(value)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t('moduleSummaryExporter:selectStylePlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="auditPatrimonial">{t('moduleSummaryExporter:styleAuditPatrimonial')}</SelectItem>
+              <SelectItem value="preconisationRapide">{t('moduleSummaryExporter:stylePreconisationRapide')}</SelectItem>
+              <SelectItem value="lettreDeMission">{t('moduleSummaryExporter:styleLettreDeMission')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="text">{t('moduleSummaryExporter:textSummaryTab')}</TabsTrigger>

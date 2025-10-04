@@ -566,6 +566,13 @@
     "value": "Valeur",
     "metric": "Métrique",
     "noSpecificInputs": "Aucun input spécifique à afficher.",
-    "noSpecificResults": "Aucun résultat spécifique à afficher."
+    "noSpecificResults": "Aucun résultat spécifique à afficher.",
+    "selectStyleLabel": "Choisir un style de résumé",
+    "selectStylePlaceholder": "Sélectionner un style",
+    "styleAuditPatrimonial": "Audit patrimonial",
+    "stylePreconisationRapide": "Préconisation rapide",
+    "styleLettreDeMission": "Lettre de mission",
+    "formalSalutation": "Cher(e) client(e),\n\nSuite à notre analyse de votre situation, nous vous présentons ci-dessous le résumé de la simulation effectuée.",
+    "formalClosing": "Nous restons à votre entière disposition pour toute question ou complément d'information.\n\nCordialement,"
   }
 }
