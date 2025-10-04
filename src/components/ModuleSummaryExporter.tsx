@@ -2,17 +2,28 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Copy as CopyIcon } from 'lucide-react';
+import { Copy as CopyIcon, FileText, FileDown } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-// Removed Select and FormLabel imports
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { showSuccess, showError } from '@/utils/toast';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import i18n from '@/app/i18n'; // Import i18n instance for formatting
 import { cn } from '@/lib/utils'; // Import cn for conditional class merging
+
+// Import libraries for export
+import { asBlob } from 'html-docx-js/dist/html-docx';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable'; // Import the plugin for autoTable
 
 interface ModuleSummaryExporterProps {
   moduleName: string; // e.g., "epargne", "immo"
@@ -32,7 +43,6 @@ const generateHtmlTableSummary = (
   recommendations: string | undefined,
   t: (key: string, options?: Record<string, unknown>) => string
 ): string => {
-  // Default classes for the summary
   const defaultClasses = {
     container: 'font-sans text-base',
     h3: 'text-lg font-bold mb-2',
@@ -233,9 +243,7 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
 }) => {
   const { t } = useTranslation(['common', 'moduleSummaryExporter']);
   const [activeTab, setActiveTab] = useState('text');
-  // Removed selectedStyle state
 
-  // Simplified getFullTextSummary as there's no style selection
   const getFullTextSummary = () => {
     let text = summaryText;
     if (recommendations) {
@@ -245,7 +253,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
   };
 
   const fullTextSummary = getFullTextSummary();
-  // Call generateHtmlTableSummary without style parameter
   const htmlTableSummary = generateHtmlTableSummary(moduleName, moduleTitle, inputs, outputs, recommendations, t);
 
   const handleCopy = async (content: string) => {
@@ -258,6 +265,92 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
+  const handleExportDocx = async () => {
+    try {
+      const content = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${htmlTableSummary}</body></html>`;
+      const blob = await asBlob(content);
+      saveAs(blob, `${moduleName}-summary.docx`);
+      showSuccess(t('moduleSummaryExporter:exportSuccess'));
+    } catch (error) {
+      console.error('Error exporting DOCX:', error);
+      showError(t('moduleSummaryExporter:exportError'));
+    }
+  };
+
+  const handleExportPdf = () => {
+    try {
+      const doc = new jsPDF();
+      let yOffset = 20;
+
+      const parser = new DOMParser();
+      const docHtml = parser.parseFromString(htmlTableSummary, 'text/html');
+
+      // Add main title (h3)
+      const mainTitleElement = docHtml.querySelector('h3');
+      if (mainTitleElement) {
+        doc.setFontSize(18);
+        doc.text(mainTitleElement.textContent || '', 14, yOffset);
+        yOffset += 10;
+      }
+
+      // Add generated date (p)
+      const dateElement = docHtml.querySelector('p');
+      if (dateElement) {
+        doc.setFontSize(11);
+        doc.text(dateElement.textContent || '', 14, yOffset);
+        yOffset += 15;
+      }
+
+      // Iterate through h4 and table elements
+      docHtml.body.childNodes.forEach(node => {
+        if (node.nodeName === 'H4') {
+          yOffset += 10; // Add some space before new section
+          doc.setFontSize(14);
+          doc.text(node.textContent || '', 14, yOffset);
+          yOffset += 8;
+        } else if (node.nodeName === 'TABLE') {
+          // Use autoTable for tables
+          (doc as any).autoTable({
+            html: node as HTMLTableElement,
+            startY: yOffset,
+            theme: 'grid',
+            headStyles: { fillColor: [230, 230, 230], textColor: [0, 0, 0] },
+            styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+            margin: { left: 14, right: 14 },
+            didDrawPage: function (data: any) {
+              // Footer
+              let str = "Page " + doc.internal.getNumberOfPages();
+              doc.setFontSize(10);
+              doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            }
+          });
+          yOffset = (doc as any).autoTable.previous.finalY + 10; // Update yOffset after table
+        }
+      });
+
+      // Add the full text summary as a separate section, potentially on a new page
+      if (fullTextSummary) {
+        if (yOffset > doc.internal.pageSize.height - 50) { // If not enough space, add new page
+          doc.addPage();
+          yOffset = 20;
+        } else {
+          yOffset += 20; // Add space if on same page
+        }
+        doc.setFontSize(12);
+        doc.text(t('moduleSummaryExporter:textSummaryTab'), 14, yOffset);
+        yOffset += 8;
+        const textLines = doc.splitTextToSize(fullTextSummary, doc.internal.pageSize.width - 28);
+        doc.text(textLines, 14, yOffset);
+      }
+
+      doc.save(`${moduleName}-summary.pdf`);
+      showSuccess(t('moduleSummaryExporter:exportSuccess'));
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      showError(t('moduleSummaryExporter:exportError'));
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -265,8 +358,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
         <CardDescription>{t('moduleSummaryExporter:description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Removed the style selection UI */}
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="text">{t('moduleSummaryExporter:textSummaryTab')}</TabsTrigger>
@@ -297,6 +388,25 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
             </Button>
           </TabsContent>
         </Tabs>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="w-full mt-4">
+              <FileDown className="mr-2 h-4 w-4" />
+              {t('moduleSummaryExporter:exportButton')}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleExportDocx}>
+              <FileText className="mr-2 h-4 w-4" />
+              {t('moduleSummaryExporter:exportDocx')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportPdf}>
+              <FileText className="mr-2 h-4 w-4" />
+              {t('moduleSummaryExporter:exportPdf')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardContent>
     </Card>
   );

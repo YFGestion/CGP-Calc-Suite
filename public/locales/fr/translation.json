@@ -566,6 +566,11 @@
     "value": "Valeur",
     "metric": "Métrique",
     "noSpecificInputs": "Aucun input spécifique à afficher.",
-    "noSpecificResults": "Aucun résultat spécifique à afficher."
+    "noSpecificResults": "Aucun résultat spécifique à afficher.",
+    "exportButton": "Exporter",
+    "exportDocx": "Exporter en DOCX",
+    "exportPdf": "Exporter en PDF",
+    "exportSuccess": "Fichier exporté avec succès !",
+    "exportError": "Échec de l'exportation du fichier."
   }
 }
