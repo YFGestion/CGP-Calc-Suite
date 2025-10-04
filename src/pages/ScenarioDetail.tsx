@@ -94,13 +94,6 @@ const ScenarioDetail = () => {
 
         <Separator />
 
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">{t('inputs')}</h3>
-          <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-            {JSON.stringify(scenario.inputs, null, 2)}
-          </pre>
-        </div>
-
         {/* Replaced outputs display with a button */}
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">{t('loadScenario')}</h3>
