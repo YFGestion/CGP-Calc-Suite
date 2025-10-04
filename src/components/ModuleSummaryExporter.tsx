@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FormLabel } from '@/components/ui/form'; // Importation ajoutée
 import { showSuccess, showError } from '@/utils/toast';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import i18n from '@/app/i18n'; // Import i18n instance for formatting
