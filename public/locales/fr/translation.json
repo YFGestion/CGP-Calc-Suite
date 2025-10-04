@@ -52,7 +52,8 @@
     "admin": "Admin",
     "adminDashboard": "Administration",
     "hello": "Bonjour",
-    "saveScenarioButton": "Sauvegarder le scénario"
+    "saveScenarioButton": "Sauvegarder le scénario",
+    "loading": "Chargement..."
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
