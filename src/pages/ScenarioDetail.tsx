@@ -13,8 +13,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useScenario } from '@/hooks/useScenario';
-import { formatDateTime } from '@/lib/scenario-utils';
+import { formatDateTime, reloadScenarioInModule } from '@/lib/scenario-utils'; // Import reloadScenarioInModule
 import { ScenarioTitleEditor } from '@/components/ScenarioTitleEditor'; // Import the new editor
+import { RefreshCcw } from 'lucide-react'; // Import RefreshCcw icon
 
 const ScenarioDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +55,10 @@ const ScenarioDetail = () => {
       </Card>
     );
   }
+
+  const handleReloadClick = () => {
+    reloadScenarioInModule(scenario, navigate);
+  };
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -96,11 +101,13 @@ const ScenarioDetail = () => {
           </pre>
         </div>
 
+        {/* Replaced outputs display with a button */}
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">{t('outputs')}</h3>
-          <pre className="bg-muted p-4 rounded-md text-sm overflow-auto">
-            {JSON.stringify(scenario.outputs, null, 2)}
-          </pre>
+          <h3 className="text-lg font-semibold">{t('loadScenario')}</h3>
+          <Button onClick={handleReloadClick} className="w-full">
+            <RefreshCcw className="mr-2 h-4 w-4" />
+            {t('loadScenarioButton')}
+          </Button>
         </div>
 
         <Button onClick={() => navigate('/scenarios')} className="w-full">

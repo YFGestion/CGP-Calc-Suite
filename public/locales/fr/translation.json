@@ -518,7 +518,9 @@
     "inputs": "Inputs du scénario",
     "outputs": "Outputs du scénario",
     "backToScenarios": "Retour à l'historique des scénarios",
-    "error": "Erreur lors du chargement du scénario."
+    "error": "Erreur lors du chargement du scénario.",
+    "loadScenario": "Charger le scénario",
+    "loadScenarioButton": "Recharger dans le module"
   },
   "scenarioTitleEditor": {
     "scenarioNameLabel": "Nouveau nom du scénario",

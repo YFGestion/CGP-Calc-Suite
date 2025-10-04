@@ -1,6 +1,8 @@
 import { Scenario } from '@/types/scenario';
 import { formatCurrency, formatPercent } from './format';
 import i18n from '@/app/i18n'; // Import i18n instance for translations
+import { NavigateFunction } from 'react-router-dom';
+import { showInfo } from '@/utils/toast';
 
 export const getScenarioSummary = (scenario: Scenario): string => {
   const { module, outputs } = scenario;
@@ -77,4 +79,34 @@ export const formatDateTime = (isoString: string, locale: string = 'fr-FR'): str
     hour: '2-digit',
     minute: '2-digit',
   });
+};
+
+export const reloadScenarioInModule = (scenario: Scenario, navigate: NavigateFunction) => {
+  const modulePath = getModulePath(scenario.module);
+  const moduleTab = getModuleTab(scenario.module);
+
+  const params = new URLSearchParams();
+  // Add all inputs as search parameters
+  for (const key in scenario.inputs) {
+    if (Object.prototype.hasOwnProperty.call(scenario.inputs, key)) {
+      const value = scenario.inputs[key];
+      // Handle boolean values specifically
+      if (typeof value === 'boolean') {
+        params.append(key, value.toString());
+      } else if (value !== null && value !== undefined) {
+        params.append(key, String(value));
+      }
+    }
+  }
+
+  let targetPath = modulePath;
+  if (moduleTab) {
+    // For modules under 'autres-calculs', we need to navigate to the tab
+    targetPath = `${modulePath}?tab=${moduleTab}&${params.toString()}`;
+  } else {
+    targetPath = `${modulePath}?${params.toString()}`;
+  }
+
+  navigate(targetPath);
+  showInfo(i18n.t('common:scenarioReloaded')); // Display toast message
 };
