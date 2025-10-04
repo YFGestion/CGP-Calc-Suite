@@ -10,14 +10,6 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -35,14 +27,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { MoreHorizontal, Copy, Trash2, RefreshCcw } from 'lucide-react';
+import { MoreHorizontal, Copy, Trash2, RefreshCcw, Eye } from 'lucide-react'; // Added Eye icon
 import { useScenarios } from '@/hooks/useScenarios';
 import { useDuplicateScenario } from '@/hooks/useDuplicateScenario';
 import { useDeleteScenario } from '@/hooks/useDeleteScenario';
 import { useSession } from '@/components/SessionContextProvider';
 import { Scenario } from '@/types/scenario';
-import { getScenarioSummary, getModulePath, getModuleTab, formatDateTime } from '@/lib/scenario-utils';
-import { showInfo } from '@/utils/toast'; // Import showInfo from utility
+import { getModulePath, getModuleTab, formatDateTime } from '@/lib/scenario-utils';
+import { showInfo } from '@/utils/toast';
+import { Badge } from '@/components/ui/badge'; // Import Badge
 
 const ScenarioHistoryPage = () => {
   const { t } = useTranslation(['scenarioHistoryPage', 'common']);
@@ -104,7 +97,7 @@ const ScenarioHistoryPage = () => {
 
   if (isSessionLoading || isScenariosLoading) {
     return (
-      <Card className="w-full">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader><CardTitle>{t('title')}</CardTitle></CardHeader>
         <CardContent className="text-center py-8">{t('loading')}</CardContent>
       </Card>
@@ -113,7 +106,7 @@ const ScenarioHistoryPage = () => {
 
   if (!session) {
     return (
-      <Card className="w-full">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader><CardTitle>{t('title')}</CardTitle></CardHeader>
         <CardContent className="text-center py-8">
           <CardDescription>{t('notAuthenticated')}</CardDescription>
@@ -125,7 +118,7 @@ const ScenarioHistoryPage = () => {
 
   if (isError) {
     return (
-      <Card className="w-full">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader><CardTitle>{t('title')}</CardTitle></CardHeader>
         <CardContent className="text-center py-8 text-destructive">
           {t('error')} {error?.message}
@@ -136,7 +129,7 @@ const ScenarioHistoryPage = () => {
 
   if (!scenarios || scenarios.length === 0) {
     return (
-      <Card className="w-full">
+      <Card className="w-full max-w-4xl mx-auto">
         <CardHeader><CardTitle>{t('title')}</CardTitle></CardHeader>
         <CardContent className="text-center py-8">
           <CardDescription>{t('noScenarios')}</CardDescription>
@@ -146,62 +139,57 @@ const ScenarioHistoryPage = () => {
   }
 
   return (
-    <Card className="w-full">
+    <div className="w-full max-w-6xl mx-auto">
       <CardHeader>
         <CardTitle>{t('title')}</CardTitle>
         <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('tableHeaderClientName')}</TableHead>
-                <TableHead>{t('tableHeaderModule')}</TableHead>
-                <TableHead>{t('tableHeaderCreatedAt')}</TableHead>
-                <TableHead>{t('tableHeaderUpdatedAt')}</TableHead>
-                <TableHead>{t('tableHeaderSummary')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaderActions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {scenarios.map((scenario) => (
-                <TableRow key={scenario.id}>
-                  <TableCell className="font-medium">{scenario.client_name}</TableCell>
-                  <TableCell>{t(`common:${scenario.module}`)}</TableCell>
-                  <TableCell>{formatDateTime(scenario.created_at)}</TableCell>
-                  <TableCell>{formatDateTime(scenario.updated_at)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {getScenarioSummary(scenario)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">{t('common:openMenu')}</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleReloadClick(scenario)}>
-                          <RefreshCcw className="mr-2 h-4 w-4" />
-                          <span>{t('actionReload')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDuplicateClick(scenario)}>
-                          <Copy className="mr-2 h-4 w-4" />
-                          <span>{t('actionDuplicate')}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteClick(scenario.id)} className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          <span>{t('actionDelete')}</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {scenarios.map((scenario) => (
+            <Card key={scenario.id} className="flex flex-col h-full">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-semibold">{scenario.client_name}</CardTitle>
+                  <Badge variant="secondary" className="bg-primary text-primary-foreground">
+                    {t(`common:${scenario.module}`)}
+                  </Badge>
+                </div>
+                <CardDescription className="text-sm text-muted-foreground mt-1">
+                  {t('tableHeaderCreatedAt')}: {formatDateTime(scenario.created_at)}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col justify-between pt-0">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {t('tableHeaderUpdatedAt')}: {formatDateTime(scenario.updated_at)}
+                </p>
+                <div className="flex items-center justify-between mt-auto">
+                  <Button variant="outline" size="sm" onClick={() => handleReloadClick(scenario)}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    {t('actionView')}
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">{t('common:openMenu')}</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleDuplicateClick(scenario)}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        <span>{t('actionDuplicate')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDeleteClick(scenario.id)} className="text-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>{t('actionDelete')}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -221,7 +209,7 @@ const ScenarioHistoryPage = () => {
           </AlertDialogContent>
         </AlertDialog>
       </CardContent>
-    </Card>
+    </div>
   );
 };
 

@@ -417,6 +417,7 @@
     "actionDuplicate": "Dupliquer",
     "actionDelete": "Supprimer",
     "actionReload": "Recharger",
+    "actionView": "Voir",
     "deleteConfirmTitle": "Confirmer la suppression",
     "deleteConfirmDescription": "Êtes-vous sûr de vouloir supprimer ce scénario ? Cette action est irréversible.",
     "deleteConfirmCancel": "Annuler",
