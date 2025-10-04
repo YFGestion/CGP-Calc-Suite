@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormLabel } from '@/components/ui/form'; // Importation ajoutée
+// Removed FormLabel import as it's no longer needed for this specific use case
 import { showSuccess, showError } from '@/utils/toast';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import i18n from '@/app/i18n'; // Import i18n instance for formatting
@@ -314,9 +314,11 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
       </CardHeader>
       <CardContent>
         <div className="mb-4">
-          <FormLabel>{t('moduleSummaryExporter:selectStyleLabel')}</FormLabel>
+          <label htmlFor="summary-style-select" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            {t('moduleSummaryExporter:selectStyleLabel')}
+          </label>
           <Select value={selectedStyle} onValueChange={(value: SummaryStyle) => setSelectedStyle(value)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="summary-style-select" className="w-full">
               <SelectValue placeholder={t('moduleSummaryExporter:selectStylePlaceholder')} />
             </SelectTrigger>
             <SelectContent>
