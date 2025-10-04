@@ -10,11 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CopyBlock } from '@/lib/copy';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { solveAnnualRateFromAnnuityFV } from '@/lib/math-core/irr'; // Import the new function
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
-// import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // Removed import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -87,15 +86,6 @@ const RateSolverDemo = () => {
       showError(error.message || t('calculationError'));
       setResults(null);
       setSummaryContent('');
-    }
-  };
-
-  const handleCopySummary = () => {
-    if (summaryContent) {
-      navigator.clipboard.writeText(summaryContent);
-      showSuccess(commonT('copied'));
-    } else {
-      showError(t('noResultsToCopy'));
     }
   };
 
@@ -202,10 +192,13 @@ const RateSolverDemo = () => {
                 <span className="font-medium">{formatPercent(results.rAnnual, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
-
-            {/* ScenarioTitleModal removed from here */}
-
-            <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+            <ModuleSummaryExporter
+              moduleName="rateSolver"
+              moduleTitle={t('title')}
+              inputs={form.getValues()}
+              outputs={results}
+              summaryText={summaryContent}
+            />
           </div>
         )}
       </CardContent>

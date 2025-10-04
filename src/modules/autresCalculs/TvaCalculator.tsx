@@ -13,10 +13,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { CopyBlock } from '@/lib/copy';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
-// import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // Removed import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -222,9 +221,14 @@ const TvaCalculator = () => {
               <Button variant="outline" onClick={handleExportCsv} className="flex-1">
                 {t('exportCsvButton')}
               </Button>
-              {/* ScenarioTitleModal removed from here */}
             </div>
-            <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+            <ModuleSummaryExporter
+              moduleName="tvaCalculator"
+              moduleTitle={t('title')}
+              inputs={form.getValues()}
+              outputs={results}
+              summaryText={summaryContent}
+            />
           </div>
         )}
       </CardContent>

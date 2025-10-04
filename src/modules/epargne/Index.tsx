@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { CopyBlock } from '@/lib/copy';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { savingsProjection } from '@/lib/math-core/savings';
@@ -25,6 +24,7 @@ import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
 import { UpgradeMessage } from '@/components/UpgradeMessage'; // Import UpgradeMessage
 import { showError } from '@/utils/toast'; // Import showError from utility
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -394,7 +394,6 @@ const EpargnePage = () => {
               <Button variant="outline" onClick={handleExportCsv} className="flex-1">
                 {t('exportCsvButton')}
               </Button>
-              {/* Add ScenarioTitleModal here */}
               <ScenarioTitleModal
                 moduleName="epargne"
                 currentInputs={form.getValues()}
@@ -403,7 +402,13 @@ const EpargnePage = () => {
                 disabled={!isPremium}
               />
             </div>
-            <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+            <ModuleSummaryExporter
+              moduleName="epargne"
+              moduleTitle={t('title')}
+              inputs={form.getValues()}
+              outputs={results}
+              summaryText={summaryContent}
+            />
           </div>
         )}
 

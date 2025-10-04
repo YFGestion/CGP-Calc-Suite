@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { CopyBlock } from '@/lib/copy';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { amortizationSchedule } from '@/lib/math-core/loan';
@@ -32,6 +31,7 @@ import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -135,6 +135,7 @@ const CreditPage = () => {
       totalInterest: formatCurrency(computedResults.totals.interest),
       totalInsurance: formatCurrency(computedResults.totals.insurance),
       totalCost: formatCurrency(computedResults.totals.cost),
+      totalPayments: formatCurrency(computedResults.totals.payments),
     };
 
     setSummaryContent(
@@ -494,7 +495,6 @@ const CreditPage = () => {
               <Button variant="outline" onClick={handleSendToImmo} className="flex-1">
                 {t('sendToImmoButton')}
               </Button>
-              {/* Add ScenarioTitleModal here */}
               <ScenarioTitleModal
                 moduleName="credit"
                 currentInputs={form.getValues()}
@@ -503,7 +503,13 @@ const CreditPage = () => {
                 disabled={!results}
               />
             </div>
-            <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+            <ModuleSummaryExporter
+              moduleName="credit"
+              moduleTitle={t('title')}
+              inputs={form.getValues()}
+              outputs={results}
+              summaryText={summaryContent}
+            />
           </div>
         )}
       </CardContent>

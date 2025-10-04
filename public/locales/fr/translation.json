@@ -57,7 +57,9 @@
     "selectTags": "Sélectionner des tags...",
     "searchOrAddTags": "Rechercher ou ajouter des tags...",
     "noTagFound": "Aucun tag trouvé.",
-    "addTag": "Ajouter '{tag}'"
+    "addTag": "Ajouter '{tag}'",
+    "years": "ans",
+    "copyError": "Échec de la copie."
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",
@@ -548,5 +550,22 @@
       "tagRequired": "Un tag ne peut pas être vide.",
       "tooManyTags": "Vous ne pouvez pas ajouter plus de 10 tags."
     }
+  },
+  "moduleSummaryExporter": {
+    "title": "Résumé et Exportation",
+    "description": "Générez et exportez un résumé structuré de votre simulation.",
+    "textSummaryTab": "Résumé Texte",
+    "htmlTableTab": "Résumé Tableau",
+    "copyText": "Copier le texte",
+    "copyHtml": "Copier le tableau HTML",
+    "generatedOn": "Généré le {date}",
+    "keyInputs": "Inputs Clés",
+    "keyResults": "Résultats Clés",
+    "recommendations": "Recommandations",
+    "parameter": "Paramètre",
+    "value": "Valeur",
+    "metric": "Métrique",
+    "noSpecificInputs": "Aucun input spécifique à afficher.",
+    "noSpecificResults": "Aucun résultat spécifique à afficher."
   }
 }

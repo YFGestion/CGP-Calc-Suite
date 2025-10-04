@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { CopyBlock } from '@/lib/copy';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { rentalCashflowIrr } from '@/lib/math-core/rental';
@@ -42,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import { showInfo } from '@/utils/toast'; // Import showInfo from utility
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -1324,7 +1324,6 @@ const ImmoPage = () => {
               <Button variant="outline" onClick={handleExportCsv} className="flex-1">
                 {t('exportCsvButton')}
               </Button>
-              {/* Replace existing duplicate button with ScenarioTitleModal */}
               <ScenarioTitleModal
                 moduleName="immo"
                 currentInputs={form.getValues()}
@@ -1333,7 +1332,13 @@ const ImmoPage = () => {
                 disabled={!results}
               />
             </div>
-            <CopyBlock title={t('summaryTitle')} content={summaryContent} className="mt-4" />
+            <ModuleSummaryExporter
+              moduleName="immo"
+              moduleTitle={t('title')}
+              inputs={form.getValues()}
+              outputs={results}
+              summaryText={summaryContent}
+            />
           </div>
         )}
       </CardContent>
