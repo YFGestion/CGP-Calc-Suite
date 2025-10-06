@@ -19,10 +19,10 @@ import { formatCurrency, formatPercent } from '@/lib/format';
 import i18n from '@/app/i18n'; // Import i18n instance for formatting
 import { cn } from '@/lib/utils'; // Import cn for conditional class merging
 
-// Import libraries for export
-import { asBlob } from 'html-docx-js/dist/html-docx';
-import { saveAs } from 'file-saver';
-import jsPDF from 'jspdf';
+// Import libraries for export - now dynamic
+// import { asBlob } from 'html-docx-js/dist/html-docx';
+// import { saveAs } from 'file-saver';
+// import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Import the plugin for autoTable
 
 interface ModuleSummaryExporterProps {
@@ -267,6 +267,8 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
 
   const handleExportDocx = async () => {
     try {
+      const { asBlob } = await import('html-docx-js/dist/html-docx');
+      const { saveAs } = await import('file-saver');
       const content = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${htmlTableSummary}</body></html>`;
       const blob = await asBlob(content);
       saveAs(blob, `${moduleName}-summary.docx`);
@@ -277,8 +279,9 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
     try {
+      const jsPDF = (await import('jspdf')).jsPDF;
       const doc = new jsPDF();
       let yOffset = 20;
 
