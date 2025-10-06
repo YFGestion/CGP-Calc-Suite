@@ -59,7 +59,8 @@
     "noTagFound": "Aucun tag trouvé.",
     "addTag": "Ajouter '{tag}'",
     "years": "ans",
-    "copyError": "Échec de la copie."
+    "copyError": "Échec de la copie.",
+    "noContentToExport": "Aucun contenu à exporter."
   },
   "aboutPage": {
     "title": "À propos et Hypothèses",

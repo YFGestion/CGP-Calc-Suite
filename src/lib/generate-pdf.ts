@@ -1,54 +1,44 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable'; // This import extends jsPDF.prototype
+import html2canvas from 'html2canvas'; // Import html2canvas
 
-interface KeyFact {
-  label: string;
-  value: string;
-}
-
-export const generateModuleSummaryPdf = (
+export const generateModuleSummaryPdf = async (
   moduleTitle: string,
-  keyFacts: KeyFact[],
+  htmlElement: HTMLElement, // Now accepts an HTMLElement
   t: (key: string, options?: any) => string // Pass translation function
 ) => {
   try {
-    const doc = new jsPDF();
-    let yOffset = 20;
+    const doc = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
+    const margin = 10; // mm
+    let yOffset = margin;
 
     doc.setFontSize(18);
-    doc.text(moduleTitle, 14, yOffset);
+    doc.text(moduleTitle, margin, yOffset);
     yOffset += 10;
 
-    doc.setFontSize(14);
-    doc.text(t('moduleSummaryExporter:keyData'), 14, yOffset);
-    yOffset += 5;
-
-    const tableColumn = [t('moduleSummaryExporter:label'), t('moduleSummaryExporter:value')];
-    const tableRows = keyFacts.map(fact => [fact.label, fact.value]);
-
-    (doc as any).autoTable({
-      startY: yOffset,
-      head: [tableColumn],
-      body: tableRows,
-      theme: 'grid',
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-        valign: 'middle',
-      },
-      headStyles: {
-        fillColor: [244, 248, 252],
-        textColor: [7, 13, 89],
-        fontStyle: 'bold',
-      },
-      alternateRowStyles: {
-        fillColor: [255, 255, 255],
-      },
-      bodyStyles: {
-        textColor: [7, 13, 89],
-      },
-      margin: { left: 14, right: 14 },
+    // Use html2canvas to render the HTML element to a canvas
+    const canvas = await html2canvas(htmlElement, {
+      scale: 2, // Increase scale for better resolution
+      useCORS: true, // Important for images loaded from external sources
+      windowWidth: htmlElement.scrollWidth, // Capture full width
+      windowHeight: htmlElement.scrollHeight, // Capture full height
     });
+
+    const imgData = canvas.toDataURL('image/png');
+    const imgWidth = 190; // A4 width - 2*margin (210 - 2*10)
+    const pageHeight = 295; // A4 height
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+
+    doc.addImage(imgData, 'PNG', margin, yOffset, imgWidth, imgHeight);
+    heightLeft -= pageHeight - yOffset;
+
+    while (heightLeft >= 0) {
+      doc.addPage();
+      yOffset = margin;
+      doc.addImage(imgData, 'PNG', margin, yOffset - heightLeft, imgWidth, imgHeight);
+      heightLeft -= pageHeight - yOffset;
+    }
 
     doc.save(`${moduleTitle.replace(/\s/g, '-')}-summary.pdf`);
     return { success: true };
