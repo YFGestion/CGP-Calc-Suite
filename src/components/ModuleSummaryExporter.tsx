@@ -16,8 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-// For PDF export
-import { jsPDF } from '@/lib/pdf-utils'; // Import jsPDF from the new utility file
+// For PDF export: Import jsPDF directly and then jspdf-autotable for its side effects
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 interface KeyFact {
   label: string;
