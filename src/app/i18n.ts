@@ -33,6 +33,7 @@ const allNamespaces = [
   'scenarioTitleModal',
   'scenarioDetailPage',
   'scenarioTitleEditor',
+  'moduleSummaryExporter', // Add new namespace
 ];
 
 i18n

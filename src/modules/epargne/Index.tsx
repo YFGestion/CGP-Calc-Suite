@@ -24,6 +24,7 @@ import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
 import { UpgradeMessage } from '@/components/UpgradeMessage'; // Import UpgradeMessage
 import { showError } from '@/utils/toast'; // Import showError from utility
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -143,6 +144,23 @@ const EpargnePage = () => {
       </Card>
     );
   }
+
+  // Prepare data for ModuleSummaryExporter
+  const epargneSummaryData = results ? {
+    moduleTitle: t('title'),
+    keyFacts: [
+      { label: t('finalCapital'), value: formatCurrency(results.finalCapital) },
+      { label: t('totalContributions'), value: formatCurrency(results.totalContributions) },
+      { label: t('grossGains'), value: formatCurrency(results.grossGains) },
+      { label: t('durationLabel'), value: `${form.getValues('duration')} ${commonT('years')}` },
+      { label: t('returnRateLabel'), value: formatPercent(form.getValues('returnRate') / 100) },
+    ],
+    recommendations: [
+      results.grossGains > 0 ? t('recommendationPositiveGains') : t('recommendationNegativeGains'),
+    ],
+    rawInputs: form.getValues(),
+    rawOutputs: results,
+  } : null;
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -384,6 +402,17 @@ const EpargnePage = () => {
                 disabled={!isPremium}
               />
             </div>
+
+            {epargneSummaryData && (
+              <ModuleSummaryExporter
+                moduleTitle={epargneSummaryData.moduleTitle}
+                keyFacts={epargneSummaryData.keyFacts}
+                recommendations={epargneSummaryData.recommendations}
+                rawInputs={epargneSummaryData.rawInputs}
+                rawOutputs={epargneSummaryData.rawOutputs}
+                className="mt-8"
+              />
+            )}
           </div>
         )}
 

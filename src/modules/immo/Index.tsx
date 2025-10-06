@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/select";
 import { showInfo } from '@/utils/toast'; // Import showInfo from utility
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -467,6 +468,24 @@ const ImmoPage = () => {
     showInfo(t('scenarioDuplicated'));
     // Future implementation: copy current form state to a new scenario
   };
+
+  // Prepare data for ModuleSummaryExporter
+  const immoSummaryData = results ? {
+    moduleTitle: t('title'),
+    keyFacts: [
+      { label: t('avgSavingEffortDuringLoanAnnual'), value: formatCurrency(results.avgSavingEffortDuringLoan) },
+      { label: t('avgPostLoanIncomeAnnual'), value: formatCurrency(results.avgPostLoanIncome) },
+      { label: t('cagr'), value: isNaN(results.cagr) ? commonT('none') : formatPercent(results.cagr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+      { label: t('capitalRecoveredAtSale'), value: formatCurrency(results.capitalRecoveredAtSale) },
+      { label: t('salePriceAtSale'), value: formatCurrency(results.salePriceAtSale) },
+    ],
+    recommendations: [
+      results.cagr > 0.05 ? t('recommendationHighCagr') : t('recommendationLowCagr'),
+      results.avgSavingEffortDuringLoan > 0 ? t('recommendationSavingEffort') : t('recommendationNoSavingEffort'),
+    ],
+    rawInputs: getValues(), // Use getValues() to get current form state
+    rawOutputs: results,
+  } : null;
 
   return (
     <Card className="w-full max-w-5xl mx-auto">
@@ -1305,6 +1324,17 @@ const ImmoPage = () => {
                 disabled={!results}
               />
             </div>
+
+            {immoSummaryData && (
+              <ModuleSummaryExporter
+                moduleTitle={immoSummaryData.moduleTitle}
+                keyFacts={immoSummaryData.keyFacts}
+                recommendations={immoSummaryData.recommendations}
+                rawInputs={immoSummaryData.rawInputs}
+                rawOutputs={immoSummaryData.rawOutputs}
+                className="mt-8"
+              />
+            )}
           </div>
         )}
       </CardContent>

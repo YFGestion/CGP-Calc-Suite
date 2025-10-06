@@ -123,7 +123,9 @@
       "durationMin": "La durée doit être d'au moins 1 an.",
       "returnRateRange": "Le rendement annuel doit être entre -10% et 20%.",
       "entryFeeRange": "Les frais d'entrée doivent être entre 0% et 10%."
-    }
+    },
+    "recommendationPositiveGains": "Vos gains bruts sont positifs, ce qui indique une bonne performance de votre épargne.",
+    "recommendationNegativeGains": "Vos gains bruts sont négatifs, il pourrait être judicieux de revoir votre stratégie d'épargne ou vos hypothèses."
   },
   "rateSolverPage": {
     "title": "Calculateur de Taux de Rendement Interne (TRI)",
@@ -292,7 +294,11 @@
       "loanDurationMin": "La durée du prêt doit être d'au moins 1 an.",
       "loanInsuranceRateRange": "Le taux d'assurance doit être entre 0% et 1%.",
       "loanAmountExceedsPrice": "Le montant du prêt ne peut pas être supérieur au prix d'acquisition."
-    }
+    },
+    "recommendationHighCagr": "Le TRI est élevé, ce qui indique un investissement potentiellement très rentable.",
+    "recommendationLowCagr": "Le TRI est faible ou négatif, une analyse plus approfondie ou un ajustement des paramètres pourrait être nécessaire.",
+    "recommendationSavingEffort": "Un effort d'épargne est nécessaire pendant la période de prêt, assurez-vous que votre budget le permet.",
+    "recommendationNoSavingEffort": "L'investissement génère un cashflow positif dès le début, ce qui est très favorable."
   },
   "endettementPage": {
     "title": "Calculateur de Capacité d'Endettement",
@@ -550,5 +556,19 @@
       "tagRequired": "Un tag ne peut pas être vide.",
       "tooManyTags": "Vous ne pouvez pas ajouter plus de 10 tags."
     }
+  },
+  "moduleSummaryExporter": {
+    "title": "Exporter le résumé du module",
+    "description": "Générez et exportez un résumé structuré des calculs et résultats de ce module.",
+    "keyData": "Données clés",
+    "recommendations": "Recommandations / Observations",
+    "rawInputs": "Inputs bruts",
+    "rawOutputs": "Outputs bruts",
+    "plainTextFormat": "Format Texte Brut",
+    "htmlTableFormat": "Format Tableau HTML",
+    "plainTextSummary": "Résumé en texte brut",
+    "htmlTableSummary": "Résumé en tableau HTML",
+    "label": "Label",
+    "value": "Valeur"
   }
 }
