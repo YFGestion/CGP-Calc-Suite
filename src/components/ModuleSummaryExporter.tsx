@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // For DOCX export
-import { convert } from 'html-to-docx';
+import convert from 'html-to-docx'; // Corrected import: default import
 import { saveAs } from 'file-saver';
 
 // For PDF export
