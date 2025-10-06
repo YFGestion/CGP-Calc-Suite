@@ -31,7 +31,6 @@ import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -95,7 +94,6 @@ const CreditPage = () => {
   const insuranceMode = form.watch('insuranceMode');
 
   const [results, setResults] = useState<ReturnType<typeof amortizationSchedule> | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const insuranceDetails = values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined
@@ -113,34 +111,6 @@ const CreditPage = () => {
       insurance: insuranceDetails,
     });
     setResults(computedResults);
-
-    const totalMonthlyPayment = computedResults.schedule.length > 0 ? computedResults.schedule[0].payment : 0;
-
-    let insuranceSummaryText = t('insuranceDetailsNone');
-    if (values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined) {
-      const formattedInsuranceRate = formatPercent(values.insuranceRate / 100, 'fr-FR', { maximumFractionDigits: 1 });
-      if (values.insuranceMode === 'initialPct') {
-        insuranceSummaryText = t('insuranceDetailsInitialPct', { insuranceRate: formattedInsuranceRate });
-      } else if (values.insuranceMode === 'crdPct') {
-        insuranceSummaryText = t('insuranceDetailsCrdPct', { insuranceRate: formattedInsuranceRate });
-      }
-    }
-
-    const formattedResults = {
-      loanAmount: formatCurrency(values.loanAmount),
-      durationYears: values.durationYears,
-      nominalRate: formatPercent(values.nominalRate / 100, 'fr-FR', { maximumFractionDigits: 1 }),
-      insuranceDetails: insuranceSummaryText,
-      totalMonthlyPayment: formatCurrency(totalMonthlyPayment),
-      totalInterest: formatCurrency(computedResults.totals.interest),
-      totalInsurance: formatCurrency(computedResults.totals.insurance),
-      totalCost: formatCurrency(computedResults.totals.cost),
-      totalPayments: formatCurrency(computedResults.totals.payments),
-    };
-
-    setSummaryContent(
-      t('summaryContent', formattedResults)
-    );
   };
 
   useEffect(() => {
@@ -503,13 +473,6 @@ const CreditPage = () => {
                 disabled={!results}
               />
             </div>
-            <ModuleSummaryExporter
-              moduleName="credit"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
       </CardContent>

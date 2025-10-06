@@ -33,7 +33,6 @@ const allNamespaces = [
   'scenarioTitleModal',
   'scenarioDetailPage',
   'scenarioTitleEditor',
-  'moduleSummaryExporter', // Réintégré
 ];
 
 i18n

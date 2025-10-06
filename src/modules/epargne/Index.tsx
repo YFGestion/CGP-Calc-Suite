@@ -24,7 +24,6 @@ import { useUserRole } from '@/hooks/useUserRole'; // Import useUserRole
 import { UpgradeMessage } from '@/components/UpgradeMessage'; // Import UpgradeMessage
 import { showError } from '@/utils/toast'; // Import showError from utility
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -81,7 +80,6 @@ const EpargnePage = () => {
   const applyEntryFee = form.watch('applyEntryFee');
 
   const [results, setResults] = useState<ReturnType<typeof savingsProjection> | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     // Example: Restrict a feature to premium users
@@ -99,22 +97,6 @@ const EpargnePage = () => {
       entryFee: values.applyEntryFee && values.entryFee !== undefined ? values.entryFee / 100 : 0, // Convert percentage to decimal
     });
     setResults(computedResults);
-
-    const formattedResults = {
-      initialDeposit: formatCurrency(values.initialDeposit),
-      periodicDeposit: formatCurrency(values.periodicDeposit),
-      periodicity: t(values.periodicity),
-      duration: values.duration,
-      returnRate: formatPercent(values.returnRate / 100, 'fr-FR', { maximumFractionDigits: 1 }),
-      entryFee: values.applyEntryFee && values.entryFee !== undefined ? formatPercent(values.entryFee / 100, 'fr-FR', { maximumFractionDigits: 1 }) : formatPercent(0, 'fr-FR', { maximumFractionDigits: 1 }),
-      finalCapital: formatCurrency(computedResults.finalCapital),
-      totalContributions: formatCurrency(computedResults.totalContributions),
-      grossGains: formatCurrency(computedResults.grossGains),
-    };
-
-    setSummaryContent(
-      t('summaryContent', formattedResults)
-    );
   };
 
   const handleExportCsv = () => {
@@ -402,13 +384,6 @@ const EpargnePage = () => {
                 disabled={!isPremium}
               />
             </div>
-            <ModuleSummaryExporter
-              moduleName="epargne"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
 

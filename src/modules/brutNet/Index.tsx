@@ -16,7 +16,6 @@ import { Separator } from '@/components/ui/separator';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { computeBrutNet } from '@/lib/math-core/brutNet';
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -49,7 +48,6 @@ const BrutNetPage = () => {
   });
 
   const [results, setResults] = useState<ReturnType<typeof computeBrutNet> | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     // Determine chargesRate based on employeeStatus
@@ -63,23 +61,6 @@ const BrutNetPage = () => {
       withholdingRate: values.withholdingRate / 100, // Convert percentage to decimal
     });
     setResults(computedResults);
-
-    const formattedResults = {
-      grossValue: formatCurrency(values.grossValue),
-      inputPeriod: values.inputPeriod === 'monthly' ? t('monthly') : t('annual'),
-      paidMonths: values.paidMonths,
-      employeeStatus: t(values.employeeStatus), // Translate employee status
-      withholdingRate: formatPercent(values.withholdingRate / 100, 'fr-FR', { maximumFractionDigits: 1 }),
-      netBeforeTaxAnnual: formatCurrency(computedResults.netBeforeTaxAnnual),
-      netBeforeTaxMonthlyAvg: formatCurrency(computedResults.netBeforeTaxMonthlyAvg),
-      netAfterTaxAnnual: formatCurrency(computedResults.netAfterTaxAnnual),
-      netAfterTaxMonthlyAvg: formatCurrency(computedResults.netAfterTaxMonthlyAvg),
-      netPerPay: formatCurrency(computedResults.netPerPay),
-    };
-
-    setSummaryContent(
-      t('summaryContent', formattedResults)
-    );
   };
 
   const handleExportCsv = () => {
@@ -298,13 +279,6 @@ const BrutNetPage = () => {
                 {t('exportCsvButton')}
               </Button>
             </div>
-            <ModuleSummaryExporter
-              moduleName="brutNet"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
       </CardContent>

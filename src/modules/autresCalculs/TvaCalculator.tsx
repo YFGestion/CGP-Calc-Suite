@@ -15,7 +15,6 @@ import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { exportCsv } from '@/lib/csv';
 import { formatCurrency, formatPercent } from '@/lib/format';
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -44,7 +43,6 @@ const TvaCalculator = () => {
   });
 
   const [results, setResults] = useState<{ priceHT: number; vatAmount: number; priceTTC: number } | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const vatRateDecimal = values.vatRate / 100;
@@ -68,19 +66,6 @@ const TvaCalculator = () => {
       priceTTC: parseFloat(priceTTC.toFixed(2)),
     };
     setResults(computedResults);
-
-    const formattedResults = {
-      priceInput: formatCurrency(values.priceInput),
-      vatRate: formatPercent(vatRateDecimal, 'fr-FR', { maximumFractionDigits: 1 }),
-      priceType: t(values.priceType),
-      priceHT: formatCurrency(computedResults.priceHT),
-      vatAmount: formatCurrency(computedResults.vatAmount),
-      priceTTC: formatCurrency(computedResults.priceTTC),
-    };
-
-    setSummaryContent(
-      t('summaryContent', formattedResults)
-    );
   };
 
   const handleExportCsv = () => {
@@ -222,13 +207,6 @@ const TvaCalculator = () => {
                 {t('exportCsvButton')}
               </Button>
             </div>
-            <ModuleSummaryExporter
-              moduleName="tvaCalculator"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
       </CardContent>

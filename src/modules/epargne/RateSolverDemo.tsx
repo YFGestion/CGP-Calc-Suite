@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { formatCurrency, formatPercent } from '@/lib/format';
 import { solveAnnualRateFromAnnuityFV } from '@/lib/math-core/irr'; // Import the new function
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -58,7 +57,6 @@ const RateSolverDemo = () => {
   });
 
   const [results, setResults] = useState<{ rMonthly: number; rAnnual: number } | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     try {
@@ -69,23 +67,9 @@ const RateSolverDemo = () => {
         years: values.years,
       });
       setResults(computedRates);
-
-      const formattedResults = {
-        finalCapital: formatCurrency(values.finalCapital),
-        initialCapital: formatCurrency(values.initialCapital),
-        monthlyContribution: formatCurrency(values.monthlyContribution),
-        years: values.years,
-        rMonthly: formatPercent(computedRates.rMonthly, 'fr-FR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }),
-        rAnnual: formatPercent(computedRates.rAnnual, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      };
-
-      setSummaryContent(
-        t('summaryContent', formattedResults)
-      );
     } catch (error: any) {
       showError(error.message || t('calculationError'));
       setResults(null);
-      setSummaryContent('');
     }
   };
 
@@ -192,13 +176,6 @@ const RateSolverDemo = () => {
                 <span className="font-medium">{formatPercent(results.rAnnual, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
-            <ModuleSummaryExporter
-              moduleName="rateSolver"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
       </CardContent>

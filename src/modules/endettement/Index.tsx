@@ -31,7 +31,6 @@ import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
 import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -101,7 +100,7 @@ const formSchema = (t: (key: string) => string) => z.object({
 const EndettementPage = () => {
   const { t } = useTranslation('endettementPage');
   const { t: commonT } = useTranslation('common');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialisation de useNavigate
   const settings = useSettingsStore(); // Import settings store
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
@@ -128,7 +127,6 @@ const EndettementPage = () => {
   const loanInsuranceMode = form.watch('loanInsuranceMode');
 
   const [results, setResults] = useState<ReturnType<typeof debtCapacity> | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const onSubmit = (values: z.infer<ReturnType<typeof formSchema>>) => {
     const computedResults = debtCapacity({
@@ -152,21 +150,6 @@ const EndettementPage = () => {
         : undefined,
     });
     setResults(computedResults);
-
-    const formattedResults = {
-      netIncome: formatCurrency(values.netIncome),
-      charges: formatCurrency(values.charges),
-      existingDebt: formatCurrency(values.existingDebt),
-      targetDTI: formatPercent(values.targetDTI / 100, 'fr-FR', { maximumFractionDigits: 1 }),
-      currentDTI: formatPercent(computedResults.currentDTI, 'fr-FR', { maximumFractionDigits: 1 }),
-      projectedDTI: formatPercent(computedResults.projectedDTI, 'fr-FR', { maximumFractionDigits: 1 }),
-      maxPayment: formatCurrency(computedResults.maxPayment),
-      affordablePrincipal: formatCurrency(computedResults.affordablePrincipal),
-    };
-
-    setSummaryContent(
-      t('summaryContent', formattedResults)
-    );
   };
 
   const handleExportCsv = () => {
@@ -616,13 +599,6 @@ const EndettementPage = () => {
                 disabled={!results}
               />
             </div>
-            <ModuleSummaryExporter
-              moduleName="endettement"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
       </CardContent>

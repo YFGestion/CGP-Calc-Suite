@@ -41,7 +41,6 @@ import {
 } from "@/components/ui/select";
 import { showInfo } from '@/utils/toast'; // Import showInfo from utility
 import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -256,7 +255,6 @@ const ImmoPage = () => {
   }, [price, applyLoan, setValue]);
 
   const [results, setResults] = useState<ReturnType<typeof rentalCashflowIrr> | null>(null);
-  const [summaryContent, setSummaryContent] = useState('');
 
   const calculate = useCallback((values: z.infer<ReturnType<typeof formSchema>>) => {
     let baseRentAnnualGross = 0;
@@ -318,32 +316,7 @@ const ImmoPage = () => {
       ps: values.ps / 100,
     });
     setResults(computedResults);
-
-    const avgSavingEffortMonthly = computedResults.avgSavingEffortDuringLoan / 12;
-    const avgPostLoanIncomeMonthly = computedResults.avgPostLoanIncome / 12;
-
-    const formattedResults = {
-      price: formatCurrency(values.price),
-      horizonYears: values.horizonYears,
-      loanAmount: loanDetails ? formatCurrency(loanDetails.amount) : commonT('none'),
-      loanRate: loanDetails ? formatPercent(loanDetails.rate, 'fr-FR', { maximumFractionDigits: 1 }) : commonT('none'),
-      loanDurationYears: loanDetails ? loanDetails.years : commonT('none'),
-      saleYear: values.saleYear,
-      avgSavingEffortDuringLoanAnnual: formatCurrency(computedResults.avgSavingEffortDuringLoan),
-      avgSavingEffortDuringLoanMonthly: formatCurrency(avgSavingEffortMonthly),
-      avgPostLoanIncomeAnnual: formatCurrency(computedResults.avgPostLoanIncome),
-      avgPostLoanIncomeMonthly: formatCurrency(avgPostLoanIncomeMonthly),
-      salePriceAtSale: formatCurrency(computedResults.salePriceAtSale),
-      netSalePriceBeforeCrd: formatCurrency(computedResults.netSalePriceBeforeCrd),
-      crdAtSale: formatCurrency(computedResults.crdAtSale),
-      capitalRecoveredAtSale: formatCurrency(computedResults.capitalRecoveredAtSale),
-      cagr: isNaN(computedResults.cagr) ? commonT('none') : formatPercent(computedResults.cagr, 'fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    };
-
-    setSummaryContent(
-      t('summaryContent', formattedResults)
-    );
-  }, [commonT, t]);
+  }, [t]);
 
   const onSubmit = useCallback((values: z.infer<ReturnType<typeof formSchema>>) => {
     calculate(values);
@@ -1332,13 +1305,6 @@ const ImmoPage = () => {
                 disabled={!results}
               />
             </div>
-            <ModuleSummaryExporter
-              moduleName="immo"
-              moduleTitle={t('title')}
-              inputs={form.getValues()}
-              outputs={results}
-              summaryText={summaryContent}
-            />
           </div>
         )}
       </CardContent>
