@@ -16,9 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-// For PDF export: Import jsPDF directly and then jspdf-autotable for its side effects
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { generateModuleSummaryPdf } from '@/lib/generate-pdf'; // Import the new utility function
 
 interface KeyFact {
   label: string;
@@ -79,53 +77,11 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
   };
 
   const handleExportPdf = () => {
-    try {
-      const doc = new jsPDF();
-      let yOffset = 20;
-
-      doc.setFontSize(18);
-      doc.text(moduleTitle, 14, yOffset);
-      yOffset += 10;
-
-      doc.setFontSize(14);
-      doc.text(t('moduleSummaryExporter:keyData'), 14, yOffset);
-      yOffset += 5;
-
-      // Prepare data for autoTable
-      const tableColumn = [t('moduleSummaryExporter:label'), t('moduleSummaryExporter:value')];
-      const tableRows = keyFacts.map(fact => [fact.label, fact.value]);
-
-      (doc as any).autoTable({
-        startY: yOffset,
-        head: [tableColumn],
-        body: tableRows,
-        theme: 'grid',
-        styles: {
-          fontSize: 10,
-          cellPadding: 3,
-          valign: 'middle',
-        },
-        headStyles: {
-          fillColor: [244, 248, 252], // --background-light
-          textColor: [7, 13, 89], // --foreground-dark
-          fontStyle: 'bold',
-        },
-        alternateRowStyles: {
-          fillColor: [255, 255, 255],
-        },
-        bodyStyles: {
-          textColor: [7, 13, 89],
-        },
-        margin: { left: 14, right: 14 },
-      });
-
-      yOffset = (doc as any).autoTable.previous.finalY + 10;
-
-      doc.save(`${moduleTitle.replace(/\s/g, '-')}-summary.pdf`);
+    const { success, error } = generateModuleSummaryPdf(moduleTitle, keyFacts, t);
+    if (success) {
       showSuccess(t('moduleSummaryExporter:exportPdfSuccess'));
-    } catch (error) {
-      console.error('Error exporting to PDF:', error);
-      showError(t('moduleSummaryExporter:exportPdfError'));
+    } else {
+      showError(error || t('moduleSummaryExporter:exportPdfError'));
     }
   };
 
