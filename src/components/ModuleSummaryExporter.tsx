@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
   className,
 }) => {
   const { t } = useTranslation(['common', 'moduleSummaryExporter']);
-  const htmlTableRef = useRef<HTMLDivElement>(null); // Ref for the HTML table content
 
   const generatePlainTextSummary = (): string => {
     let summary = `${moduleTitle}\n\n`;
@@ -77,16 +76,12 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
-  const handleExportPdf = async () => {
-    if (htmlTableRef.current) {
-      const { success, error } = await generateModuleSummaryPdf(moduleTitle, htmlTableRef.current, t);
-      if (success) {
-        showSuccess(t('moduleSummaryExporter:exportPdfSuccess'));
-      } else {
-        showError(error || t('moduleSummaryExporter:exportPdfError'));
-      }
+  const handleExportPdf = () => {
+    const { success, error } = generateModuleSummaryPdf(moduleTitle, keyFacts, t);
+    if (success) {
+      showSuccess(t('moduleSummaryExporter:exportPdfSuccess'));
     } else {
-      showError(t('moduleSummaryExporter:exportPdfError') + ': ' + t('common:noContentToExport'));
+      showError(error || t('moduleSummaryExporter:exportPdfError'));
     }
   };
 
@@ -118,7 +113,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
         <div className="space-y-2">
           <h4 className="text-md font-semibold">{t('moduleSummaryExporter:htmlTableFormat')}</h4>
           <div
-            ref={htmlTableRef} // Attach ref here
             className="border rounded-md p-4 bg-background text-foreground overflow-x-auto"
             dangerouslySetInnerHTML={{ __html: htmlTableSummary }}
             aria-label={t('moduleSummaryExporter:htmlTableSummary')}
