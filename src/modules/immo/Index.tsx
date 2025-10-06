@@ -479,12 +479,6 @@ const ImmoPage = () => {
       { label: t('capitalRecoveredAtSale'), value: formatCurrency(results.capitalRecoveredAtSale) },
       { label: t('salePriceAtSale'), value: formatCurrency(results.salePriceAtSale) },
     ],
-    recommendations: [
-      results.cagr > 0.05 ? t('recommendationHighCagr') : t('recommendationLowCagr'),
-      results.avgSavingEffortDuringLoan > 0 ? t('recommendationSavingEffort') : t('recommendationNoSavingEffort'),
-    ],
-    rawInputs: getValues(), // Use getValues() to get current form state
-    rawOutputs: results,
   } : null;
 
   return (
@@ -1329,9 +1323,6 @@ const ImmoPage = () => {
               <ModuleSummaryExporter
                 moduleTitle={immoSummaryData.moduleTitle}
                 keyFacts={immoSummaryData.keyFacts}
-                recommendations={immoSummaryData.recommendations}
-                rawInputs={immoSummaryData.rawInputs}
-                rawOutputs={immoSummaryData.rawOutputs}
                 className="mt-8"
               />
             )}

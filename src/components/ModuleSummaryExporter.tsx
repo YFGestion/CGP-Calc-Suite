@@ -18,18 +18,12 @@ interface KeyFact {
 interface ModuleSummaryExporterProps {
   moduleTitle: string;
   keyFacts: KeyFact[];
-  recommendations?: string[];
-  rawInputs: Record<string, unknown>;
-  rawOutputs: Record<string, unknown>;
   className?: string;
 }
 
 export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
   moduleTitle,
   keyFacts,
-  recommendations = [],
-  rawInputs,
-  rawOutputs,
   className,
 }) => {
   const { t } = useTranslation(['common', 'moduleSummaryExporter']);
@@ -40,20 +34,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     keyFacts.forEach(fact => {
       summary += `- ${fact.label}: ${fact.value}\n`;
     });
-
-    if (recommendations.length > 0) {
-      summary += `\n${t('moduleSummaryExporter:recommendations')}:\n`;
-      recommendations.forEach(rec => {
-        summary += `- ${rec}\n`;
-      });
-    }
-
-    summary += `\n${t('moduleSummaryExporter:rawInputs')}:\n`;
-    summary += JSON.stringify(rawInputs, null, 2);
-
-    summary += `\n\n${t('moduleSummaryExporter:rawOutputs')}:\n`;
-    summary += JSON.stringify(rawOutputs, null, 2);
-
     return summary;
   };
 
@@ -74,22 +54,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
       html += `</tr>`;
     });
     html += `</tbody></table>`;
-
-    if (recommendations.length > 0) {
-      html += `<h3 style="color: #070d59;">${t('moduleSummaryExporter:recommendations')}</h3>`;
-      html += `<ul style="list-style-type: disc; margin-left: 20px; margin-bottom: 15px;">`;
-      recommendations.forEach(rec => {
-        html += `<li>${rec}</li>`;
-      });
-      html += `</ul>`;
-    }
-
-    html += `<h3 style="color: #070d59;">${t('moduleSummaryExporter:rawInputs')}</h3>`;
-    html += `<pre style="background-color: #f8f8f8; border: 1px solid #ddd; padding: 10px; overflow-x: auto; font-size: 0.9em;">${JSON.stringify(rawInputs, null, 2)}</pre>`;
-
-    html += `<h3 style="color: #070d59;">${t('moduleSummaryExporter:rawOutputs')}</h3>`;
-    html += `<pre style="background-color: #f8f8f8; border: 1px solid #ddd; padding: 10px; overflow-x: auto; font-size: 0.9em;">${JSON.stringify(rawOutputs, null, 2)}</pre>`;
-
     html += `</div>`;
     return html;
   };

@@ -155,11 +155,6 @@ const EpargnePage = () => {
       { label: t('durationLabel'), value: `${form.getValues('duration')} ${commonT('years')}` },
       { label: t('returnRateLabel'), value: formatPercent(form.getValues('returnRate') / 100) },
     ],
-    recommendations: [
-      results.grossGains > 0 ? t('recommendationPositiveGains') : t('recommendationNegativeGains'),
-    ],
-    rawInputs: form.getValues(),
-    rawOutputs: results,
   } : null;
 
   return (
@@ -407,9 +402,6 @@ const EpargnePage = () => {
               <ModuleSummaryExporter
                 moduleTitle={epargneSummaryData.moduleTitle}
                 keyFacts={epargneSummaryData.keyFacts}
-                recommendations={epargneSummaryData.recommendations}
-                rawInputs={epargneSummaryData.rawInputs}
-                rawOutputs={epargneSummaryData.rawOutputs}
                 className="mt-8"
               />
             )}
