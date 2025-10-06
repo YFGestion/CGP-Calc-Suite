@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Copy as CopyIcon, Download, FileText, FileInput } from 'lucide-react';
+import { Copy as CopyIcon, Download, FileInput } from 'lucide-react'; // Removed FileText
 import { showSuccess, showError } from '@/utils/toast';
 import { cn } from '@/lib/utils';
 import {
@@ -16,9 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-// For DOCX export
-import { asBlob } from 'html-docx-js';
-import { saveAs } from 'file-saver';
+// Removed DOCX export imports: import { asBlob } from 'html-docx-js'; import { saveAs } from 'file-saver';
 
 // For PDF export
 import jsPDF from 'jspdf';
@@ -82,17 +80,7 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
-  const handleExportDocx = async () => {
-    try {
-      const htmlContent = generateHtmlTableSummary();
-      const converted = await asBlob(htmlContent);
-      saveAs(converted, `${moduleTitle.replace(/\s/g, '-')}-summary.docx`);
-      showSuccess(t('moduleSummaryExporter:exportDocxSuccess'));
-    } catch (error) {
-      console.error('Error exporting to DOCX:', error);
-      showError(t('moduleSummaryExporter:exportDocxError'));
-    }
-  };
+  // Removed handleExportDocx function
 
   const handleExportPdf = () => {
     try {
@@ -198,10 +186,7 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
               <CopyIcon className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:copyHtmlTable')}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleExportDocx}>
-              <FileText className="mr-2 h-4 w-4" />
-              <span>{t('moduleSummaryExporter:exportDocx')}</span>
-            </DropdownMenuItem>
+            {/* Removed DOCX export option */}
             <DropdownMenuItem onClick={handleExportPdf}>
               <FileInput className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:exportPdf')}</span>

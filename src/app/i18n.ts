@@ -2,7 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 // Importe l'intégralité du fichier de traduction JSON
-import frTranslations from '../../public/locales/fr/translation.json';
+import frTranslations from '../locales/fr/translation.json'; // Updated path
 
 // Crée l'objet de ressources en mappant directement l'objet JSON importé
 // Chaque clé de haut niveau du fichier JSON (e.g., 'common', 'homePage') sera un namespace.

@@ -7,6 +7,7 @@ export default {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    "./src/locales/**/*.json", // Added to include translation files
   ],
   prefix: "",
   theme: {
