@@ -139,11 +139,9 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
         {/* HTML Table Export */}
         <div className="space-y-2">
           <h4 className="text-md font-semibold">{t('moduleSummaryExporter:htmlTableFormat')}</h4>
-          <Textarea
-            value={htmlTableSummary}
-            readOnly
-            rows={10}
-            className="font-mono text-xs resize-y"
+          <div
+            className="border rounded-md p-4 bg-background text-foreground overflow-x-auto"
+            dangerouslySetInnerHTML={{ __html: htmlTableSummary }}
             aria-label={t('moduleSummaryExporter:htmlTableSummary')}
           />
           <Button
