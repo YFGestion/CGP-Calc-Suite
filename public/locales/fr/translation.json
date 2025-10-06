@@ -566,6 +566,15 @@
     "plainTextSummary": "Résumé en texte brut",
     "htmlTableSummary": "Résumé en tableau HTML",
     "label": "Label",
-    "value": "Valeur"
+    "value": "Valeur",
+    "exportButton": "Exporter",
+    "copyPlainText": "Copier Texte Brut",
+    "copyHtmlTable": "Copier Tableau HTML",
+    "exportDocx": "Exporter DOCX",
+    "exportDocxSuccess": "Résumé exporté en DOCX avec succès !",
+    "exportDocxError": "Échec de l'exportation en DOCX.",
+    "exportPdf": "Exporter PDF",
+    "exportPdfSuccess": "Résumé exporté en PDF avec succès !",
+    "exportPdfError": "Échec de l'exportation en PDF."
   }
 }

@@ -6,9 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Copy as CopyIcon } from 'lucide-react';
+import { Copy as CopyIcon, Download, FileText, FileInput } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+// For DOCX export
+import { asBlob } from 'html-docx-js';
+import { saveAs } from 'file-saver';
+
+// For PDF export
+import jsPDF from 'jspdf';
+import 'jspdf-autotable'; // Extends jsPDF with autoTable method
 
 interface KeyFact {
   label: string;
@@ -68,6 +82,69 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
+  const handleExportDocx = async () => {
+    try {
+      const htmlContent = generateHtmlTableSummary();
+      const converted = await asBlob(htmlContent);
+      saveAs(converted, `${moduleTitle.replace(/\s/g, '-')}-summary.docx`);
+      showSuccess(t('moduleSummaryExporter:exportDocxSuccess'));
+    } catch (error) {
+      console.error('Error exporting to DOCX:', error);
+      showError(t('moduleSummaryExporter:exportDocxError'));
+    }
+  };
+
+  const handleExportPdf = () => {
+    try {
+      const doc = new jsPDF();
+      let yOffset = 20;
+
+      doc.setFontSize(18);
+      doc.text(moduleTitle, 14, yOffset);
+      yOffset += 10;
+
+      doc.setFontSize(14);
+      doc.text(t('moduleSummaryExporter:keyData'), 14, yOffset);
+      yOffset += 5;
+
+      // Prepare data for autoTable
+      const tableColumn = [t('moduleSummaryExporter:label'), t('moduleSummaryExporter:value')];
+      const tableRows = keyFacts.map(fact => [fact.label, fact.value]);
+
+      (doc as any).autoTable({
+        startY: yOffset,
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+          valign: 'middle',
+        },
+        headStyles: {
+          fillColor: [244, 248, 252], // --background-light
+          textColor: [7, 13, 89], // --foreground-dark
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: {
+          fillColor: [255, 255, 255],
+        },
+        bodyStyles: {
+          textColor: [7, 13, 89],
+        },
+        margin: { left: 14, right: 14 },
+      });
+
+      yOffset = (doc as any).autoTable.previous.finalY + 10;
+
+      doc.save(`${moduleTitle.replace(/\s/g, '-')}-summary.pdf`);
+      showSuccess(t('moduleSummaryExporter:exportPdfSuccess'));
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      showError(t('moduleSummaryExporter:exportPdfError'));
+    }
+  };
+
   const plainTextSummary = generatePlainTextSummary();
   const htmlTableSummary = generateHtmlTableSummary();
 
@@ -78,7 +155,7 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
         <CardDescription>{t('moduleSummaryExporter:description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Plain Text Export */}
+        {/* Plain Text Preview */}
         <div className="space-y-2">
           <h4 className="text-md font-semibold">{t('moduleSummaryExporter:plainTextFormat')}</h4>
           <Textarea
@@ -88,19 +165,11 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
             className="font-mono text-xs resize-y"
             aria-label={t('moduleSummaryExporter:plainTextSummary')}
           />
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => copyToClipboard(plainTextSummary, t('common:copied'), t('common:copyError'))}
-          >
-            <CopyIcon className="mr-2 h-4 w-4" />
-            {t('common:copy')}
-          </Button>
         </div>
 
         <Separator />
 
-        {/* HTML Table Export */}
+        {/* HTML Table Preview */}
         <div className="space-y-2">
           <h4 className="text-md font-semibold">{t('moduleSummaryExporter:htmlTableFormat')}</h4>
           <div
@@ -108,15 +177,37 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
             dangerouslySetInnerHTML={{ __html: htmlTableSummary }}
             aria-label={t('moduleSummaryExporter:htmlTableSummary')}
           />
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => copyToClipboard(htmlTableSummary, t('common:copied'), t('common:copyError'))}
-          >
-            <CopyIcon className="mr-2 h-4 w-4" />
-            {t('common:copy')}
-          </Button>
         </div>
+
+        <Separator />
+
+        {/* Export Actions */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="w-full">
+              <Download className="mr-2 h-4 w-4" />
+              {t('moduleSummaryExporter:exportButton')}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => copyToClipboard(plainTextSummary, t('common:copied'), t('common:copyError'))}>
+              <CopyIcon className="mr-2 h-4 w-4" />
+              <span>{t('moduleSummaryExporter:copyPlainText')}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => copyToClipboard(htmlTableSummary, t('common:copied'), t('common:copyError'))}>
+              <CopyIcon className="mr-2 h-4 w-4" />
+              <span>{t('moduleSummaryExporter:copyHtmlTable')}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportDocx}>
+              <FileText className="mr-2 h-4 w-4" />
+              <span>{t('moduleSummaryExporter:exportDocx')}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportPdf}>
+              <FileInput className="mr-2 h-4 w-4" />
+              <span>{t('moduleSummaryExporter:exportPdf')}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardContent>
     </Card>
   );
