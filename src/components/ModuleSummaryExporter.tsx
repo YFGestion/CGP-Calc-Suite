@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Copy as CopyIcon, Download, FileInput } from 'lucide-react'; // Removed FileText
+import { Copy as CopyIcon, Download, FileInput } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { cn } from '@/lib/utils';
 import {
@@ -17,8 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // For PDF export
-import jsPDF from 'jspdf';
-import 'jspdf-autotable'; // Extends jsPDF with autoTable method
+import { jsPDF } from '@/lib/pdf-utils'; // Import jsPDF from the new utility file
 
 interface KeyFact {
   label: string;
@@ -77,8 +76,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
       showError(errorMessage);
     }
   };
-
-  // Removed handleExportDocx function
 
   const handleExportPdf = () => {
     try {
@@ -184,7 +181,6 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
               <CopyIcon className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:copyHtmlTable')}</span>
             </DropdownMenuItem>
-            {/* Removed DOCX export option */}
             <DropdownMenuItem onClick={handleExportPdf}>
               <FileInput className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:exportPdf')}</span>
