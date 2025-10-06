@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Copy as CopyIcon, Download, FileInput } from 'lucide-react'; // Removed FileText
+import { Copy as CopyIcon, Download, FileText, FileInput } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { cn } from '@/lib/utils';
 import {
@@ -16,7 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-// Removed DOCX export imports: import { asBlob } from 'html-docx-js'; import { saveAs } from 'file-saver';
+// For DOCX export
+import { convert } from 'html-to-docx';
+import { saveAs } from 'file-saver';
 
 // For PDF export
 import jsPDF from 'jspdf';
@@ -80,7 +82,21 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
-  // Removed handleExportDocx function
+  const handleExportDocx = async () => {
+    try {
+      const htmlContent = generateHtmlTableSummary();
+      const fileBuffer = await convert(htmlContent, {
+        // Options for html-to-docx, e.g., orientation, margins
+        orientation: 'portrait',
+        margins: { top: 720, right: 720, bottom: 720, left: 720 }, // 1 inch in twips (1/1440 of an inch)
+      });
+      saveAs(new Blob([fileBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), `${moduleTitle.replace(/\s/g, '-')}-summary.docx`);
+      showSuccess(t('moduleSummaryExporter:exportDocxSuccess'));
+    } catch (error) {
+      console.error('Error exporting to DOCX:', error);
+      showError(t('moduleSummaryExporter:exportDocxError'));
+    }
+  };
 
   const handleExportPdf = () => {
     try {
@@ -186,7 +202,10 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
               <CopyIcon className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:copyHtmlTable')}</span>
             </DropdownMenuItem>
-            {/* Removed DOCX export option */}
+            <DropdownMenuItem onClick={handleExportDocx}>
+              <FileText className="mr-2 h-4 w-4" />
+              <span>{t('moduleSummaryExporter:exportDocx')}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleExportPdf}>
               <FileInput className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:exportPdf')}</span>
