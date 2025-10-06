@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Copy as CopyIcon, Download, FileInput } from 'lucide-react'; // Removed FileText
+import { Copy as CopyIcon, Download, FileText, FileInput } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { cn } from '@/lib/utils';
 import {
@@ -15,6 +15,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+// For DOCX export
+import { saveAs } from 'file-saver';
 
 // For PDF export
 import jsPDF from 'jspdf';
@@ -78,7 +81,30 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
     }
   };
 
-  // Removed handleExportDocx function
+  const handleExportDocx = async () => {
+    try {
+      const htmlContent = generateHtmlTableSummary();
+      const response = await fetch('/api/export-docx', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ htmlContent, moduleTitle }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || t('moduleSummaryExporter:exportDocxError'));
+      }
+
+      const blob = await response.blob();
+      saveAs(blob, `${moduleTitle.replace(/\s/g, '-')}-summary.docx`);
+      showSuccess(t('moduleSummaryExporter:exportDocxSuccess'));
+    } catch (error: any) {
+      console.error('Error exporting to DOCX:', error);
+      showError(error.message || t('moduleSummaryExporter:exportDocxError'));
+    }
+  };
 
   const handleExportPdf = () => {
     try {
@@ -184,7 +210,10 @@ export const ModuleSummaryExporter: React.FC<ModuleSummaryExporterProps> = ({
               <CopyIcon className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:copyHtmlTable')}</span>
             </DropdownMenuItem>
-            {/* Removed DOCX export option */}
+            <DropdownMenuItem onClick={handleExportDocx}>
+              <FileText className="mr-2 h-4 w-4" />
+              <span>{t('moduleSummaryExporter:exportDocx')}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleExportPdf}>
               <FileInput className="mr-2 h-4 w-4" />
               <span>{t('moduleSummaryExporter:exportPdf')}</span>
