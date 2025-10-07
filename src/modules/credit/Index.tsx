@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSearchParams, useNavigate } from 'react-router-dom'; // Ajout de useNavigate
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -29,8 +29,9 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
-import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { showError, showSuccess } from '@/utils/toast';
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal';
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -57,7 +58,7 @@ const formSchema = (t: (key: string) => string) => z.object({
     if (!data.insuranceMode) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: t('validation.requiredField'), // Reusing message for simplicity
+        message: t('validation.requiredField'),
         path: ['insuranceMode'],
       });
     }
@@ -75,7 +76,7 @@ const CreditPage = () => {
   const { t } = useTranslation('creditPage');
   const { t: commonT } = useTranslation('common');
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate(); // Initialisation de useNavigate
+  const navigate = useNavigate();
   const settings = useSettingsStore();
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
@@ -99,15 +100,15 @@ const CreditPage = () => {
     const insuranceDetails = values.applyInsurance && values.insuranceMode && values.insuranceRate !== undefined
       ? {
         mode: values.insuranceMode,
-        value: values.insuranceRate / 100, // Convert percentage to decimal
+        value: values.insuranceRate / 100,
       }
       : undefined;
 
     const computedResults = amortizationSchedule({
       principal: values.loanAmount,
-      rate: values.nominalRate / 100, // Convert percentage to decimal
+      rate: values.nominalRate / 100,
       years: values.durationYears,
-      frequency: 12, // Fixed to monthly
+      frequency: 12,
       insurance: insuranceDetails,
     });
     setResults(computedResults);
@@ -200,6 +201,17 @@ const CreditPage = () => {
     navigate(`/immo?${params.toString()}`);
     showSuccess(t('immoSentSuccess'));
   };
+
+  const creditSummaryData = results ? {
+    moduleTitle: t('title'),
+    keyFacts: [
+      { label: t('monthlyPayment'), value: formatCurrency(results.schedule[0].payment) },
+      { label: t('totalInterest'), value: formatCurrency(results.totals.interest) },
+      { label: t('totalInsurance'), value: formatCurrency(results.totals.insurance) },
+      { label: t('totalCost'), value: formatCurrency(results.totals.cost) },
+      { label: t('totalPayments'), value: formatCurrency(results.totals.payments) },
+    ],
+  } : null;
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -473,6 +485,13 @@ const CreditPage = () => {
                 disabled={!results}
               />
             </div>
+            {creditSummaryData && (
+              <ModuleSummaryExporter
+                moduleTitle={creditSummaryData.moduleTitle}
+                keyFacts={creditSummaryData.keyFacts}
+                className="mt-8"
+              />
+            )}
           </div>
         )}
       </CardContent>

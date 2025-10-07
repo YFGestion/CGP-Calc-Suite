@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form'; // Corrected import
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +28,10 @@ import {
 } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
-import { useSettingsStore } from '@/store/useSettingsStore'; // Import settings store
-import { showError, showSuccess } from '@/utils/toast'; // Import toast utility functions
-import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
+import { useSettingsStore } from '@/store/useSettingsStore';
+import { showError, showSuccess } from '@/utils/toast';
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal';
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -100,8 +101,8 @@ const formSchema = (t: (key: string) => string) => z.object({
 const EndettementPage = () => {
   const { t } = useTranslation('endettementPage');
   const { t: commonT } = useTranslation('common');
-  const navigate = useNavigate(); // Initialisation de useNavigate
-  const settings = useSettingsStore(); // Import settings store
+  const navigate = useNavigate();
+  const settings = useSettingsStore();
 
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
@@ -112,7 +113,7 @@ const EndettementPage = () => {
       targetDTI: settings.defaultTargetDTI,
       loanRate: settings.defaultLoanRate,
       loanDurationYears: settings.defaultLoanDurationYears,
-      loanApplyInsurance: true, // Default to applying insurance
+      loanApplyInsurance: true,
       loanInsuranceMode: 'initialPct',
       loanInsuranceRate: settings.defaultLoanInsuranceRate,
       applyRentalInvestment: false,
@@ -133,9 +134,9 @@ const EndettementPage = () => {
       netIncome: values.netIncome,
       existingDebt: values.existingDebt,
       charges: values.charges,
-      targetDTI: values.targetDTI / 100, // Convert percentage to decimal
+      targetDTI: values.targetDTI / 100,
       loan: {
-        rate: values.loanRate / 100, // Convert percentage to decimal
+        rate: values.loanRate / 100,
         years: values.loanDurationYears,
         insuranceRate: values.loanApplyInsurance && values.loanInsuranceRate !== undefined
           ? values.loanInsuranceRate / 100
@@ -219,6 +220,16 @@ const EndettementPage = () => {
     navigate(`/credit?${params.toString()}`);
     showSuccess(t('creditSentSuccess'));
   };
+
+  const endettementSummaryData = results ? {
+    moduleTitle: t('title'),
+    keyFacts: [
+      { label: t('currentDTI'), value: formatPercent(results.currentDTI) },
+      { label: t('projectedDTI'), value: formatPercent(results.projectedDTI) },
+      { label: t('maxPayment'), value: formatCurrency(results.maxPayment) },
+      { label: t('affordablePrincipal'), value: formatCurrency(results.affordablePrincipal) },
+    ],
+  } : null;
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -599,6 +610,13 @@ const EndettementPage = () => {
                 disabled={!results}
               />
             </div>
+            {endettementSummaryData && (
+              <ModuleSummaryExporter
+                moduleTitle={endettementSummaryData.moduleTitle}
+                keyFacts={endettementSummaryData.keyFacts}
+                className="mt-8"
+              />
+            )}
           </div>
         )}
       </CardContent>

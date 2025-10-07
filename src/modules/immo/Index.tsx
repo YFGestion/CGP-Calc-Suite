@@ -39,9 +39,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { showInfo } from '@/utils/toast'; // Import showInfo from utility
-import { ScenarioTitleModal } from '@/components/ScenarioTitleModal'; // New import
-import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter'; // New import
+import { showInfo } from '@/utils/toast';
+import { ScenarioTitleModal } from '@/components/ScenarioTitleModal';
+import { ModuleSummaryExporter } from '@/components/ModuleSummaryExporter';
 
 // Zod schema for form validation
 const formSchema = (t: (key: string) => string) => z.object({
@@ -67,7 +67,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   }).min(0, t('validation.percentageRange', { min: 0, max: 20 })).max(20, t('validation.percentageRange', { min: 0, max: 20 })).optional(),
   
   rentPeriodicity: z.enum(['monthly', 'annual']),
-  applyOpexAndTax: z.boolean(), // New field
+  applyOpexAndTax: z.boolean(),
   opex: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
@@ -85,7 +85,7 @@ const formSchema = (t: (key: string) => string) => z.object({
   capex: z.coerce.number({
     required_error: t('validation.nonNegativeNumber'),
     invalid_type_error: t('validation.nonNegativeNumber'),
-  }).min(0, t('validation.nonNegativeNumber')).optional(), // Made optional as it's now conditional
+  }).min(0, t('validation.nonNegativeNumber')).optional(),
   horizonYears: z.coerce.number({
     required_error: t('validation.durationMin'),
     invalid_type_error: t('validation.durationMin'),
@@ -142,10 +142,10 @@ const formSchema = (t: (key: string) => string) => z.object({
   if (data.applyAcqCosts && (data.acqCosts === undefined || data.acqCosts === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['acqCosts'] });
   }
-  if (data.applyOpexAndTax) { // New validation for opex and propertyTax
+  if (data.applyOpexAndTax) {
     if (data.opex === undefined || data.opex === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['opex'] });
     if (data.propertyTax === undefined || data.propertyTax === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['propertyTax'] });
-    if (data.capex === undefined || data.capex === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['capex'] }); // Added capex validation
+    if (data.capex === undefined || data.capex === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['capex'] });
   }
   if (data.applyMgmtFees && (!data.mgmtFeesType || data.mgmtFeesValue === undefined || data.mgmtFeesValue === null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['mgmtFeesType'] });
@@ -171,7 +171,6 @@ const formSchema = (t: (key: string) => string) => z.object({
       if (data.loanInsuranceRate === undefined || data.loanInsuranceRate === null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.requiredField'), path: ['loanInsuranceRate'] });
     }
 
-    // New validation: loanAmount cannot be greater than price
     if (data.loanAmount !== undefined && data.price !== undefined && data.loanAmount > data.price) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -181,7 +180,6 @@ const formSchema = (t: (key: string) => string) => z.object({
     }
   }
 
-  // Conditional validation for rent input mode
   if (data.rentInputMode === 'fixedAmount') {
     if (data.rentGross === undefined || data.rentGross === null) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: t('validation.nonNegativeNumber'), path: ['rentGross'] });
@@ -202,14 +200,14 @@ const ImmoPage = () => {
   const form = useForm<z.infer<ReturnType<typeof formSchema>>>({
     resolver: zodResolver(formSchema(t)),
     defaultValues: {
-      price: 100000, // Changed default
+      price: 100000,
       applyAcqCosts: false,
-      acqCosts: 100000 * (settings.defaultAcqCostsPct / 100), // Adjusted based on new price
-      rentInputMode: 'yieldPct', // Changed default
+      acqCosts: 100000 * (settings.defaultAcqCostsPct / 100),
+      rentInputMode: 'yieldPct',
       rentGross: 1000,
       expectedYield: 5,
       rentPeriodicity: 'monthly',
-      applyOpexAndTax: false, // Default to NOT applying opex and tax
+      applyOpexAndTax: false,
       opex: 500,
       propertyTax: 1000,
       applyMgmtFees: false,
@@ -219,18 +217,18 @@ const ImmoPage = () => {
       horizonYears: 20,
       saleYear: 20,
       salePriceMode: 'growth',
-      saleGrowthRate: 1, // Changed default
-      saleCostsPct: 10, // Changed default
+      saleGrowthRate: 1,
+      saleCostsPct: 10,
 
       applyLoan: true,
-      loanAmount: 80000, // Adjusted default to be less than new price
+      loanAmount: 80000,
       loanRate: settings.defaultLoanRate,
       loanDurationYears: settings.defaultLoanDurationYears,
       loanApplyInsurance: true,
       loanInsuranceMode: 'initialPct',
       loanInsuranceRate: settings.defaultLoanInsuranceRate,
 
-      tmi: 30, // Default TMI to 30
+      tmi: 30,
       ps: settings.defaultPS,
     },
   });
@@ -240,15 +238,14 @@ const ImmoPage = () => {
   const applyAcqCosts = watch('applyAcqCosts');
   const rentInputMode = watch('rentInputMode');
   const rentPeriodicity = watch('rentPeriodicity');
-  const applyOpexAndTax = watch('applyOpexAndTax'); // Watch new field
+  const applyOpexAndTax = watch('applyOpexAndTax');
   const applyMgmtFees = watch('applyMgmtFees');
   const mgmtFeesType = watch('mgmtFeesType');
   const salePriceMode = watch('salePriceMode');
   const applyLoan = watch('applyLoan');
   const loanApplyInsurance = watch('loanApplyInsurance');
-  const price = watch('price'); // Watch price for loan amount update
+  const price = watch('price');
 
-  // Effect to update loanAmount when price changes, if applyLoan is true
   useEffect(() => {
     if (applyLoan && price !== undefined) {
       setValue('loanAmount', price);
@@ -285,7 +282,7 @@ const ImmoPage = () => {
             mode: values.loanInsuranceMode,
             value: values.loanInsuranceRate / 100,
           }
-          : { mode: 'initialPct' as const, value: 0 }, // Default to 0 if no insurance
+          : { mode: 'initialPct' as const, value: 0 },
       }
       : undefined;
 
@@ -302,10 +299,10 @@ const ImmoPage = () => {
       price: values.price,
       acqCosts: values.applyAcqCosts ? values.acqCosts : 0,
       rentAnnualGross: adjustedRentAnnualGross,
-      opex: values.applyOpexAndTax ? values.opex : 0, // Pass 0 if switch is off
-      propertyTax: values.applyOpexAndTax ? values.propertyTax : 0, // Pass 0 if switch is off
+      opex: values.applyOpexAndTax ? values.opex : 0,
+      propertyTax: values.applyOpexAndTax ? values.propertyTax : 0,
       mgmtFeesPct: mgmtFeesPctValue,
-      capex: values.applyOpexAndTax ? values.capex : 0, // Pass 0 if switch is off
+      capex: values.applyOpexAndTax ? values.capex : 0,
       horizonYears: values.horizonYears,
       saleYear: values.saleYear,
       salePriceMode: values.salePriceMode,
@@ -366,9 +363,9 @@ const ImmoPage = () => {
     const mgmtFeesValue = values.applyMgmtFees && values.mgmtFeesValue !== undefined ? values.mgmtFeesValue : 0;
     const mgmtFeesTypeTranslated = values.applyMgmtFees && values.mgmtFeesType ? t(values.mgmtFeesType) : 'N/A';
 
-    const opexValue = values.applyOpexAndTax && values.opex !== undefined ? values.opex : 0; // Export actual value or 0
-    const propertyTaxValue = values.applyOpexAndTax && values.propertyTax !== undefined ? values.propertyTax : 0; // Export actual value or 0
-    const capexValue = values.applyOpexAndTax && values.capex !== undefined ? values.capex : 0; // Export actual value or 0
+    const opexValue = values.applyOpexAndTax && values.opex !== undefined ? values.opex : 0;
+    const propertyTaxValue = values.applyOpexAndTax && values.propertyTax !== undefined ? values.propertyTax : 0;
+    const capexValue = values.applyOpexAndTax && values.capex !== undefined ? values.capex : 0;
 
     const loanAmountValue = values.applyLoan && values.loanAmount !== undefined ? values.loanAmount : 0;
     const loanRateValue = values.applyLoan && values.loanRate !== undefined ? values.loanRate : 0;
@@ -400,10 +397,10 @@ const ImmoPage = () => {
       [t('rentInputModeLabel'), rentInputModeTranslated],
       [rentLabel, rentValue],
       [t('rentPeriodicityLabel'), t(values.rentPeriodicity)],
-      [t('applyOpexAndTaxToggleLabel'), values.applyOpexAndTax ? 'Oui' : 'Non'], // Export new switch state
+      [t('applyOpexAndTaxToggleLabel'), values.applyOpexAndTax ? 'Oui' : 'Non'],
       [t('opexLabel'), opexValue.toString()],
       [t('propertyTaxLabel'), propertyTaxValue.toString()],
-      [t('capexLabel'), capexValue.toString()], // Export capex
+      [t('capexLabel'), capexValue.toString()],
       [t('mgmtFeesToggleLabel'), values.applyMgmtFees ? 'Oui' : 'Non'],
       [t('mgmtFeesTypeLabel'), mgmtFeesTypeTranslated],
       [t('mgmtFeesValueLabel'), mgmtFeesValue.toString()],
@@ -466,10 +463,8 @@ const ImmoPage = () => {
 
   const handleDuplicateScenario = () => {
     showInfo(t('scenarioDuplicated'));
-    // Future implementation: copy current form state to a new scenario
   };
 
-  // Prepare data for ModuleSummaryExporter
   const immoSummaryData = results ? {
     moduleTitle: t('title'),
     keyFacts: [
