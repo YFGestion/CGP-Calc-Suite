@@ -24,7 +24,12 @@ export const generateModuleSummaryPdf = (
     yOffset += 5;
 
     const tableColumn = [t('moduleSummaryExporter:label'), t('moduleSummaryExporter:value')];
-    const tableRows = keyFacts.map(fact => [fact.label, fact.value]);
+    const tableRows = keyFacts.map(fact => [
+      fact.label,
+      // Replace narrow non-breaking space (\u202F) with a regular space for better PDF rendering
+      // and normalize any other potential weird spaces.
+      fact.value.replace(/\u202F/g, ' ').replace(/(\d)\s(\d{3})/g, '$1 $2')
+    ]);
 
     (doc as any).autoTable({
       startY: yOffset,
